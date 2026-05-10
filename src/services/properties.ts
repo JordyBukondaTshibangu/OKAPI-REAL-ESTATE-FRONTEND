@@ -1,0 +1,28 @@
+import type { Property, PropertyDetail } from "@/features/properties/types/property";
+
+export type PropertyParams = {
+  listingType?: string;
+  category?: string;
+  type?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  limit?: number;
+};
+
+export async function fetchProperties(params: PropertyParams = {}): Promise<Property[]> {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) query.set(k, String(v));
+  });
+  const res = await fetch(`/api/listings/properties?${query.toString()}`);
+  if (!res.ok) throw new Error("Failed to fetch properties");
+  const json = await res.json();
+  return Array.isArray(json) ? json : (json.data ?? []);
+}
+
+export async function fetchPropertyById(id: string): Promise<PropertyDetail> {
+  const res = await fetch(`/api/listings/properties/${id}`);
+  if (!res.ok) throw new Error(`Failed to fetch property ${id}`);
+  return res.json();
+}

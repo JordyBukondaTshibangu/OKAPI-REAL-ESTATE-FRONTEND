@@ -1,0 +1,43 @@
+import PropertyListingPage from "@/features/properties/components/PropertyListingPage";
+import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
+
+export const metadata = {
+  title: "Appartements à vendre à Kinshasa — Okapi Real Estate",
+};
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; q?: string; type?: string; minPrice?: string; maxPrice?: string; beds?: string }>;
+}) {
+  const { page, q, type, minPrice, maxPrice, beds } = await searchParams;
+  const currentPage = Math.max(1, parseInt(page ?? "1", 10));
+  const raw = await getPropertiesByCategory("sale", "apartment");
+  const _filters: PropertyFilters = {
+    q: q || undefined,
+    type: type || undefined,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    beds: beds ? Number(beds) : undefined,
+  };
+  const all = filterProperties(raw, _filters);
+  const activeFilters = [q, type, minPrice, maxPrice, beds].filter(Boolean).length;
+  const { items, totalPages } = paginateProperties(all, currentPage);
+
+  return (
+    <PropertyListingPage
+      title="Appartements à vendre à Kinshasa"
+      totalListings={all.length}
+      mode="sale"
+      crumbs={[{ label: "Vendre", href: "/vendre" }, { label: "Appartements" }]}
+      categories={[
+        { label: "Maisons", count: 0, href: "/vendre/maison" },
+        { label: "Appartements", count: all.length, href: "/vendre/appartement" },
+      ]}
+      properties={items}
+      currentPage={currentPage}
+      totalPages={totalPages}
+    activeFilters={activeFilters}
+    />
+  );
+}

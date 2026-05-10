@@ -1,0 +1,39 @@
+
+import PropertyListingPage from "@/features/properties/components/PropertyListingPage";
+import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
+
+export const metadata = { title: "Entrepôts à louer à Kinshasa — Okapi Real Estate" };
+
+export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; type?: string; minPrice?: string; maxPrice?: string; beds?: string }> }) {
+  const { page, q, type, minPrice, maxPrice, beds } = await searchParams;
+  const currentPage = Math.max(1, parseInt(page ?? "1", 10));
+  const raw = await getPropertiesByCategory("commercial", "warehouse", "rent");
+  const _filters: PropertyFilters = {
+    q: q || undefined,
+    type: type || undefined,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    beds: beds ? Number(beds) : undefined,
+  };
+  const all = filterProperties(raw, _filters);
+  const activeFilters = [q, type, minPrice, maxPrice, beds].filter(Boolean).length;
+  const { items, totalPages } = paginateProperties(all, currentPage);
+
+  return (
+    <PropertyListingPage
+      title="Entrepôts à louer à Kinshasa"
+      totalListings={all.length}
+      mode="commercial"
+      crumbs={[{ label: "Commercial", href: "/commercial" }, { label: "Location", href: "/commercial" }, { label: "Entrepôts" }]}
+      categories={[
+        { label: "Bureaux", count: 0, href: "/commercial/location/bureaux" },
+        { label: "Magasins", count: 0, href: "/commercial/location/magasins" },
+        { label: "Entrepôts", count: all.length, href: "/commercial/location/entrepots" },
+      ]}
+      properties={items}
+      currentPage={currentPage}
+      totalPages={totalPages}
+    activeFilters={activeFilters}
+    />
+  );
+}
