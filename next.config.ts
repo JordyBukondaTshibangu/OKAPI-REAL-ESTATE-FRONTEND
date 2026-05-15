@@ -34,6 +34,11 @@ const nextConfig: NextConfig = {
         hostname: "thumbs.dreamstime.com",
         pathname: "/**",
       },
+      {
+        protocol : "https",
+        hostname : "plus.unsplash.com",
+        pathname : "/**"
+      }
       
     ],
   },

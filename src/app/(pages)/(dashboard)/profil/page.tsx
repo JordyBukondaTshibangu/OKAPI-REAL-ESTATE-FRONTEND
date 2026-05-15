@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle, Eye, EyeOff } from "lucide-react";
+import { Camera, CheckCircle, Eye, EyeOff, Trash2, X } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import UserSidebarLayout from "@/features/user/components/UserSidebarLayout";
 import { useAuthStore } from "@/store/useAuthStore";
-import { updateMe, changePassword } from "@/services/auth";
+import {
+  updateMe,
+  changePassword,
+  uploadAvatar,
+  removeAvatar,
+  deleteAccount,
+} from "@/services/auth";
 
 const profileSchema = z.object({
   firstName: z.string().min(2, "Le prénom est requis"),
@@ -32,8 +40,16 @@ const passwordSchema = z
 type ProfileData = z.infer<typeof profileSchema>;
 type PasswordData = z.infer<typeof passwordSchema>;
 
+function avatarUrl(profileImage: string | null | undefined): string | null {
+  if (!profileImage) return null;
+  return `/api/proxy/${profileImage}`;
+}
+
 export default function ProfilePage() {
-  const { user, token, setUser } = useAuthStore();
+  const { user, token, setUser, logout } = useAuthStore();
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [pwdSuccess, setPwdSuccess] = useState(false);
@@ -41,6 +57,13 @@ export default function ProfilePage() {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const {
     register: regProfile,
@@ -90,17 +113,134 @@ export default function ProfilePage() {
     }
   }
 
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+    setAvatarError(null);
+    setAvatarLoading(true);
+    try {
+      const updated = await uploadAvatar(token, file);
+      setUser(updated);
+    } catch {
+      setAvatarError("Impossible de charger la photo. Vérifiez le format (jpg, png, webp) et la taille (max 5 Mo).");
+    } finally {
+      setAvatarLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleRemoveAvatar() {
+    if (!token) return;
+    setAvatarError(null);
+    setAvatarLoading(true);
+    try {
+      const updated = await removeAvatar(token);
+      setUser(updated);
+    } catch {
+      setAvatarError("Impossible de supprimer la photo.");
+    } finally {
+      setAvatarLoading(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (!token) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      await deleteAccount(token);
+      logout();
+      router.push("/");
+    } catch {
+      setDeleteError("Impossible de supprimer le compte. Réessayez.");
+      setDeleteLoading(false);
+    }
+  }
+
+  const imgSrc = avatarUrl(user?.profileImage);
+
   return (
     <UserSidebarLayout>
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold text-text-dark">Mon Profil</h1>
+
+        {/* Avatar card */}
+        <div className="bg-card rounded-2xl shadow-sm p-8">
+          <h2 className="text-base font-semibold text-text-dark mb-6">
+            Photo de profil
+          </h2>
+          <div className="flex items-center gap-6">
+            <div className="relative shrink-0">
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-primary flex items-center justify-center">
+                {imgSrc ? (
+                  <Image
+                    src={imgSrc}
+                    alt="Photo de profil"
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
+                ) : (
+                  <span className="text-white font-bold text-2xl select-none">
+                    {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+                  </span>
+                )}
+              </div>
+              {avatarLoading && (
+                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={avatarLoading}
+                  className="gap-1.5"
+                >
+                  <Camera className="w-4 h-4" />
+                  {imgSrc ? "Changer la photo" : "Ajouter une photo"}
+                </Button>
+                {imgSrc && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleRemoveAvatar}
+                    disabled={avatarLoading}
+                    className="gap-1.5 text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="w-4 h-4" />
+                    Supprimer
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                JPG, PNG ou WebP · Max 5 Mo
+              </p>
+              {avatarError && (
+                <p className="text-xs text-destructive">{avatarError}</p>
+              )}
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+          </div>
+        </div>
 
         {/* Profile info card */}
         <div className="bg-card rounded-2xl shadow-sm p-8">
           <h2 className="text-base font-semibold text-text-dark mb-6">
             Informations personnelles
           </h2>
-
           <form onSubmit={handleProfile(onProfileSubmit)} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -126,7 +266,6 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
-
             <div>
               <label className="text-sm font-medium text-text-dark block mb-1.5">
                 Adresse e-mail
@@ -138,7 +277,6 @@ export default function ProfilePage() {
                 </p>
               )}
             </div>
-
             <div>
               <label className="text-sm font-medium text-text-dark block mb-1.5">
                 Téléphone
@@ -150,7 +288,6 @@ export default function ProfilePage() {
                 </p>
               )}
             </div>
-
             {profileSuccess && (
               <div className="flex items-center gap-2 text-green-600 text-sm">
                 <CheckCircle className="w-4 h-4" />
@@ -160,7 +297,6 @@ export default function ProfilePage() {
             {profileError && (
               <p className="text-sm text-destructive">{profileError}</p>
             )}
-
             <div className="flex justify-end">
               <Button type="submit" disabled={profileSubmitting}>
                 {profileSubmitting ? "Enregistrement…" : "Enregistrer les modifications"}
@@ -174,7 +310,6 @@ export default function ProfilePage() {
           <h2 className="text-base font-semibold text-text-dark mb-6">
             Changer le mot de passe
           </h2>
-
           <form onSubmit={handlePwd(onPasswordSubmit)} className="space-y-5">
             <div>
               <label className="text-sm font-medium text-text-dark block mb-1.5">
@@ -201,7 +336,6 @@ export default function ProfilePage() {
                 </p>
               )}
             </div>
-
             <div>
               <label className="text-sm font-medium text-text-dark block mb-1.5">
                 Nouveau mot de passe
@@ -227,7 +361,6 @@ export default function ProfilePage() {
                 </p>
               )}
             </div>
-
             <div>
               <label className="text-sm font-medium text-text-dark block mb-1.5">
                 Confirmer le nouveau mot de passe
@@ -253,7 +386,6 @@ export default function ProfilePage() {
                 </p>
               )}
             </div>
-
             {pwdSuccess && (
               <div className="flex items-center gap-2 text-green-600 text-sm">
                 <CheckCircle className="w-4 h-4" />
@@ -263,13 +395,62 @@ export default function ProfilePage() {
             {pwdError && (
               <p className="text-sm text-destructive">{pwdError}</p>
             )}
-
             <div className="flex justify-end">
               <Button type="submit" disabled={pwdSubmitting}>
                 {pwdSubmitting ? "Modification…" : "Modifier le mot de passe"}
               </Button>
             </div>
           </form>
+        </div>
+
+        {/* Danger zone */}
+        <div className="bg-card rounded-2xl shadow-sm p-8 border border-destructive/20">
+          <h2 className="text-base font-semibold text-destructive mb-2">
+            Zone de danger
+          </h2>
+          <p className="text-sm text-muted-foreground mb-5">
+            La suppression de votre compte est irréversible. Toutes vos données
+            (favoris, alertes, demandes, avis) seront définitivement effacées.
+          </p>
+
+          {!showDeleteConfirm ? (
+            <Button
+              variant="outline"
+              className="gap-2 border-destructive/40 text-destructive hover:bg-destructive hover:text-white"
+              onClick={() => setShowDeleteConfirm(true)}
+            >
+              <Trash2 className="w-4 h-4" />
+              Supprimer mon compte
+            </Button>
+          ) : (
+            <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-5 space-y-4">
+              <p className="text-sm font-medium text-destructive">
+                Êtes-vous sûr de vouloir supprimer définitivement votre compte ?
+              </p>
+              {deleteError && (
+                <p className="text-xs text-destructive">{deleteError}</p>
+              )}
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleteLoading}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-destructive hover:bg-destructive/90 text-white gap-2"
+                  onClick={handleDeleteAccount}
+                  disabled={deleteLoading}
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {deleteLoading ? "Suppression…" : "Oui, supprimer mon compte"}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </UserSidebarLayout>

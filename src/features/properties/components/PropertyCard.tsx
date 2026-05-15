@@ -2,6 +2,8 @@
 
 import type { Property } from "@/features/properties/types/property";
 import { categoryLabel, formatListedAgo, formatPrice } from "@/lib/properties";
+import { addFavourite, removeFavourite } from "@/services/auth";
+import { useAuthStore } from "@/store/useAuthStore";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { Button } from "@/shared/components/ui/button";
 import AreaIcon from "@/shared/components/ui/icons/AreaIcon";
@@ -13,12 +15,39 @@ import PhoneIcon from "@/shared/components/ui/icons/PhoneIcon";
 import WhatsAppIcon from "@/shared/components/ui/icons/WhatsAppIcon";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import NewBadge from "./badges/NewBadge";
 import PremiumBadge from "./badges/PremiumBadge";
 import VerifiedBadge from "./badges/VerifiedBadge";
 
 export default function PropertyCard({ property }: { property: Property }) {
   const { iconType } = property;
+  const { token, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function handleToggleFavourite(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!isAuthenticated || !token) {
+      router.push("/connexion");
+      return;
+    }
+    if (saving) return;
+    setSaving(true);
+    try {
+      if (saved) {
+        await removeFavourite(token, property.id);
+        setSaved(false);
+      } else {
+        await addFavourite(token, property.id);
+        setSaved(true);
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
 
   const detailHref = `/property/${property.id}`;
   return (
@@ -57,10 +86,14 @@ export default function PropertyCard({ property }: { property: Property }) {
 
           {/* Heart */}
           <button
-            aria-label="Ajouter aux favoris"
-            className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-foreground/70 hover:text-secondary transition-colors"
+            onClick={handleToggleFavourite}
+            aria-label={saved ? "Retirer des favoris" : "Ajouter aux favoris"}
+            disabled={saving}
+            className={`absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors disabled:opacity-60 ${
+              saved ? "text-secondary" : "text-foreground/70 hover:text-secondary"
+            }`}
           >
-            <HeartIcon className="w-4 h-4" />
+            <HeartIcon className="w-4 h-4" filled={saved} />
           </button>
 
           {/* Photo count */}

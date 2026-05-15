@@ -3,6 +3,9 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { addFavourite, removeFavourite } from "@/services/auth";
+import { useAuthStore } from "@/store/useAuthStore";
 import {
   ArrowLeft,
   Bath,
@@ -321,6 +324,30 @@ export default function PropertyDetailClient({
   const [activeImage, setActiveImage] = useState(0);
   const [sliderOpen, setSliderOpen] = useState(false);
   const [sliderIndex, setSliderIndex] = useState(0);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const { token, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  async function handleToggleFavourite() {
+    if (!isAuthenticated || !token) {
+      router.push("/connexion");
+      return;
+    }
+    if (saving) return;
+    setSaving(true);
+    try {
+      if (saved) {
+        await removeFavourite(token, id);
+        setSaved(false);
+      } else {
+        await addFavourite(token, id);
+        setSaved(true);
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
 
   function openSlider(idx: number) {
     setSliderIndex(idx);
@@ -344,8 +371,15 @@ export default function PropertyDetailClient({
           </Link>
           <Breadcrumb detail={detail} />
           <div className="flex items-center gap-1.5 text-sm">
-            <button className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md hover:bg-muted text-foreground/80">
-              <Heart className="w-4 h-4" /> Sauvegarder
+            <button
+              onClick={handleToggleFavourite}
+              disabled={saving}
+              className={`inline-flex items-center gap-1.5 px-3 h-9 rounded-md hover:bg-muted transition-colors disabled:opacity-60 ${
+                saved ? "text-secondary" : "text-foreground/80"
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
+              {saved ? "Sauvegardé" : "Sauvegarder"}
             </button>
             <button className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md hover:bg-muted text-foreground/80">
               <Share2 className="w-4 h-4" /> Partager

@@ -11,7 +11,7 @@ export default function AgencyCard({ agency }: { agency: Agency }) {
       <div className="grid grid-cols-[140px_1fr]">
         {/* Logo panel */}
         <div
-          className={`${agency.accentClass} flex flex-col items-center justify-center gap-2 p-6`}
+          className={`${agency?.accentClass? agency?.accentClass : 'bg-yellow-600'} flex flex-col items-center justify-center gap-2 p-6`}
         >
           <div className="w-16 h-16 rounded-xl bg-white/15 flex items-center justify-center text-white text-2xl font-bold tracking-tight">
             {agency.monogram}

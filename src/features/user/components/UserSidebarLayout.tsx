@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -45,8 +46,18 @@ export default function UserSidebarLayout({
             <div className="bg-card rounded-2xl shadow-sm p-6 sticky top-28">
               {/* User summary */}
               <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border">
-                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-lg select-none">
-                  {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-lg select-none overflow-hidden relative shrink-0">
+                  {user?.profileImage ? (
+                    <Image
+                      src={`/api/proxy/${user.profileImage}`}
+                      alt={user.firstName}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
+                  ) : (
+                    user?.firstName?.[0]?.toUpperCase() ?? "U"
+                  )}
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-text-dark truncate">

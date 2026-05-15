@@ -64,6 +64,31 @@ export async function changePassword(
   return res.data;
 }
 
+export async function uploadAvatar(token: string, file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await axios.patch<import("@/features/properties/types/user").User>(
+    `/api/proxy/users/me/avatar`,
+    formData,
+    { headers: authHeader(token) }
+  );
+  return res.data;
+}
+
+export async function removeAvatar(token: string) {
+  const res = await axios.delete<import("@/features/properties/types/user").User>(
+    `/api/proxy/users/me/avatar`,
+    { headers: authHeader(token) }
+  );
+  return res.data;
+}
+
+export async function deleteAccount(token: string) {
+  await axios.delete(`/api/proxy/users/me`, {
+    headers: authHeader(token),
+  });
+}
+
 // ── Alerts ────────────────────────────────────────────────────────────────────
 
 export type Alert = {
@@ -137,6 +162,7 @@ export type Favourite = {
     imageUrl?: string;
     location: string;
     type: string;
+    gallery : string[]
   };
   createdAt: string;
 };
@@ -231,4 +257,25 @@ export async function deleteReview(token: string, id: string) {
   await axios.delete(`${BASE}/api/user/reviews/${id}`, {
     headers: authHeader(token),
   });
+}
+
+export async function getPropertyReviews(propertyId: string): Promise<Review[]> {
+  const res = await axios.get<Review[]>(
+    `${BASE}/api/user/reviews/property/${propertyId}`
+  );
+  return res.data;
+}
+
+export async function getAgentReviews(agentId: string): Promise<Review[]> {
+  const res = await axios.get<Review[]>(
+    `${BASE}/api/user/reviews/agent/${agentId}`
+  );
+  return res.data;
+}
+
+export async function getEnquiriesForProperty(propertyId: string): Promise<Enquiry[]> {
+  const res = await axios.get<Enquiry[]>(
+    `${BASE}/api/user/enquiries/property/${propertyId}`
+  );
+  return res.data;
 }

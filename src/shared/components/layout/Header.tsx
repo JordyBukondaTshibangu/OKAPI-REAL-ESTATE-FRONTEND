@@ -294,10 +294,20 @@ function ProfileMenu() {
       <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none ring-2 ring-secondary/40"
+          className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none ring-2 ring-secondary/40 overflow-hidden relative"
           aria-label="Menu profil"
         >
-          {user.firstName[0].toUpperCase()}
+          {user.profileImage ? (
+            <Image
+              src={`/api/proxy/${user.profileImage}`}
+              alt={user.firstName}
+              fill
+              className="object-cover"
+              sizes="36px"
+            />
+          ) : (
+            user.firstName[0].toUpperCase()
+          )}
         </button>
 
         {open && (

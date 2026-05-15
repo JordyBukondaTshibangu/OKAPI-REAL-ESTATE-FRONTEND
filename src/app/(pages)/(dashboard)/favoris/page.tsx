@@ -9,6 +9,11 @@ import UserSidebarLayout from "@/features/user/components/UserSidebarLayout";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getFavourites, removeFavourite, type Favourite } from "@/services/auth";
 
+
+
+
+
+
 export default function FavouritesPage() {
   const { token } = useAuthStore();
   const [favourites, setFavourites] = useState<Favourite[]>([]);
@@ -33,6 +38,7 @@ export default function FavouritesPage() {
     }
   }
 
+  
   return (
     <UserSidebarLayout>
       <div className="space-y-6">
@@ -77,20 +83,20 @@ export default function FavouritesPage() {
 
         {!loading && favourites.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {favourites.map((fav) => (
+            {favourites.map((fav ) => (
               <div
                 key={fav.id}
                 className="bg-card rounded-2xl shadow-sm overflow-hidden group"
               >
                 <div className="relative h-44 bg-muted">
-                  {fav.property.imageUrl ? (
+                  { fav.property.gallery[0] ? (
                     <Image
-                      src={fav.property.imageUrl}
+                      src={fav.property.gallery[0]}
                       alt={fav.property.title}
                       fill
                       className="object-cover"
                     />
-                  ) : (
+                  )  : (
                     <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs">
                       Aucune image
                     </div>
