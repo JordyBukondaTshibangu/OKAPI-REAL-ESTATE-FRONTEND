@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: "/api/proxy/:path*",
+        destination: `${process.env.API_URL ?? "http://localhost:3000"}/:path*`,
+      },
+    ];
+  },
 
   images: {
     remotePatterns: [
@@ -16,10 +23,18 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
+
         protocol: "https",
         hostname: "randomuser.me",
         pathname: "/**",
       },
+      {
+        
+        protocol: "https",
+        hostname: "thumbs.dreamstime.com",
+        pathname: "/**",
+      },
+      
     ],
   },
 };

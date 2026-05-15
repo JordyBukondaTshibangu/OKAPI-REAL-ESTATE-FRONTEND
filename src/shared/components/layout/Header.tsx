@@ -1,10 +1,20 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import {
+  Bell,
+  ChevronDown,
+  Heart,
+  LogOut,
+  MessageSquare,
+  Star,
+  User,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 type MenuColumn = {
   title: string;
@@ -28,7 +38,7 @@ const navItems: NavItem[] = [
           { label: "Appartements", href: "/acheter/appartements" },
           { label: "Villas", href: "/acheter/villas" },
           { label: "Maisons de ville", href: "/acheter/maisons-ville" },
-          { label: "Terrains", href: "/acheter/terrains" },
+          
         ],
       },
       {
@@ -105,11 +115,11 @@ const navItems: NavItem[] = [
         links: [
           {
             label: "Louer un bien résidentiel",
-            href: "/commercial",
+            href: "/louer/villas",
           },
           {
             label: "Louer un bien commercial",
-            href: "/commercial/location",
+            href: "/commercial/",
           },
           {
             label: "Trouver un agent immobilier",
@@ -129,26 +139,23 @@ const navItems: NavItem[] = [
     href: "/vendre",
     columns: [
       {
-        title: "Vendre votre bien",
+        title: "Vous vendez ?",
         links: [
-          { label: "Vendre une maison", href: "/vendre/maison" },
-          { label: "Vendre un appartement", href: "/vendre/appartement" },
+          { label: "Trouver un agent immobilier", href: "/agents" },
+          { label: "Produits agences", href: "/agences" },
+        ],
+      },
+      {
+        title: "Lister ",
+        links: [
+          { label: "Vendre votre bien", href: "/vendre" },
+        ],
+      },
+      {
+        title: "Liens utiles",
+        links: [
           { label: "Estimation gratuite", href: "/vendre/estimation" },
-        ],
-      },
-      {
-        title: "Guides vendeur",
-        links: [
           { label: "Guide du vendeur", href: "/conseils/guide-vendeur" },
-          { label: "Préparer la vente", href: "/conseils/preparer-vente" },
-          { label: "Prix des biens vendus", href: "/vendre/prix-vendus" },
-        ],
-      },
-      {
-        title: "Services",
-        links: [
-          { label: "Trouver un agent", href: "/agents" },
-          { label: "Trouver une agence", href: "/agences" },
         ],
       },
     ],
@@ -201,6 +208,135 @@ const navItems: NavItem[] = [
   },
 ];
 
+const profileMenuItems = [
+  { label: "Mon Profil", href: "/profil", icon: User },
+  { label: "Favoris", href: "/favoris", icon: Heart },
+  { label: "Demandes", href: "/demandes", icon: MessageSquare },
+  { label: "Alertes", href: "/alertes", icon: Bell },
+  { label: "Avis & Notes", href: "/avis", icon: Star },
+];
+
+function ProfileMenu() {
+  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuthStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-white/40 text-white hover:bg-white/10 hover:text-white"
+          asChild
+        >
+          <Link href="/carrieres">Rejoindre l&apos;équipe</Link>
+        </Button>
+        <Button variant="gold" size="sm" asChild>
+          <Link href="/inscription">S&apos;inscrire</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="flex items-center gap-3">
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-white/40 text-white hover:bg-white/10 hover:text-white"
+          asChild
+        >
+          <Link href="/connexion" className="min-w-fit ">Se connecter</Link>
+        </Button>
+        <Button variant="gold" size="sm" asChild>
+          <Link href="/inscription">S&apos;inscrire</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  function handleLogout() {
+    logout();
+    setOpen(false);
+    router.push("/");
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      <Button
+        variant="outline"
+        size="sm"
+        className="border-white/40 text-white hover:bg-white/10 hover:text-white"
+        asChild
+      >
+        <Link href="/carrieres">Rejoindre l&apos;équipe</Link>
+      </Button>
+
+      <div className="relative" ref={ref}>
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none ring-2 ring-secondary/40"
+          aria-label="Menu profil"
+        >
+          {user.firstName[0].toUpperCase()}
+        </button>
+
+        {open && (
+          <div className="absolute right-0 top-full mt-2 w-56 bg-card rounded-xl shadow-lg border border-border py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="px-4 py-3 border-b border-border mb-1">
+              <p className="text-sm font-semibold text-text-dark">
+                {user.firstName} {user.lastName}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+            </div>
+
+            {profileMenuItems.map(({ label, href, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-dark hover:bg-muted transition-colors"
+              >
+                <Icon className="w-4 h-4 text-muted-foreground" />
+                {label}
+              </Link>
+            ))}
+
+            <div className="border-t border-border mt-1 pt-1">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 w-full transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Se déconnecter
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
@@ -229,7 +365,7 @@ export default function Header() {
                   key={item.label}
                   onMouseEnter={() => setOpenMenu(item.label)}
                 >
-                  <a
+                  <Link
                     href={item.href}
                     className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
                       isActive
@@ -245,25 +381,19 @@ export default function Header() {
                         }`}
                       />
                     )}
-                  </a>
+                  </Link>
                 </div>
               );
             })}
-          </nav>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-white/40 text-white hover:bg-white/10 hover:text-white "
-              asChild
+            <Link
+              href="/vendre"
+              onMouseEnter={() => setOpenMenu(null)}
+              className="ml-2 inline-flex items-center rounded-full border border-white/40 px-4 h-9 text-sm font-medium text-white hover:bg-white hover:text-navy transition-colors"
             >
-              <a href="/carrieres">Rejoindre l&apos;équipe</a>
-            </Button>
-
-            <Button variant="gold" size="sm" asChild>
-              <a href="/inscription">S&apos;inscrire</a>
-            </Button>
-          </div>
+              Lister 
+            </Link>
+          </nav>
+          <ProfileMenu />
         </div>
       </div>
 
@@ -292,12 +422,12 @@ export default function Header() {
                       <ul className="space-y-3">
                         {column.links.map((link) => (
                           <li key={link.label}>
-                            <a
+                            <Link
                               href={link.href}
                               className="text-sm text-primary hover:underline font-medium"
                             >
                               {link.label}
-                            </a>
+                            </Link>
                           </li>
                         ))}
                       </ul>

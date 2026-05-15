@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const url = process.env.API_URL || "http://localhost:3000";
+    const url = process.env.API_URL || "http://localhost:8080";
     const { searchParams } = new URL(request.url);
     const params = Object.fromEntries(searchParams.entries());
     const res = await axios.get(url + "/agents", { params });

@@ -6,9 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { loginUser, getMe } from "@/services/auth";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const schema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
@@ -21,6 +24,9 @@ type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const router = useRouter();
+  const { setAuth } = useAuthStore();
 
   const {
     register,
@@ -28,14 +34,26 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  async function onSubmit(_data: FormData) {
-    await new Promise((r) => setTimeout(r, 800));
+  async function onSubmit(data: FormData) {
+    setApiError(null);
+    try {
+      const { access_token } = await loginUser(data.email, data.password);
+      const user = await getMe(access_token);
+      setAuth(access_token, user);
+      router.push("/");
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 401) {
+        setApiError("Identifiants incorrects. Vérifiez votre e-mail et mot de passe.");
+      } else {
+        setApiError("Une erreur est survenue. Veuillez réessayer.");
+      }
+    }
   }
 
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <Link href="/">
             <Image
@@ -80,9 +98,9 @@ export default function LoginPage() {
                 <label className="text-sm font-medium text-text-dark">
                   Mot de passe
                 </label>
-                <a href="#" className="text-xs text-primary hover:underline">
+                <Link href="/mot-de-passe-oublie" className="text-xs text-primary hover:underline">
                   Mot de passe oublié ?
-                </a>
+                </Link>
               </div>
               <div className="relative">
                 <Input
@@ -111,6 +129,12 @@ export default function LoginPage() {
                 </p>
               )}
             </div>
+
+            {apiError && (
+              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3">
+                <p className="text-sm text-destructive">{apiError}</p>
+              </div>
+            )}
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Connexion…" : "Se connecter"}
@@ -150,12 +174,12 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-muted-foreground mt-6">
             Pas encore de compte ?{" "}
-            <a
+            <Link
               href="/inscription"
               className="text-primary font-medium hover:underline"
             >
               S&apos;inscrire gratuitement
-            </a>
+            </Link>
           </p>
         </div>
       </div>

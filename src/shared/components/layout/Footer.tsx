@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 type IconProps = { className?: string };
 
@@ -160,12 +161,12 @@ export default function Footer() {
               <ul className="space-y-2">
                 {col.links.map((link) => (
                   <li key={link}>
-                    <a
+                    <Link
                       href="#"
                       className="text-sm text-white/80 hover:text-secondary hover:underline transition-colors"
                     >
                       {link}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

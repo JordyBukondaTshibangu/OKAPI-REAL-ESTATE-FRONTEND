@@ -6,9 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { registerUser, getMe } from "@/services/auth";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const schema = z
   .object({
@@ -33,7 +36,9 @@ type FormData = z.infer<typeof schema>;
 export default function RegisterPage() {
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [done, setDone] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const router = useRouter();
+  const { setAuth } = useAuthStore();
 
   const {
     register,
@@ -41,48 +46,32 @@ export default function RegisterPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  async function onSubmit(_data: FormData) {
-    await new Promise((r) => setTimeout(r, 900));
-    setDone(true);
-  }
-
-  if (done) {
-    return (
-      <div className="min-h-screen bg-muted flex items-center justify-center px-4">
-        <div className="bg-card rounded-2xl shadow-lg p-10 max-w-md w-full text-center">
-          <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-7 h-7 text-green-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-text-dark mb-2">
-            Compte créé avec succès !
-          </h2>
-          <p className="text-sm text-muted-foreground mb-6">
-            Vérifiez votre boîte e-mail pour confirmer votre adresse.
-          </p>
-          <Button asChild className="w-full">
-            <a href="/connexion">Se connecter</a>
-          </Button>
-        </div>
-      </div>
-    );
+  async function onSubmit(data: FormData) {
+    setApiError(null);
+    try {
+      const { access_token } = await registerUser({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phone,
+        password: data.password,
+      });
+      const user = await getMe(access_token);
+      setAuth(access_token, user);
+      router.push("/profil");
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 409) {
+        setApiError("Cette adresse e-mail est déjà utilisée.");
+      } else {
+        setApiError("Une erreur est survenue. Veuillez réessayer.");
+      }
+    }
   }
 
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-lg">
-        {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <Link href="/">
             <Image
@@ -237,25 +226,31 @@ export default function RegisterPage() {
                 className="text-xs text-text-light leading-relaxed"
               >
                 J&apos;accepte les{" "}
-                <a
+                <Link
                   href="/conditions-generales"
                   className="text-primary hover:underline"
                 >
                   conditions générales d&apos;utilisation
-                </a>{" "}
+                </Link>{" "}
                 et la{" "}
-                <a
+                <Link
                   href="/confidentialite"
                   className="text-primary hover:underline"
                 >
                   politique de confidentialité
-                </a>
+                </Link>
               </label>
             </div>
             {errors.terms && (
               <p className="text-xs text-destructive -mt-2">
                 {errors.terms.message}
               </p>
+            )}
+
+            {apiError && (
+              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3">
+                <p className="text-sm text-destructive">{apiError}</p>
+              </div>
             )}
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
@@ -265,12 +260,12 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-muted-foreground mt-6">
             Déjà un compte ?{" "}
-            <a
+            <Link
               href="/connexion"
               className="text-primary font-medium hover:underline"
             >
               Se connecter
-            </a>
+            </Link>
           </p>
         </div>
       </div>

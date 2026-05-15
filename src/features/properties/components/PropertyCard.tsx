@@ -28,9 +28,9 @@ export default function PropertyCard({ property }: { property: Property }) {
         <div className="relative aspect-4/3 md:aspect-auto overflow-hidden bg-muted">
           {property.gallery.length > 0 ? (
             <Image
+              fill
               src={property.gallery[0]}
               alt={property.title}
-              fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 280px"
             />
