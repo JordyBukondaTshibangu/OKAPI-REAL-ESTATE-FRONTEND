@@ -133,7 +133,7 @@ const companyLinks = [
   { label: "À propos", href: "/a-propos" },
   { label: "Nous contacter", href: "/contact" },
   { label: "Notre Blog", href: "/blog" },
-  { label: "Plan du site", href: "#" },
+  { label: "Plan du site", href: "/plan-du-site" },
 ];
 const legalLinks = [
   { label: "Conditions générales", href: "/conditions-generales" },
