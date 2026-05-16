@@ -171,11 +171,20 @@ export default function PropertyCard({ property }: { property: Property }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <PhoneIcon className="w-4 h-4" /> Appeler
+              <Button variant="outline" size="sm" className="gap-1.5" asChild>
+                <Link href={detailHref}>
+                  <PhoneIcon className="w-4 h-4" /> Appeler
+                </Link>
               </Button>
-              <Button variant="default" size="sm" className="gap-1.5">
-                <WhatsAppIcon className="w-4 h-4" /> WhatsApp
+              <Button variant="default" size="sm" className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53]" asChild>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(`Bonjour, je suis intéressé(e) par ce bien : ${property.title} — ${property.neighborhood}, ${property.suburb}. Réf : ${property.id}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <WhatsAppIcon className="w-4 h-4" /> WhatsApp
+                </a>
               </Button>
             </div>
           </div>

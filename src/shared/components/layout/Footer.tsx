@@ -66,11 +66,13 @@ function PlayIcon({ className }: IconProps) {
 type LinkColumn = {
   title: string;
   links: string[];
+  param?: "suburb" | "city";
 };
 
 const regions: LinkColumn[] = [
   {
     title: "Biens à vendre — Quartiers Centre",
+    param: "suburb",
     links: [
       "Gombe",
       "Lingwala",
@@ -84,6 +86,7 @@ const regions: LinkColumn[] = [
   },
   {
     title: "Biens à vendre — Quartiers Ouest",
+    param: "suburb",
     links: [
       "Ngaliema",
       "Mont-Ngafula",
@@ -96,6 +99,7 @@ const regions: LinkColumn[] = [
   },
   {
     title: "Biens à vendre — Quartiers Est",
+    param: "suburb",
     links: [
       "Masina",
       "N'Djili",
@@ -109,6 +113,7 @@ const regions: LinkColumn[] = [
   },
   {
     title: "Reste de la RDC",
+    param: "city",
     links: [
       "Lubumbashi",
       "Goma",
@@ -127,7 +132,7 @@ const regions: LinkColumn[] = [
 const companyLinks = [
   { label: "À propos", href: "/a-propos" },
   { label: "Nous contacter", href: "/contact" },
-  { label: "Commentaires", href: "/contact" },
+  { label: "Notre Blog", href: "/blog" },
   { label: "Plan du site", href: "#" },
 ];
 const legalLinks = [
@@ -138,8 +143,8 @@ const legalLinks = [
 ];
 const partnerLinks = [
   { label: "Rejoindre notre équipe", href: "/carrieres" },
-  { label: "Espace agents", href: "#" },
-  { label: "Produits pour agences", href: "#" },
+  { label: "Espace agents", href: "/agents" },
+  { label: "Produits pour agences", href: "/agences" },
 ];
 
 export default function Footer() {
@@ -162,7 +167,7 @@ export default function Footer() {
                 {col.links.map((link) => (
                   <li key={link}>
                     <Link
-                      href="#"
+                      href={`/acheter?${col.param ?? "suburb"}=${encodeURIComponent(link)}`}
                       className="text-sm text-white/80 hover:text-secondary hover:underline transition-colors"
                     >
                       {link}
@@ -183,7 +188,7 @@ export default function Footer() {
         {/* Brand + socials row */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
           <div>
-            <a href="/" className="flex items-center">
+            <Link href="/" className="flex items-center">
               <Image
                 src="/assets/images/company-logo.png"
                 alt="Okapi Real Estate"
@@ -191,7 +196,7 @@ export default function Footer() {
                 height={56}
                 className="h-24 w-auto"
               />
-            </a>
+            </Link>
             <p className="text-xs text-white/60 mt-2 tracking-wide">
               Enraciné au Congo, bâtir votre avenir
             </p>
@@ -219,9 +224,9 @@ export default function Footer() {
           <ul className="space-y-3">
             {companyLinks.map((link) => (
               <li key={link.label}>
-                <a href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
+                <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -229,9 +234,9 @@ export default function Footer() {
           <ul className="space-y-3">
             {legalLinks.map((link) => (
               <li key={link.label}>
-                <a href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
+                <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -239,9 +244,9 @@ export default function Footer() {
           <ul className="space-y-3">
             {partnerLinks.map((link) => (
               <li key={link.label}>
-                <a href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
+                <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

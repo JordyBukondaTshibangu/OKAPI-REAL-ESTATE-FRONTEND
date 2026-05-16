@@ -13,6 +13,8 @@ export type PropertyFilters = {
   minPrice?: number;
   maxPrice?: number;
   beds?: number;
+  suburb?: string;
+  city?: string;
 };
 
 export async function getPropertiesByListingType(
@@ -66,6 +68,10 @@ export function filterProperties(
         item.city.toLowerCase().includes(q);
       if (!match) return false;
     }
+    if (filters.suburb && !item.suburb.toLowerCase().includes(filters.suburb.toLowerCase()))
+      return false;
+    if (filters.city && !item.city.toLowerCase().includes(filters.city.toLowerCase()))
+      return false;
     if (filters.type && item.category !== filters.type) return false;
     if (filters.minPrice !== undefined && item.price < filters.minPrice)
       return false;

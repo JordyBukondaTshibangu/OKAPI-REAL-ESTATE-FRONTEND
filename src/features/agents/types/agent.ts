@@ -39,6 +39,7 @@ export type Agent = {
   forRentCount: number;
   closedDeals: number;
   totalDealsValueUsd: number;
+  phone?: string;
   bio: string;
   photo: string;
   photoGradient: string;

@@ -62,11 +62,11 @@ const navItems: NavItem[] = [
         links: [
           {
             label: "Acheter un bien résidentiel",
-            href: "/commercial",
+            href: "/acheter/villas",
           },
           {
             label: "Acheter un bien commercial",
-            href: "/commercial",
+            href: "/commercial/magasins",
           },
           {
             label: "Trouver un agent immobilier",
@@ -119,7 +119,7 @@ const navItems: NavItem[] = [
           },
           {
             label: "Louer un bien commercial",
-            href: "/commercial/",
+            href: "/commercial/magasins",
           },
           {
             label: "Trouver un agent immobilier",

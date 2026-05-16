@@ -8,6 +8,8 @@ export type PropertyParams = {
   maxPrice?: number;
   page?: number;
   limit?: number;
+  agentId?: string;
+  agencyId?: string;
 };
 
 export async function fetchProperties(params: PropertyParams = {}): Promise<Property[]> {

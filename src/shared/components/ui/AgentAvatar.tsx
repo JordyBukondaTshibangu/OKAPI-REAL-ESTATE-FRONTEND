@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 function initials(name: string): string {
   return name
     .split(" ")
@@ -24,15 +22,17 @@ export default function AgentAvatar({ name, photo, size = 40, className = "" }: 
 
   if (photo) {
     return (
-      <div className={`${base} bg-muted`} style={style}>
-        <Image
-          src={photo}
-          alt={name}
-          width={size}
-          height={size}
-          className="w-full h-full object-cover"
-        />
-      </div>
+      // Using <img> intentionally — photo URLs come from the backend and may be
+      // from any hostname, so Next.js <Image> (which requires configured remotePatterns) would crash.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={photo}
+        alt={name}
+        width={size}
+        height={size}
+        className={`${base} object-cover bg-muted`}
+        style={style}
+      />
     );
   }
 

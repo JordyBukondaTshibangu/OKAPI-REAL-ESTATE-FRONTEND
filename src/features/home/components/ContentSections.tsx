@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/shared/components/ui/card";
+import Link from "next/link";
 
 const sections = [
   {
@@ -24,21 +25,23 @@ export default function ContentSections() {
           Actualités et conseils
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {sections.map((section) => (
-            <Card
-              key={section.title}
-              className="rounded-xl shadow-md overflow-hidden border border-border"
-            >
-              <div className="h-48 bg-muted" />
-              <CardContent className="p-6">
-                <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] mb-2">
-                  {section.title}
-                </p>
-                <p className="text-base font-medium text-foreground">
-                  {section.excerpt}
-                </p>
-              </CardContent>
-            </Card>
+          {sections.map((section,index) => (
+            <Link href="/blog" key={index}>
+              <Card
+                key={section.title}
+                className="rounded-xl shadow-md overflow-hidden border border-border"
+              >
+                <div className="h-48 bg-muted" />
+                <CardContent className="p-6">
+                  <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] mb-2">
+                    {section.title}
+                  </p>
+                  <p className="text-base font-medium text-foreground">
+                    {section.excerpt}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>

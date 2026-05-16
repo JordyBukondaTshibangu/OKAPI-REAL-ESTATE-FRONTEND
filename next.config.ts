@@ -23,13 +23,11 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-
         protocol: "https",
         hostname: "randomuser.me",
         pathname: "/**",
       },
       {
-        
         protocol: "https",
         hostname: "thumbs.dreamstime.com",
         pathname: "/**",
@@ -37,6 +35,21 @@ const nextConfig: NextConfig = {
       {
         protocol : "https",
         hostname : "plus.unsplash.com",
+        pathname : "/**"
+      },
+      {
+        protocol : "https",
+        hostname : "static.wixstatic.com",
+        pathname : "/**"
+      },
+      {
+        protocol : "https",
+        hostname : "pbs.twimg.com",
+        pathname : "/**"
+      },
+      {
+        protocol : "https",
+        hostname : "www.thehousedesigners.com",
         pathname : "/**"
       }
       

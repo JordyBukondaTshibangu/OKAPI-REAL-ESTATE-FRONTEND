@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import ShareButton from "@/shared/components/ui/ShareButton";
 
 function StarRating({ value, max = 5 }: { value: number; max?: number }) {
   const full = Math.floor(value);
@@ -130,9 +131,7 @@ export default function AgentDetailClient({
             <ArrowLeft className="w-4 h-4" /> Retour aux résultats
           </Link>
           <Breadcrumb agent={agent} />
-          <button className="hidden md:inline-flex items-center gap-1.5 text-sm text-foreground/80 hover:text-primary">
-            <Share2 className="w-4 h-4" /> Partager le profil
-          </button>
+          <ShareButton title={`${agent.name} — Agent immobilier — Okapi Real Estate`} />
         </div>
       </div>
 
@@ -185,15 +184,19 @@ export default function AgentDetailClient({
               </div>
 
               <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
-                <Button className="h-11 gap-2 bg-white text-foreground hover:bg-white/90">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-4 h-4 text-[#25D366]"
+                <Button className="h-11 gap-2 bg-white text-foreground hover:bg-white/90" asChild>
+                  <a
+                    href={agent.phone
+                      ? `https://wa.me/${agent.phone.replace(/[\s+\-()]/g, "")}?text=${encodeURIComponent(`Bonjour ${agent.name}, je vous contacte via Okapi Real Estate.`)}`
+                      : `https://wa.me/?text=${encodeURIComponent(`Bonjour ${agent.name}, je vous contacte via Okapi Real Estate.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    <path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.1-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.075-.3-.15-1.263-.465-2.403-1.485-.888-.795-1.484-1.77-1.66-2.07-.174-.3-.019-.465.13-.615.136-.135.301-.345.451-.523.146-.181.194-.301.297-.496.1-.21.049-.375-.025-.524-.075-.15-.672-1.62-.922-2.206-.24-.584-.487-.51-.672-.51-.172-.015-.371-.015-.571-.015-.2 0-.523.074-.797.359-.273.3-1.045 1.02-1.045 2.475s1.07 2.865 1.219 3.075c.149.18 2.095 3.195 5.076 4.483.709.305 1.262.483 1.694.61.712.227 1.36.195 1.871.121.571-.085 1.758-.719 2.006-1.413.255-.704.255-1.301.18-1.426-.074-.135-.27-.21-.57-.345m-5.446 7.443h-.016a9.87 9.87 0 0 1-5.031-1.378l-.36-.214-3.742.982.999-3.648-.235-.375a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.334.101 11.893c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652a11.882 11.882 0 0 0 5.71 1.447h.006c6.585 0 11.946-5.336 11.949-11.896 0-3.176-1.24-6.165-3.495-8.411" />
-                  </svg>
-                  WhatsApp
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[#25D366]">
+                      <path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.1-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.075-.3-.15-1.263-.465-2.403-1.485-.888-.795-1.484-1.77-1.66-2.07-.174-.3-.019-.465.13-.615.136-.135.301-.345.451-.523.146-.181.194-.301.297-.496.1-.21.049-.375-.025-.524-.075-.15-.672-1.62-.922-2.206-.24-.584-.487-.51-.672-.51-.172-.015-.371-.015-.571-.015-.2 0-.523.074-.797.359-.273.3-1.045 1.02-1.045 2.475s1.07 2.865 1.219 3.075c.149.18 2.095 3.195 5.076 4.483.709.305 1.262.483 1.694.61.712.227 1.36.195 1.871.121.571-.085 1.758-.719 2.006-1.413.255-.704.255-1.301.18-1.426-.074-.135-.27-.21-.57-.345m-5.446 7.443h-.016a9.87 9.87 0 0 1-5.031-1.378l-.36-.214-3.742.982.999-3.648-.235-.375a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.334.101 11.893c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652a11.882 11.882 0 0 0 5.71 1.447h.006c6.585 0 11.946-5.336 11.949-11.896 0-3.176-1.24-6.165-3.495-8.411" />
+                    </svg>
+                    WhatsApp
+                  </a>
                 </Button>
                 <Button
                   variant="outline"

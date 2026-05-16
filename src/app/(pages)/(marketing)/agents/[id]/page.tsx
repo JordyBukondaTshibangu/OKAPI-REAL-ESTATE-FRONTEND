@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getAgentBySlug, getAllProperties } from "@/lib/api";
+import { getAgentBySlug, getPropertiesByAgent } from "@/lib/api";
 import AgentDetailClient from "./AgentDetailClient";
 
 export async function generateMetadata({
@@ -22,15 +22,11 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [agent, allProperties] = await Promise.all([
+  const [agent, agentProperties] = await Promise.all([
     getAgentBySlug(id),
-    getAllProperties(),
+    getPropertiesByAgent(id),
   ]);
   if (!agent) notFound();
-
-  const agentProperties = allProperties.filter(
-    (p) => p.agent.name === agent.name
-  );
 
   return <AgentDetailClient id={id} agent={agent} agentProperties={agentProperties} />;
 }

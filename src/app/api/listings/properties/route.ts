@@ -11,6 +11,8 @@ export async function GET(request: NextRequest) {
     const type = queryParameters.get("type");
     const minPrice = queryParameters.get("minPrice");
     const maxPrice = queryParameters.get("maxPrice");
+    const agentId = queryParameters.get("agentId");
+    const agencyId = queryParameters.get("agencyId");
 
     let apiUrl = url + "/properties?";
 
@@ -20,6 +22,8 @@ export async function GET(request: NextRequest) {
     if (type) apiUrl += `type=${type}&`;
     if (minPrice) apiUrl += `minPrice=${minPrice}&`;
     if (maxPrice) apiUrl += `maxPrice=${maxPrice}&`;
+    if (agentId) apiUrl += `agentId=${agentId}&`;
+    if (agencyId) apiUrl += `agencyId=${agencyId}&`;
 
     const res = await axios.get(apiUrl);
 

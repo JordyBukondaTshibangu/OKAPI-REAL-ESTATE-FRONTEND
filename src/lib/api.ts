@@ -24,6 +24,28 @@ export async function getAllProperties(): Promise<Property[]> {
   }
 }
 
+export async function getPropertiesByAgent(agentId: string): Promise<Property[]> {
+  try {
+    const res = await fetch(`${API_URL}/properties?agentId=${agentId}`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return Array.isArray(json) ? json : (json.data ?? []);
+  } catch {
+    return [];
+  }
+}
+
+export async function getPropertiesByAgency(agencyId: string): Promise<Property[]> {
+  try {
+    const res = await fetch(`${API_URL}/properties?agencyId=${agencyId}`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return Array.isArray(json) ? json : (json.data ?? []);
+  } catch {
+    return [];
+  }
+}
+
 export async function getAgentBySlug(id: string): Promise<Agent | null> {
   try {
     const res = await fetch(`${API_URL}/agents/${id}`, { cache: "no-store" });

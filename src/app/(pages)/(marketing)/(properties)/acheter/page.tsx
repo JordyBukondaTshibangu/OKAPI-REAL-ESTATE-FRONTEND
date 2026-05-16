@@ -22,9 +22,11 @@ export default async function AcheterPage({
     minPrice?: string;
     maxPrice?: string;
     beds?: string;
+    suburb?: string;
+    city?: string;
   }>;
 }) {
-  const { page, q, type, minPrice, maxPrice, beds } = await searchParams;
+  const { page, q, type, minPrice, maxPrice, beds, suburb, city } = await searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10));
 
   const allSale = await getPropertiesByListingType("sale");
@@ -35,10 +37,12 @@ export default async function AcheterPage({
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     beds: beds ? Number(beds) : undefined,
+    suburb: suburb || undefined,
+    city: city || undefined,
   };
   const filtered = filterProperties(allSale, filters);
 
-  const activeFilters = [q, type, minPrice, maxPrice, beds].filter(
+  const activeFilters = [q, type, minPrice, maxPrice, beds, suburb, city].filter(
     Boolean,
   ).length;
   const { items, totalPages } = paginateProperties(filtered, currentPage);

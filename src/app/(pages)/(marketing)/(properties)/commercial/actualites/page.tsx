@@ -1,0 +1,198 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Button } from "@/shared/components/ui/button";
+import { ArrowRight, TrendingUp, Building2, BarChart3, Newspaper } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Actualités commerciales — Okapi Real Estate",
+  description:
+    "Tendances du marché immobilier commercial à Kinshasa : bureaux, commerces, entrepôts. Analyses et actualités par Okapi Real Estate.",
+};
+
+const articles = [
+  {
+    category: "Bureaux",
+    tag: "Tendance",
+    title: "Le marché des bureaux à Gombe enregistre une hausse de 12% en 2025",
+    excerpt:
+      "La demande pour les surfaces de bureaux premium dans le centre des affaires de Gombe continue de croître, portée par l'implantation de nouvelles multinationales.",
+    date: "12 mai 2025",
+    readTime: "4 min",
+    icon: Building2,
+    color: "bg-primary/10 text-primary",
+  },
+  {
+    category: "Commerce de détail",
+    tag: "Analyse",
+    title: "Les galeries marchandes regagnent du terrain après la pandémie",
+    excerpt:
+      "Le segment retail reprend de la vigueur à Kinshasa. Les centres commerciaux comme le Mall de la ville enregistrent des taux d'occupation supérieurs à 85%.",
+    date: "5 mai 2025",
+    readTime: "6 min",
+    icon: TrendingUp,
+    color: "bg-secondary/20 text-secondary-foreground",
+  },
+  {
+    category: "Entrepôts & Logistique",
+    tag: "Opportunité",
+    title: "La zone industrielle de Limete attire de nouveaux investisseurs",
+    excerpt:
+      "Face à l'essor du commerce en ligne, la demande pour les entrepôts logistiques bien connectés ne cesse d'augmenter dans la périphérie de Kinshasa.",
+    date: "28 avril 2025",
+    readTime: "5 min",
+    icon: BarChart3,
+    color: "bg-primary/10 text-primary",
+  },
+  {
+    category: "Investissement",
+    tag: "Marché",
+    title: "Rendements locatifs commerciaux : où investir en 2025 ?",
+    excerpt:
+      "Notre analyse comparative des rendements locatifs bruts par type de bien commercial et par commune à Kinshasa pour guider vos décisions d'investissement.",
+    date: "20 avril 2025",
+    readTime: "8 min",
+    icon: TrendingUp,
+    color: "bg-secondary/20 text-secondary-foreground",
+  },
+  {
+    category: "Réglementation",
+    tag: "Juridique",
+    title: "Nouvelles règles d'urbanisme commercial : ce qui change pour les propriétaires",
+    excerpt:
+      "La mairie de Kinshasa a actualisé ses normes de construction et d'aménagement pour les locaux commerciaux. Voici ce que vous devez savoir.",
+    date: "14 avril 2025",
+    readTime: "5 min",
+    icon: Newspaper,
+    color: "bg-primary/10 text-primary",
+  },
+  {
+    category: "Coworking",
+    tag: "Nouveau",
+    title: "Le coworking s'installe durablement dans le paysage kinois",
+    excerpt:
+      "Plusieurs espaces de coworking premium ont ouvert leurs portes à Gombe et Limete, répondant à la demande des startups et travailleurs indépendants.",
+    date: "7 avril 2025",
+    readTime: "4 min",
+    icon: Building2,
+    color: "bg-secondary/20 text-secondary-foreground",
+  },
+];
+
+const stats = [
+  { value: "+12%", label: "Hausse des loyers bureaux (2025)" },
+  { value: "85%", label: "Taux d'occupation retail moyen" },
+  { value: "6–9%", label: "Rendement locatif commercial brut" },
+  { value: "340", label: "Surfaces commerciales listées" },
+];
+
+export default function ActualitesCommercialesPage() {
+  return (
+    <>
+      {/* Hero */}
+      <section className="bg-navy text-white py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
+            <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
+            <span>/</span>
+            <Link href="/commercial" className="hover:text-white transition-colors">Commercial</Link>
+            <span>/</span>
+            <span className="text-white">Actualités</span>
+          </nav>
+          <div className="inline-flex items-center gap-2 bg-secondary/20 text-secondary text-xs font-semibold px-3 py-1 rounded-full mb-4">
+            <Newspaper className="w-3.5 h-3.5" />
+            Actualités &amp; Analyses
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+            Actualités commerciales
+          </h1>
+          <p className="text-lg text-white/80 max-w-2xl">
+            Tendances du marché, analyses de rendement et opportunités d&apos;investissement
+            dans l&apos;immobilier commercial à Kinshasa et en RDC.
+          </p>
+        </div>
+      </section>
+
+      {/* Stats strip */}
+      <section className="bg-white border-b border-border">
+        <div className="max-w-5xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+          {stats.map((s) => (
+            <div key={s.label} className="text-center">
+              <p className="text-2xl md:text-3xl font-bold text-primary">{s.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Articles */}
+      <section className="py-14 px-6 bg-background-alt">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid gap-6">
+            {articles.map((article) => {
+              const Icon = article.icon;
+              return (
+                <article
+                  key={article.title}
+                  className="bg-white rounded-2xl border border-border shadow-sm p-6 hover:shadow-md transition-shadow group cursor-pointer"
+                >
+                  <div className="flex items-start gap-5">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${article.color}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          {article.category}
+                        </span>
+                        <span className="text-xs bg-accent text-primary px-2 py-0.5 rounded-full font-medium">
+                          {article.tag}
+                        </span>
+                      </div>
+                      <h2 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors leading-snug mb-2">
+                        {article.title}
+                      </h2>
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">
+                        {article.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <span>{article.date}</span>
+                          <span>·</span>
+                          <span>Lecture : {article.readTime}</span>
+                        </div>
+                        <span className="text-xs font-medium text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                          Lire <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 px-6 bg-navy text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-3">
+            Vous cherchez un bien commercial ?
+          </h2>
+          <p className="text-white/75 mb-8 max-w-xl mx-auto">
+            Bureaux, commerces, entrepôts ou terrains — nos agents spécialisés
+            vous accompagnent dans votre projet d&apos;investissement.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild variant="gold" size="lg">
+              <Link href="/commercial">Voir les biens commerciaux</Link>
+            </Button>
+            <Button asChild size="lg" className="border border-white/30 bg-transparent hover:bg-white/10">
+              <Link href="/agents">Contacter un agent</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

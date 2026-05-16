@@ -171,7 +171,7 @@ export default function ProfilePage() {
           </h2>
           <div className="flex items-center gap-6">
             <div className="relative shrink-0">
-              <div className="w-20 h-20 rounded-full overflow-hidden bg-primary flex items-center justify-center">
+              <div className="relative w-20 h-20 rounded-full overflow-hidden bg-primary flex items-center justify-center">
                 {imgSrc ? (
                   <Image
                     src={imgSrc}

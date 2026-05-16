@@ -11,8 +11,9 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/shared/components/ui/button";
 import { useAgenciesStore } from "@/store/useAgenciesStore";
 import { useAgentsStore } from "@/store/useAgentsStore";
-import { ChevronDown, Search, Sparkles } from "lucide-react";
+import { ChevronDown, Search, Sparkles, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const TRANSACTIONS: { label: string; value: "all" | "sale" | "rent" }[] = [
   { label: "Vente résidentielle", value: "sale" },
@@ -24,6 +25,32 @@ const LIMIT = 12;
 
 export default function AgentsListClient() {
   const [tab, setTab] = useState<"agents" | "agencies">("agents");
+  const [sortBy, setSortBy] = useState<"pertinence" | "title">("pertinence");
+  const [sortOpen, setSortOpen] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const titleFilter = searchParams.get("title"); // e.g. "SUPERAGENT"
+
+  const TITLE_RANK: Record<string, number> = {
+    SUPERAGENT: 0,
+    "AGENT EXCLUSIF": 1,
+    AGENT: 2,
+  };
+
+  function handleSuperAgentFilter() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("title", "SUPERAGENT");
+    router.push(`?${params.toString()}`);
+    setTimeout(() => {
+      document.getElementById("agents-grid")?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }
+
+  function clearTitleFilter() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("title");
+    router.push(`?${params.toString()}`);
+  }
 
   // ── Agent store ──
   const agentQuery = useAgentsStore((s) => s.query);
@@ -97,6 +124,17 @@ export default function AgentsListClient() {
     agencies.forEach((a) => a.languages.forEach((l) => set.add(l)));
     return Array.from(set).sort();
   }, [agencies]);
+
+  const displayedAgents = useMemo(() => {
+    let result = [...agents];
+    if (titleFilter) result = result.filter((a) => a.title === titleFilter);
+    if (sortBy === "title") {
+      result = result.sort(
+        (a, b) => (TITLE_RANK[a.title] ?? 99) - (TITLE_RANK[b.title] ?? 99),
+      );
+    }
+    return result;
+  }, [agents, titleFilter, sortBy]);
 
   const hasAgentFilters =
     !!agentQuery ||
@@ -347,8 +385,8 @@ export default function AgentsListClient() {
               sur Okapi Real Estate. Une réponse en moyenne en moins de 5
               minutes.
             </p>
-            <Button variant="outlineGold" className="mt-4">
-              En savoir plus
+            <Button variant="outlineGold" className="mt-4" onClick={handleSuperAgentFilter}>
+              Trouver un SuperAgent
             </Button>
           </div>
           <SuperAgentIllustration />
@@ -359,32 +397,66 @@ export default function AgentsListClient() {
       <section className="max-w-6xl mx-auto px-6 mt-10 pb-20">
         {tab === "agents" ? (
           <>
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">
-                  {agentMeta.total}
-                </span>{" "}
-                agent{agentMeta.total > 1 ? "s" : ""} trouvé
-                {agentMeta.total > 1 ? "s" : ""}
-              </p>
-              <button className="inline-flex items-center gap-1.5 text-sm text-foreground/80 hover:text-primary">
-                Trier par : <span className="font-medium">Pertinence</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
+            <div className="flex items-center justify-between mb-5" id="agents-grid">
+              <div className="flex items-center gap-3 flex-wrap">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">
+                    {displayedAgents.length}
+                  </span>{" "}
+                  agent{displayedAgents.length > 1 ? "s" : ""} trouvé
+                  {displayedAgents.length > 1 ? "s" : ""}
+                </p>
+                {titleFilter && (
+                  <span className="inline-flex items-center gap-1.5 bg-secondary/20 text-secondary-foreground text-xs font-semibold px-3 py-1 rounded-full">
+                    <Sparkles className="w-3 h-3" />
+                    {titleFilter}
+                    <button onClick={clearTitleFilter} className="hover:text-destructive ml-0.5">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+              </div>
+
+              {/* Sort dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setSortOpen((v) => !v)}
+                  className="inline-flex items-center gap-1.5 text-sm text-foreground/80 hover:text-primary"
+                >
+                  Trier par :{" "}
+                  <span className="font-medium">
+                    {sortBy === "title" ? "Titre" : "Pertinence"}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
+                </button>
+                {sortOpen && (
+                  <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl border border-border shadow-lg z-30 overflow-hidden">
+                    {(["pertinence", "title"] as const).map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => { setSortBy(opt); setSortOpen(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-accent ${sortBy === opt ? "bg-accent text-primary font-semibold" : ""}`}
+                      >
+                        {opt === "title" ? "Titre (SuperAgent en tête)" : "Pertinence"}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {agentLoading ? (
               <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
                 Chargement des agents...
               </div>
-            ) : agents.length === 0 ? (
+            ) : displayedAgents.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
                 Aucun agent ne correspond à votre recherche.
               </div>
             ) : (
               <>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                  {agents.map((a) => (
+                  {displayedAgents.map((a) => (
                     <AgentCard key={a.id} agent={a} />
                   ))}
                 </div>
