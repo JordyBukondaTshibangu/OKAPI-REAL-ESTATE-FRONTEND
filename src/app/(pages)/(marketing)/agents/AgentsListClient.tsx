@@ -147,7 +147,7 @@ export default function AgentsListClient() {
   return (
     <div className="bg-background-alt">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-navy text-white">
+      <section className="relative bg-navy text-white">
         <div className="absolute inset-0 opacity-25 pointer-events-none">
           <div
             className="absolute inset-0"
@@ -168,7 +168,7 @@ export default function AgentsListClient() {
         </div>
 
         {/* Search panel */}
-        <div className="relative max-w-6xl mx-auto px-6 -mb-12 -translate-y-12">
+        <div className="relative max-w-6xl mx-auto px-6 -mb-12 -translate-y-12 z-99">
           <div className="bg-white text-foreground rounded-2xl shadow-lg p-5 md:p-6">
             {/* Tabs */}
             <div className="flex items-center gap-2 mb-4">
@@ -430,7 +430,7 @@ export default function AgentsListClient() {
                   <ChevronDown className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
                 </button>
                 {sortOpen && (
-                  <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl border border-border shadow-lg z-30 overflow-hidden">
+                  <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl border border-border shadow-lg z-30">
                     {(["pertinence", "title"] as const).map((opt) => (
                       <button
                         key={opt}

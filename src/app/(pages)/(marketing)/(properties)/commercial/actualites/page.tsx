@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/shared/components/ui/button";
 import { ArrowRight, TrendingUp, Building2, BarChart3, Newspaper } from "lucide-react";
+import { commercialArticles } from "@/lib/blog";
 
 export const metadata: Metadata = {
   title: "Actualités commerciales — Okapi Real Estate",
@@ -9,74 +10,15 @@ export const metadata: Metadata = {
     "Tendances du marché immobilier commercial à Kinshasa : bureaux, commerces, entrepôts. Analyses et actualités par Okapi Real Estate.",
 };
 
-const articles = [
-  {
-    category: "Bureaux",
-    tag: "Tendance",
-    title: "Le marché des bureaux à Gombe enregistre une hausse de 12% en 2025",
-    excerpt:
-      "La demande pour les surfaces de bureaux premium dans le centre des affaires de Gombe continue de croître, portée par l'implantation de nouvelles multinationales.",
-    date: "12 mai 2025",
-    readTime: "4 min",
-    icon: Building2,
-    color: "bg-primary/10 text-primary",
-  },
-  {
-    category: "Commerce de détail",
-    tag: "Analyse",
-    title: "Les galeries marchandes regagnent du terrain après la pandémie",
-    excerpt:
-      "Le segment retail reprend de la vigueur à Kinshasa. Les centres commerciaux comme le Mall de la ville enregistrent des taux d'occupation supérieurs à 85%.",
-    date: "5 mai 2025",
-    readTime: "6 min",
-    icon: TrendingUp,
-    color: "bg-secondary/20 text-secondary-foreground",
-  },
-  {
-    category: "Entrepôts & Logistique",
-    tag: "Opportunité",
-    title: "La zone industrielle de Limete attire de nouveaux investisseurs",
-    excerpt:
-      "Face à l'essor du commerce en ligne, la demande pour les entrepôts logistiques bien connectés ne cesse d'augmenter dans la périphérie de Kinshasa.",
-    date: "28 avril 2025",
-    readTime: "5 min",
-    icon: BarChart3,
-    color: "bg-primary/10 text-primary",
-  },
-  {
-    category: "Investissement",
-    tag: "Marché",
-    title: "Rendements locatifs commerciaux : où investir en 2025 ?",
-    excerpt:
-      "Notre analyse comparative des rendements locatifs bruts par type de bien commercial et par commune à Kinshasa pour guider vos décisions d'investissement.",
-    date: "20 avril 2025",
-    readTime: "8 min",
-    icon: TrendingUp,
-    color: "bg-secondary/20 text-secondary-foreground",
-  },
-  {
-    category: "Réglementation",
-    tag: "Juridique",
-    title: "Nouvelles règles d'urbanisme commercial : ce qui change pour les propriétaires",
-    excerpt:
-      "La mairie de Kinshasa a actualisé ses normes de construction et d'aménagement pour les locaux commerciaux. Voici ce que vous devez savoir.",
-    date: "14 avril 2025",
-    readTime: "5 min",
-    icon: Newspaper,
-    color: "bg-primary/10 text-primary",
-  },
-  {
-    category: "Coworking",
-    tag: "Nouveau",
-    title: "Le coworking s'installe durablement dans le paysage kinois",
-    excerpt:
-      "Plusieurs espaces de coworking premium ont ouvert leurs portes à Gombe et Limete, répondant à la demande des startups et travailleurs indépendants.",
-    date: "7 avril 2025",
-    readTime: "4 min",
-    icon: Building2,
-    color: "bg-secondary/20 text-secondary-foreground",
-  },
-];
+const ICONS = [Building2, TrendingUp, BarChart3, TrendingUp, Newspaper, Building2] as const;
+const COLORS = [
+  "bg-primary/10 text-primary",
+  "bg-secondary/20 text-secondary-foreground",
+  "bg-primary/10 text-primary",
+  "bg-secondary/20 text-secondary-foreground",
+  "bg-primary/10 text-primary",
+  "bg-secondary/20 text-secondary-foreground",
+] as const;
 
 const stats = [
   { value: "+12%", label: "Hausse des loyers bureaux (2025)" },
@@ -128,15 +70,17 @@ export default function ActualitesCommercialesPage() {
       <section className="py-14 px-6 bg-background-alt">
         <div className="max-w-5xl mx-auto">
           <div className="grid gap-6">
-            {articles.map((article) => {
-              const Icon = article.icon;
+            {commercialArticles.map((article, idx) => {
+              const Icon = ICONS[idx % ICONS.length];
+              const color = COLORS[idx % COLORS.length];
               return (
-                <article
-                  key={article.title}
-                  className="bg-white rounded-2xl border border-border shadow-sm p-6 hover:shadow-md transition-shadow group cursor-pointer"
+                <Link
+                  key={article.slug}
+                  href={`/blog/${article.slug}`}
+                  className="bg-white rounded-2xl border border-border shadow-sm p-6 hover:shadow-md transition-shadow group"
                 >
                   <div className="flex items-start gap-5">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${article.color}`}>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -166,7 +110,7 @@ export default function ActualitesCommercialesPage() {
                       </div>
                     </div>
                   </div>
-                </article>
+                </Link>
               );
             })}
           </div>
