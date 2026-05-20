@@ -94,11 +94,12 @@ export default function FavouritesPage() {
                       src={fav.property.gallery[0]}
                       alt={fav.property.title}
                       fill
+                      sizes="450"
                       className="object-cover"
                     />
                   )  : (
-                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs">
-                      Aucune image
+                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs bg-secondary text-white">
+                      <p className="text-xl">Aucune image</p>
                     </div>
                   )}
                   <button
