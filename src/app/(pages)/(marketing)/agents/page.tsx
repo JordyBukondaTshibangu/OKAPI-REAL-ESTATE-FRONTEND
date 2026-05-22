@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import AgentsListClient from "./AgentsListClient";
 
 export const metadata = {
@@ -7,5 +8,9 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <AgentsListClient />;
+  return (
+    <Suspense>
+      <AgentsListClient />
+    </Suspense>
+  );
 }
