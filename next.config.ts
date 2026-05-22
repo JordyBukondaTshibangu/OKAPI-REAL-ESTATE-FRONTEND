@@ -71,6 +71,16 @@ const nextConfig: NextConfig = {
         protocol : "https",
         hostname : "www.housegyan.com",
         pathname : "/**"
+      },
+      {
+        protocol : "https",
+        hostname : "www.executivecentre.com",
+        pathname : "/**"
+      },
+      {
+        protocol : "https",
+        hostname : "www.tcccanada.com",
+        pathname : "/**"
       }
       
     ],

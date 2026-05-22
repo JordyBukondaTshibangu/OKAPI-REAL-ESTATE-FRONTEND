@@ -68,7 +68,7 @@ export default function AboutSection() {
               Okapi Real Estate, contactez l&apos;un de nos agents de confiance.
             </p>
             <Button asChild>
-              <a href="/vendre/agents">Rechercher un agent</a>
+              <a href="/agents">Rechercher un agent</a>
             </Button>
           </div>
 

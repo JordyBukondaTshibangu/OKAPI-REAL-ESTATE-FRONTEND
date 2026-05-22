@@ -4,13 +4,13 @@ import Link from "next/link";
 
 const sections = [
   {
-    image : "https://thumbs.dreamstime.com/b/property-news-information-updates-related-to-real-estate-market-text-concept-background-362539602.jpg",
+    image : "/assets/images/article-1.jpg",
     title: "Actualités",
     excerpt:
       "Louer ou acheter à Kinshasa — quelle est la meilleure décision financière selon votre situation ?",
   },
   {
-    image : "https://thumbs.dreamstime.com/z/brown-surface-house-pen-notepad-inscription-property-news-business-concept-brown-surface-248951635.jpg",
+    image : "/assets/images/article-2.png",
     title: "Conseils",
     excerpt:
       "Pourquoi les vendeurs bien préparés obtiennent de meilleurs prix sur le marché immobilier de Kinshasa.",
@@ -35,7 +35,7 @@ export default function ContentSections() {
                 className="rounded-xl shadow-md overflow-hidden border border-border"
               >
                 <div className="w-full h-64 bg-muted">
-                  <Image src={section.image} alt={section.title} width={100} height={48} className="w-full h-10/9 object-cover"/>
+                  <Image src={section.image} alt={section.title} width={100} height={48} className="object-cover w-full h-full"/>
                 </div>
 
                 <CardContent className="p-6 mt-8">
