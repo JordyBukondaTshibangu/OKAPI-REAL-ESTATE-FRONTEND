@@ -10,7 +10,7 @@ const sections = [
       "Louer ou acheter à Kinshasa — quelle est la meilleure décision financière selon votre situation ?",
   },
   {
-    image : "/assets/images/article-2.png",
+    image : "/assets/images/article-2.jpg",
     title: "Conseils",
     excerpt:
       "Pourquoi les vendeurs bien préparés obtiennent de meilleurs prix sur le marché immobilier de Kinshasa.",
@@ -34,8 +34,8 @@ export default function ContentSections() {
                 key={section.title}
                 className="rounded-xl shadow-md overflow-hidden border border-border"
               >
-                <div className="w-full h-64 bg-muted">
-                  <Image src={section.image} alt={section.title} width={100} height={48} className="object-cover w-full h-full"/>
+                <div className="w-full h-128 bg-muted">
+                  <Image src={section.image} alt={section.title} width={580} height={8} className="object-cover h-full"/>
                 </div>
 
                 <CardContent className="p-6 mt-8">
