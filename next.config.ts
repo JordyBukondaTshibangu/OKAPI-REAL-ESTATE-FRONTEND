@@ -81,6 +81,11 @@ const nextConfig: NextConfig = {
         protocol : "https",
         hostname : "www.tcccanada.com",
         pathname : "/**"
+      },
+      {
+        protocol : "https",
+        hostname : "images.unsplash.com",
+        pathname : "/**"
       }
       
     ],
