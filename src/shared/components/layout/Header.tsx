@@ -1,7 +1,9 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
+import LanguageSwitcher from "@/shared/components/ui/LanguageSwitcher";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useT } from "@/i18n/useT";
 import {
   Bell,
   ChevronDown,
@@ -27,194 +29,148 @@ type NavItem = {
   columns?: MenuColumn[];
 };
 
-const navItems: NavItem[] = [
-  {
-    label: "Acheter",
-    href: "/acheter",
-    columns: [
-      {
-        title: "Biens résidentiels à vendre",
-        links: [
-          { label: "Appartements", href: "/acheter/appartements" },
-          { label: "Villas", href: "/acheter/villas" },
-          { label: "Maisons de ville", href: "/acheter/maisons-ville" },
-          
-        ],
-      },
-      {
-        title: "Conseils d'achat",
-        links: [
-          { label: "Guide de l'acheteur", href: "/conseils/guide-acheteur" },
-          { label: "Infos quartiers", href: "/conseils/quartiers" },
-          { label: "Guides communautaires", href: "/conseils/communautes" },
-          {
-            label: "Guides tours & résidences",
-            href: "/conseils/tours-residences",
-          },
-          {
-            label: "Guides écoles & universités",
-            href: "/conseils/ecoles-universites",
-          },
-        ],
-      },
-      {
-        title: "Services",
-        links: [
-          {
-            label: "Acheter un bien résidentiel",
-            href: "/acheter/villas",
-          },
-          {
-            label: "Acheter un bien commercial",
-            href: "/commercial/magasins",
-          },
-          {
-            label: "Trouver un agent immobilier",
-            href: "/agents",
-          },
-          {
-            label: "Trouver une agence",
-            href: "/agences",
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    label: "Louer",
-    href: "/louer",
-    columns: [
-      {
-        title: "Biens résidentiels à louer",
-        links: [
-          { label: "Appartements", href: "/louer/appartements" },
-          { label: "Studios", href: "/louer/studios" },
-          { label: "Villas", href: "/louer/villas" },
-          { label: "Maisons de ville", href: "/louer/maisons-ville" },
-        ],
-      },
-      {
-        title: "Conseils location",
-        links: [
-          { label: "Guide du locataire", href: "/conseils/guide-locataire" },
-          { label: "Infos quartiers", href: "/conseils/quartiers" },
-          { label: "Guides communautaires", href: "/conseils/communautes" },
-          {
-            label: "Guides tours & résidences",
-            href: "/conseils/tours-residences",
-          },
-          {
-            label: "Guides écoles & universités",
-            href: "/conseils/ecoles-universites",
-          },
-        ],
-      },
-      {
-        title: "Services",
-        links: [
-          {
-            label: "Louer un bien résidentiel",
-            href: "/louer/villas",
-          },
-          {
-            label: "Louer un bien commercial",
-            href: "/commercial/magasins",
-          },
-          {
-            label: "Trouver un agent immobilier",
-            href: "/agents",
-          },
-          {
-            label: "Trouver une agence",
-            href: "/agences",
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    label: "Vendre",
-    href: "/vendre",
-    columns: [
-      {
-        title: "Vous vendez ?",
-        links: [
-          { label: "Trouver un agent immobilier", href: "/agents" },
-          { label: "Produits agences", href: "/agences" },
-        ],
-      },
-      {
-        title: "Lister ",
-        links: [
-          { label: "Vendre votre bien", href: "/vendre" },
-        ],
-      },
-      {
-        title: "Liens utiles",
-        links: [
-          { label: "Estimation gratuite", href: "/vendre/estimation" },
-          { label: "Guide du vendeur", href: "/conseils/guide-vendeur" },
-        ],
-      },
-    ],
-  },
-
-  {
-    label: "Agents & Agences",
-    href: "/agents",
-    columns: [
-      {
-        title: "Trouver",
-        links: [
-          { label: "Trouver un agent immobilier", href: "/agents" },
-          { label: "Trouver une agence", href: "/agences" },
-        ],
-      },
-    ],
-  },
-
-  {
-    label: "Commercial",
-    href: "/commercial",
-    columns: [
-      {
-        title: "Acheter commercial",
-        links: [
-          { label: "Bureaux", href: "/commercial/bureaux" },
-          { label: "Magasins", href: "/commercial/magasins" },
-          { label: "Entrepôts", href: "/commercial/entrepots" },
-          { label: "Terrains", href: "/commercial/terrains" },
-        ],
-      },
-      {
-        title: "Louer commercial",
-        links: [
-          { label: "Bureaux", href: "/commercial/location/bureaux" },
-          { label: "Magasins", href: "/commercial/location/magasins" },
-          { label: "Entrepôts", href: "/commercial/location/entrepots" },
-        ],
-      },
-      {
-        title: "Services",
-        links: [
-          { label: "Trouver un agent commercial", href: "/agents" },
-          { label: "Trouver une agence", href: "/agences" },
-          { label: "Actualités commerciales", href: "/commercial/actualites" },
-        ],
-      },
-    ],
-  },
-];
-
-const profileMenuItems = [
-  { label: "Mon Profil", href: "/profil", icon: User },
-  { label: "Favoris", href: "/favoris", icon: Heart },
-  { label: "Demandes", href: "/demandes", icon: MessageSquare },
-  { label: "Alertes", href: "/alertes", icon: Bell },
-  { label: "Avis & Notes", href: "/avis", icon: Star },
-];
+function useNavItems(): NavItem[] {
+  const t = useT();
+  return [
+    {
+      label: t.nav.buy,
+      href: "/acheter",
+      columns: [
+        {
+          title: t.nav.col_residential_buy,
+          links: [
+            { label: t.nav.apartments, href: "/acheter/appartements" },
+            { label: t.nav.villas, href: "/acheter/villas" },
+            { label: t.nav.townhouses, href: "/acheter/maisons-ville" },
+          ],
+        },
+        {
+          title: t.nav.col_tips_buy,
+          links: [
+            { label: t.nav.buyerGuide, href: "/conseils/guide-acheteur" },
+            { label: t.nav.neighborhoods, href: "/conseils/quartiers" },
+            { label: t.nav.communities, href: "/conseils/communautes" },
+            { label: t.nav.toursResidences, href: "/conseils/tours-residences" },
+            { label: t.nav.schoolsUniversities, href: "/conseils/ecoles-universites" },
+          ],
+        },
+        {
+          title: t.nav.col_services,
+          links: [
+            { label: t.nav.buyResidential, href: "/acheter/villas" },
+            { label: t.nav.buyCommercial, href: "/commercial/magasins" },
+            { label: t.nav.findAgent, href: "/agents" },
+            { label: t.nav.findAgency, href: "/agences" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.rent,
+      href: "/louer",
+      columns: [
+        {
+          title: t.nav.col_residential_rent,
+          links: [
+            { label: t.nav.apartments, href: "/louer/appartements" },
+            { label: t.nav.studios, href: "/louer/studios" },
+            { label: t.nav.villas, href: "/louer/villas" },
+            { label: t.nav.townhouses, href: "/louer/maisons-ville" },
+          ],
+        },
+        {
+          title: t.nav.col_tips_rent,
+          links: [
+            { label: t.nav.renterGuide, href: "/conseils/guide-locataire" },
+            { label: t.nav.neighborhoods, href: "/conseils/quartiers" },
+            { label: t.nav.communities, href: "/conseils/communautes" },
+            { label: t.nav.toursResidences, href: "/conseils/tours-residences" },
+            { label: t.nav.schoolsUniversities, href: "/conseils/ecoles-universites" },
+          ],
+        },
+        {
+          title: t.nav.col_services,
+          links: [
+            { label: t.nav.rentResidential, href: "/louer/villas" },
+            { label: t.nav.rentCommercial, href: "/commercial/magasins" },
+            { label: t.nav.findAgent, href: "/agents" },
+            { label: t.nav.findAgency, href: "/agences" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.sell,
+      href: "/vendre",
+      columns: [
+        {
+          title: t.nav.col_selling,
+          links: [
+            { label: t.nav.findAgent, href: "/agents" },
+            { label: t.nav.agentProducts, href: "/agences" },
+          ],
+        },
+        {
+          title: t.nav.col_list,
+          links: [
+            { label: t.nav.sellYourProperty, href: "/vendre" },
+          ],
+        },
+        {
+          title: t.nav.col_useful,
+          links: [
+            { label: t.nav.freeEstimation, href: "/vendre/estimation" },
+            { label: t.nav.sellerGuide, href: "/conseils/guide-vendeur" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.agents,
+      href: "/agents",
+      columns: [
+        {
+          title: t.nav.col_find,
+          links: [
+            { label: t.nav.findAgent, href: "/agents" },
+            { label: t.nav.findAgency, href: "/agences" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.commercial,
+      href: "/commercial",
+      columns: [
+        {
+          title: t.nav.col_buy_commercial,
+          links: [
+            { label: t.nav.offices, href: "/commercial/bureaux" },
+            { label: t.nav.stores, href: "/commercial/magasins" },
+            { label: t.nav.warehouses, href: "/commercial/entrepots" },
+            { label: t.nav.lands, href: "/commercial/terrains" },
+          ],
+        },
+        {
+          title: t.nav.col_rent_commercial,
+          links: [
+            { label: t.nav.offices, href: "/commercial/location/bureaux" },
+            { label: t.nav.stores, href: "/commercial/location/magasins" },
+            { label: t.nav.warehouses, href: "/commercial/location/entrepots" },
+          ],
+        },
+        {
+          title: t.nav.col_services,
+          links: [
+            { label: t.nav.findCommercialAgent, href: "/agents" },
+            { label: t.nav.findAgency, href: "/agences" },
+            { label: t.nav.commercialNews, href: "/commercial/actualites" },
+          ],
+        },
+      ],
+    },
+  ];
+}
 
 function ProfileMenu() {
   const [open, setOpen] = useState(false);
@@ -222,6 +178,15 @@ function ProfileMenu() {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const t = useT();
+
+  const profileMenuItems = [
+    { label: t.auth.profile, href: "/profil", icon: User },
+    { label: t.auth.favorites, href: "/favoris", icon: Heart },
+    { label: t.auth.enquiries, href: "/demandes", icon: MessageSquare },
+    { label: t.auth.alerts, href: "/alertes", icon: Bell },
+    { label: t.auth.reviews, href: "/avis", icon: Star },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -239,17 +204,18 @@ function ProfileMenu() {
 
   if (!mounted) {
     return (
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
         <Button
           variant="outline"
           size="sm"
           className="border-white/40 text-white hover:bg-white/10 hover:text-white"
           asChild
         >
-          <Link href="/carrieres">Rejoindre l&apos;équipe</Link>
+          <Link href="/carrieres">{t.auth.joinTeam}</Link>
         </Button>
         <Button variant="gold" size="sm" asChild>
-          <Link href="/inscription">S&apos;inscrire</Link>
+          <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
     );
@@ -257,18 +223,18 @@ function ProfileMenu() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="flex items-center gap-3">
-
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
         <Button
           variant="outline"
           size="sm"
           className="border-white/40 text-white hover:bg-white/10 hover:text-white"
           asChild
         >
-          <Link href="/connexion" className="min-w-fit ">Se connecter</Link>
+          <Link href="/connexion" className="min-w-fit">{t.auth.login}</Link>
         </Button>
         <Button variant="gold" size="sm" asChild>
-          <Link href="/inscription">S&apos;inscrire</Link>
+          <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
     );
@@ -281,14 +247,15 @@ function ProfileMenu() {
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
+      <LanguageSwitcher />
       <Button
         variant="outline"
         size="sm"
         className="border-white/40 text-white hover:bg-white/10 hover:text-white"
         asChild
       >
-        <Link href="/carrieres">Rejoindre l&apos;équipe</Link>
+        <Link href="/carrieres">{t.auth.joinTeam}</Link>
       </Button>
 
       <div className="relative" ref={ref}>
@@ -337,7 +304,7 @@ function ProfileMenu() {
                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 w-full transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                Se déconnecter
+                {t.auth.logout}
               </button>
             </div>
           </div>
@@ -349,6 +316,7 @@ function ProfileMenu() {
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const navItems = useNavItems();
 
   return (
     <header
@@ -395,13 +363,7 @@ export default function Header() {
                 </div>
               );
             })}
-            <Link
-              href="/vendre"
-              onMouseEnter={() => setOpenMenu(null)}
-              className="ml-2 inline-flex items-center rounded-full border border-white/40 px-4 h-9 text-sm font-medium text-white hover:bg-white hover:text-navy transition-colors"
-            >
-              Lister 
-            </Link>
+            <NavListButton navItems={navItems} setOpenMenu={setOpenMenu} />
           </nav>
           <ProfileMenu />
         </div>
@@ -449,5 +411,25 @@ export default function Header() {
         </div>
       )}
     </header>
+  );
+}
+
+function NavListButton({
+  navItems,
+  setOpenMenu,
+}: {
+  navItems: NavItem[];
+  setOpenMenu: (v: string | null) => void;
+}) {
+  const t = useT();
+  const sellItem = navItems.find((n) => n.href === "/vendre");
+  return (
+    <Link
+      href="/vendre"
+      onMouseEnter={() => setOpenMenu(sellItem?.label ?? null)}
+      className="ml-2 inline-flex items-center rounded-full border border-white/40 px-4 h-9 text-sm font-medium text-white hover:bg-white hover:text-navy transition-colors"
+    >
+      {t.nav.list}
+    </Link>
   );
 }
