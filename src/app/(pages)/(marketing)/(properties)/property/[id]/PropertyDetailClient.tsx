@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { addFavourite, removeFavourite } from "@/services/auth";
+import { addFavourite, removeFavourite, createEnquiry } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import ShareButton from "@/shared/components/ui/ShareButton";
 import {
@@ -20,7 +20,6 @@ import {
   MapPin,
   Maximize2,
   Phone,
-  Share2,
   Sparkles,
   ThumbsUp,
   ThumbsDown,
@@ -195,17 +194,20 @@ function ActionChip({
   icon,
   label,
   href,
+  onClick,
   variant = "default",
 }: {
   icon: React.ReactNode;
   label: string;
   href?: string;
+  onClick?: () => void;
   variant?: "default" | "primary";
 }) {
   const Tag: "a" | "button" = href ? "a" : "button";
   return (
     <Tag
       href={href}
+      onClick={onClick}
       type={href ? undefined : "button"}
       className={`inline-flex items-center gap-2 px-4 h-10 rounded-lg text-sm font-medium transition-colors border ${
         variant === "primary"
@@ -333,6 +335,11 @@ export default function PropertyDetailClient({
   const [sliderIndex, setSliderIndex] = useState(0);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [enquiryMessage, setEnquiryMessage] = useState("");
+  const [enquirySending, setEnquirySending] = useState(false);
+  const [enquirySubmitted, setEnquirySubmitted] = useState(false);
+  const [enquiryError, setEnquiryError] = useState<string | null>(null);
   const { token, isAuthenticated } = useAuthStore();
   const router = useRouter();
 
@@ -353,6 +360,25 @@ export default function PropertyDetailClient({
       }
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleEnquiry() {
+    if (!isAuthenticated || !token) {
+      router.push("/connexion");
+      return;
+    }
+    if (!enquiryMessage.trim() || enquirySending) return;
+    setEnquirySending(true);
+    setEnquiryError(null);
+    try {
+      await createEnquiry(token, { propertyId: id, message: enquiryMessage });
+      setEnquirySubmitted(true);
+      setEnquiryMessage("");
+    } catch {
+      setEnquiryError("Impossible d'envoyer votre demande. Veuillez réessayer.");
+    } finally {
+      setEnquirySending(false);
     }
   }
 
@@ -396,6 +422,14 @@ export default function PropertyDetailClient({
         </div>
       </div>
 
+      {mapOpen && (
+        <MapModal
+          neighborhood={detail.neighborhood}
+          suburb={detail.suburb}
+          city={detail.city}
+          onClose={() => setMapOpen(false)}
+        />
+      )}
       {sliderOpen && detail.gallery.length > 0 && (
         <ImageSlider
           images={detail.gallery}
@@ -453,6 +487,7 @@ export default function PropertyDetailClient({
                   variant="primary"
                   icon={<MapPin className="w-4 h-4" />}
                   label="Voir sur la carte"
+                  onClick={() => setMapOpen(true)}
                 />
                 <ActionChip
                   icon={<Sparkles className="w-4 h-4" />}
@@ -538,7 +573,7 @@ export default function PropertyDetailClient({
                         </p>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => setMapOpen(true)}>
                       Voir sur la carte
                     </Button>
                   </div>
@@ -665,6 +700,46 @@ export default function PropertyDetailClient({
               </div>
             </section>
 
+            {/* Enquiry / Demande */}
+            <section className="pt-2 border-t border-border">
+              <SectionHeading>Envoyer une demande</SectionHeading>
+              {enquirySubmitted ? (
+                <div className="rounded-xl border border-green-200 bg-green-50 p-6 text-center">
+                  <p className="text-sm font-semibold text-green-700 mb-1">Demande envoyée !</p>
+                  <p className="text-xs text-green-600">
+                    L&apos;agent vous contactera dans les plus brefs délais.
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-border bg-white p-5">
+                  <p className="text-sm text-foreground/80 mb-4">
+                    Intéressé(e) par ce bien ? Envoyez une demande directement à l&apos;agent.
+                  </p>
+                  <textarea
+                    value={enquiryMessage}
+                    onChange={(e) => setEnquiryMessage(e.target.value)}
+                    placeholder={`Bonjour, je suis intéressé(e) par votre bien "${detail.title}" (réf. ${detail.reference}). Pourriez-vous me donner plus d'informations ?`}
+                    rows={4}
+                    className="w-full text-sm border border-border rounded-lg px-3 py-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white mb-3"
+                  />
+                  {enquiryError && (
+                    <p className="text-xs text-destructive mb-3">{enquiryError}</p>
+                  )}
+                  <Button
+                    onClick={handleEnquiry}
+                    disabled={enquirySending}
+                    className="w-full"
+                  >
+                    {enquirySending
+                      ? "Envoi en cours…"
+                      : isAuthenticated
+                      ? "Envoyer ma demande"
+                      : "Connectez-vous pour envoyer une demande"}
+                  </Button>
+                </div>
+              )}
+            </section>
+
             {/* Property details + Regulatory */}
             <section className="pt-2 border-t border-border">
               <div className="rounded-xl border border-border bg-white p-6 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
@@ -737,6 +812,66 @@ export default function PropertyDetailClient({
 }
 
 /* ------------------------------ subcomponents ------------------------------ */
+
+function MapModal({
+  neighborhood,
+  suburb,
+  city,
+  onClose,
+}: {
+  neighborhood: string;
+  suburb: string;
+  city: string;
+  onClose: () => void;
+}) {
+  const query = encodeURIComponent(
+    `${neighborhood}, ${suburb}, ${city}, République Démocratique du Congo`
+  );
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+      <div className="relative bg-white rounded-2xl overflow-hidden w-full max-w-3xl shadow-2xl">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <div>
+            <p className="text-sm font-semibold text-foreground">{neighborhood}</p>
+            <p className="text-xs text-muted-foreground">
+              {suburb}, {city}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-muted hover:bg-muted/70 flex items-center justify-center text-foreground/70 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="relative w-full" style={{ height: "420px" }}>
+          <iframe
+            title="Localisation du bien"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            referrerPolicy="no-referrer-when-downgrade"
+            src={`https://maps.google.com/maps?q=${query}&output=embed&z=15`}
+            allowFullScreen
+          />
+        </div>
+        <div className="px-5 py-3 border-t border-border flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            La localisation affichée est approximative.
+          </p>
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${query}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary hover:underline font-medium"
+          >
+            Ouvrir dans Google Maps →
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Breadcrumb({ detail }: { detail: PropertyDetail }) {
   const trail = [

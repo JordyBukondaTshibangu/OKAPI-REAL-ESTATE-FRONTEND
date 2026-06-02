@@ -80,8 +80,8 @@ export default async function AgencyDetailPage({
       <section className="bg-white border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
-            { label: "Agents", value: agency.agentCount, icon: Users },
-            { label: "Annonces actives", value: agency.listingCount, icon: TrendingUp },
+            { label: "Agents", value: agencyAgents.length, icon: Users },
+            { label: "Annonces actives", value: agencyProperties.length, icon: TrendingUp },
             { label: "Transactions", value: agency.closedDeals, icon: Award },
             {
               label: "Ans d'expérience",

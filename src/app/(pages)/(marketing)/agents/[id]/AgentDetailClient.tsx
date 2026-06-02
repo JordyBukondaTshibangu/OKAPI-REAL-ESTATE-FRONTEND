@@ -13,13 +13,15 @@ import {
   Home,
   Info,
   MapPin,
-  Share2,
   Star,
   Trophy,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ShareButton from "@/shared/components/ui/ShareButton";
+import { useAuthStore } from "@/store/useAuthStore";
+import { getAgentReviews, createReview, type Review } from "@/services/auth";
 
 function StarRating({ value, max = 5 }: { value: number; max?: number }) {
   const full = Math.floor(value);
@@ -108,6 +110,52 @@ export default function AgentDetailClient({
   const [bioExpanded, setBioExpanded] = useState(false);
   const [showAllRecord, setShowAllRecord] = useState(false);
   const [propertiesTab, setPropertiesTab] = useState<"sale" | "rent">("sale");
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewHover, setReviewHover] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const { token, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  const forSaleCount = agentProperties.filter((p) => p.listingType !== "rent").length;
+  const forRentCount = agentProperties.filter((p) => p.listingType === "rent").length;
+
+  useEffect(() => {
+    getAgentReviews(id)
+      .then(setReviews)
+      .catch(() => {})
+      .finally(() => setReviewsLoading(false));
+  }, [id]);
+
+  async function handleSubmitReview() {
+    if (!isAuthenticated || !token) {
+      router.push("/connexion");
+      return;
+    }
+    if (reviewRating === 0) return;
+    setReviewSubmitting(true);
+    setReviewError(null);
+    try {
+      const review = await createReview(token, {
+        agentId: id,
+        rating: reviewRating,
+        comment: reviewComment || undefined,
+      });
+      setReviews((prev) => [review, ...prev]);
+      setReviewSuccess(true);
+      setReviewRating(0);
+      setReviewComment("");
+      setTimeout(() => setReviewSuccess(false), 4000);
+    } catch {
+      setReviewError("Impossible de publier votre avis. Veuillez réessayer.");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  }
 
   const filteredProps = agentProperties.filter((p) =>
     propertiesTab === "sale"
@@ -238,13 +286,13 @@ export default function AgentDetailClient({
           <div className="max-w-6xl mx-auto px-6 py-7 grid grid-cols-2 md:grid-cols-4 gap-5 divide-y md:divide-y-0 md:divide-x divide-white/15">
             <div className="md:px-2 first:md:pl-0">
               <StatColumn
-                value={String(agent.forSaleCount)}
+                value={String(forSaleCount)}
                 label="Biens à vendre"
               />
             </div>
             <div className="md:px-2">
               <StatColumn
-                value={String(agent.forRentCount)}
+                value={String(forRentCount)}
                 label="Biens à louer"
               />
             </div>
@@ -443,6 +491,130 @@ export default function AgentDetailClient({
           >
             {bioExpanded ? "Réduire" : "Lire plus"}
           </button>
+        </section>
+
+        {/* Avis & Notes */}
+        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
+          <div className="flex items-end justify-between mb-5">
+            <h2 className="text-lg md:text-xl font-semibold text-foreground">
+              Avis &amp; Notes
+            </h2>
+            {reviews.length > 0 && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-bold text-foreground">
+                  {(reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)}
+                </span>
+                <StarRatingDark
+                  value={reviews.reduce((s, r) => s + r.rating, 0) / reviews.length}
+                />
+                <span className="text-muted-foreground">{reviews.length} avis</span>
+              </div>
+            )}
+          </div>
+
+          {/* Submit review */}
+          <div className="mb-6 rounded-xl bg-accent/50 border border-accent p-5">
+            <h3 className="text-sm font-semibold text-foreground mb-3">
+              {isAuthenticated ? "Laisser un avis" : "Connectez-vous pour laisser un avis"}
+            </h3>
+            <div className="flex items-center gap-1 mb-3">
+              {Array.from({ length: 5 }).map((_, i) => {
+                const val = i + 1;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onMouseEnter={() => setReviewHover(val)}
+                    onMouseLeave={() => setReviewHover(0)}
+                    onClick={() =>
+                      isAuthenticated ? setReviewRating(val) : router.push("/connexion")
+                    }
+                    className="p-0.5"
+                    aria-label={`${val} étoile${val > 1 ? "s" : ""}`}
+                  >
+                    <Star
+                      className={`w-7 h-7 transition-colors ${
+                        val <= (reviewHover || reviewRating)
+                          ? "fill-secondary text-secondary"
+                          : "text-foreground/20"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+              {reviewRating > 0 && (
+                <span className="ml-2 text-sm text-muted-foreground">
+                  {["", "Médiocre", "Passable", "Bien", "Très bien", "Excellent"][reviewRating]}
+                </span>
+              )}
+            </div>
+            <textarea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder="Partagez votre expérience avec cet agent (optionnel)…"
+              rows={3}
+              className="w-full text-sm border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white"
+              disabled={!isAuthenticated}
+            />
+            {reviewError && (
+              <p className="text-xs text-destructive mt-2">{reviewError}</p>
+            )}
+            {reviewSuccess && (
+              <p className="text-xs text-green-600 mt-2">Votre avis a été publié. Merci !</p>
+            )}
+            <div className="mt-3 flex justify-end">
+              <Button
+                onClick={handleSubmitReview}
+                disabled={reviewSubmitting || reviewRating === 0 || !isAuthenticated}
+                className="h-9 text-sm"
+              >
+                {reviewSubmitting ? "Publication…" : "Publier l'avis"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Reviews list */}
+          {reviewsLoading ? (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              Chargement des avis…
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              Aucun avis pour le moment. Soyez le premier à noter cet agent !
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="border-t border-border pt-4 first:border-t-0 first:pt-0"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        Utilisateur vérifié
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <StarRatingDark value={review.rating} />
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(review.createdAt).toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {review.comment && (
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      {review.comment}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* My properties */}
