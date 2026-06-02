@@ -192,6 +192,21 @@ export type Messages = {
     ctaHeading: string; ctaBody: string; ctaBtn: string;
   };
   blog: { allCategories: string; readTime: string; readArticle: string; noArticles: string; loadMore: string; };
+  regions: {
+    sectionLabel: string; heading: string;
+    liveLabel: string; liveTitle: string; liveTag: string;
+    total: string; forSale: string; forRent: string;
+    topSuburbs: string; avgPrice: string; ctaLabel: string;
+  };
+  travelTimes: {
+    heading: string; newBadge: string; collapse: string;
+    selectedPlace: string; searchPlace: string;
+    maxDuration: string; peakHours: string; confirm: string;
+    byCar: string; byTrain: string; byFoot: string;
+  };
+  listingHero: {
+    buyTitle: string; rentTitle: string; commercialTitle: string; listings: string;
+  };
   pages: {
     conseils: {
       breadHome: string; breadConseils: string; availableBadge: string;
@@ -248,6 +263,53 @@ export type Messages = {
       s3Title: string; s3Body: string; s4Title: string; s4Body: string;
       s5Title: string; s5Body: string; s6Title: string; s6Body: string;
       s7Title: string; s7Body: string; s8Title: string; s8Body: string;
+    };
+    blog: {
+      breadHome: string; breadBlog: string; badge: string; heading: string; subtitle: string;
+      newsletterHeading: string; newsletterSubtitle: string; newsletterPlaceholder: string; subscribe: string;
+    };
+    sitemap: {
+      breadHome: string; heading: string; subtitle: string;
+      sHome: string; sBuy: string; sRent: string; sSell: string; sCommercial: string;
+      sAgents: string; sGuides: string; sBlog: string; sAccount: string; sAbout: string; sLegal: string;
+      lHome: string; lAllBuy: string; lApts: string; lVillas: string; lTownhouses: string; lLands: string;
+      lAllRent: string; lAptsRent: string; lStudios: string; lVillasRent: string; lTownhousesRent: string;
+      lSell: string; lEstimate: string; lSellApt: string; lSellHouse: string;
+      lCommercial: string; lOffices: string; lStores: string; lWarehouses: string; lCommLands: string;
+      lOfficesRent: string; lStoresRent: string; lWarehousesRent: string; lCommNews: string;
+      lFindAgent: string; lFindAgency: string;
+      lAllGuides: string; lBuyGuide: string; lSellGuide: string; lRentGuide: string;
+      lNeighborhoods: string; lCommunities: string; lTours: string; lSchools: string;
+      lBlog: string; lLogin: string; lRegister: string; lForgotPwd: string; lProfile: string;
+      lFavorites: string; lEnquiries: string; lAlerts: string; lReviews: string;
+      lAbout: string; lContact: string; lCareers: string;
+      lTerms: string; lPrivacy: string; lCookies: string; lSitemap: string;
+    };
+    cookies: {
+      badge: string; heading: string; lastUpdated: string;
+      intro1: string; intro2: string; typesHeading: string; required: string;
+      type1Name: string; type1Desc: string;
+      type2Name: string; type2Desc: string;
+      type3Name: string; type3Desc: string;
+      type4Name: string; type4Desc: string;
+      manageHeading: string; managePara: string; question: string;
+    };
+    sell: {
+      tagline: string; heading: string; rentLink: string; popularBadge: string;
+      included: string; plus: string; listBtn: string;
+      whyHeading: string; whyPara: string;
+      stat1Value: string; stat1Label: string;
+      stat2Value: string; stat2Label: string;
+      stat3Value: string; stat3Label: string;
+      startNow: string;
+      pkg1Name: string; pkg1Price: string; pkg1Blurb: string;
+      pkg2Name: string; pkg2Price: string; pkg2Blurb: string;
+      pkg3Name: string; pkg3Price: string; pkg3Blurb: string;
+      pkg4Name: string; pkg4Price: string; pkg4Blurb: string;
+      feat1: string; feat2: string; feat3: string; feat4: string; feat5: string;
+      feat6: string; feat7: string; feat8: string; feat9: string; feat10: string;
+      inc1: string; inc2: string; inc3: string; inc4: string;
+      plusFeat: string;
     };
   };
 };
