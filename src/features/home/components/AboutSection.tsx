@@ -1,9 +1,12 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import { Button } from "@/shared/components/ui/button";
 import { Home, Laptop, Sofa, Users } from "lucide-react";
 
 export default function AboutSection() {
+  const t = useT();
+
   return (
     <section className="bg-background py-20 px-6">
       <div className="max-w-6xl mx-auto space-y-20">
@@ -28,24 +31,19 @@ export default function AboutSection() {
           {/* Copy */}
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
-              À propos
+              {t.home.about.badge}
             </p>
             <h2 className="text-3xl md:text-4xl font-semibold text-text-dark mb-5 leading-tight">
-              Le site immobilier numéro un <br className="hidden md:block" />
-              à Kinshasa
+              {t.home.about.heading}
             </h2>
             <p className="text-sm text-text-light leading-relaxed mb-4">
-              Okapi Real Estate est le plus grand portail de recherche immobilière à
-              Kinshasa et le premier endroit où commencer votre recherche !
+              {t.home.about.para1}
             </p>
             <p className="text-sm text-text-light leading-relaxed mb-8">
-              Okapi Real Estate recense maisons, appartements, terrains et parcelles
-              des principales agences immobilières de Kinshasa. Que vous
-              cherchiez à acheter ou à louer, vous trouverez votre bien idéal
-              sur Okapi Real Estate.
+              {t.home.about.para2}
             </p>
             <Button variant="outline" asChild>
-              <a href="/a-propos">En savoir plus sur Okapi Real Estate</a>
+              <a href="/a-propos">{t.home.about.learnMore}</a>
             </Button>
           </div>
         </div>
@@ -55,20 +53,16 @@ export default function AboutSection() {
           {/* Copy */}
           <div className="md:order-1">
             <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
-              Notre réseau
+              {t.home.about.networkBadge}
             </p>
             <h2 className="text-3xl md:text-4xl font-semibold text-text-dark mb-5 leading-tight">
-              Trouvez un agent immobilier de <br className="hidden md:block" />
-              confiance dans votre quartier
+              {t.home.about.networkHeading}
             </h2>
             <p className="text-sm text-text-light leading-relaxed mb-8 max-w-lg">
-              Trouvez la maison de vos rêves sur Okapi Real Estate en explorant la
-              plus grande base de biens en vente par les agences immobilières à
-              travers Kinshasa et la RDC. Pour mettre votre bien sur
-              Okapi Real Estate, contactez l&apos;un de nos agents de confiance.
+              {t.home.about.networkPara}
             </p>
             <Button asChild>
-              <a href="/agents">Rechercher un agent</a>
+              <a href="/vendre/agents">{t.home.about.findAgent}</a>
             </Button>
           </div>
 

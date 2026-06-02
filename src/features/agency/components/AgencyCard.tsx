@@ -1,8 +1,13 @@
+"use client";
+
+import { useT } from "@/i18n/useT";
 import { Agency } from "@/features/agency/types/agency";
 import { MapPin, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
 
 export default function AgencyCard({ agency }: { agency: Agency }) {
+  const t = useT();
+
   return (
     <Link
       href={`/agences/${agency.id}`}
@@ -17,7 +22,7 @@ export default function AgencyCard({ agency }: { agency: Agency }) {
             {agency.monogram}
           </div>
           <p className="text-white/80 text-[10px] font-semibold tracking-wider text-center leading-tight">
-            Depuis {agency.founded}
+            {t.cards.since.replace("{year}", String(agency.founded))}
           </p>
         </div>
 
@@ -37,11 +42,12 @@ export default function AgencyCard({ agency }: { agency: Agency }) {
           <div className="mt-auto flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground border-t border-border pt-3">
             <span className="inline-flex items-center gap-1">
               <Users className="w-3.5 h-3.5 text-primary" />
-              {agency.agentCount} agent{agency.agentCount > 1 ? "s" : ""}
+              {agency.agentCount}{" "}
+              {agency.agentCount > 1 ? t.cards.agents : t.cards.agent}
             </span>
             <span className="inline-flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5 text-primary" />
-              {agency.closedDeals} transactions
+              {agency.closedDeals} {t.cards.transactions}
             </span>
             <span className="inline-flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-primary" />
