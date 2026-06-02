@@ -26,7 +26,7 @@ export default function LanguageSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-lg text-white/80 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors"
+        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-lg text-white/80 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors min-w-max"
         aria-label="Changer de langue / Change language"
       >
         <Globe className="w-4 h-4" />

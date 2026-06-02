@@ -209,10 +209,10 @@ function ProfileMenu() {
         <Button
           variant="outline"
           size="sm"
-          className="border-white/40 text-white hover:bg-white/10 hover:text-white"
+          className="border-white/40 text-white hover:bg-white/10 hover:text-white min-w-max"
           asChild
         >
-          <Link href="/carrieres">{t.auth.joinTeam}</Link>
+          <Link href="/carrieres" className="min-w-max px-4 w-52">{t.auth.joinTeam}</Link>
         </Button>
         <Button variant="gold" size="sm" asChild>
           <Link href="/inscription">{t.auth.register}</Link>
@@ -252,7 +252,7 @@ function ProfileMenu() {
       <Button
         variant="outline"
         size="sm"
-        className="border-white/40 text-white hover:bg-white/10 hover:text-white"
+        className="border-white/40 text-white hover:bg-white/10 hover:text-white min-w-max"
         asChild
       >
         <Link href="/carrieres">{t.auth.joinTeam}</Link>

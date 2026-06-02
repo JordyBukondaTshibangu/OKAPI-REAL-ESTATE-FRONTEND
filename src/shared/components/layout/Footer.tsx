@@ -177,8 +177,8 @@ export default function Footer() {
           </ul>
 
           <ul className="space-y-3">
-            {legalLinks.map((link) => (
-              <li key={link.href}>
+            {legalLinks.map((link, index) => (
+              <li key={index}>
                 <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
                   {link.label}
                 </Link>
@@ -187,8 +187,8 @@ export default function Footer() {
           </ul>
 
           <ul className="space-y-3">
-            {partnerLinks.map((link) => (
-              <li key={link.href}>
+            {partnerLinks.map((link, index) => (
+              <li key={index}>
                 <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
                   {link.label}
                 </Link>
