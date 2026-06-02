@@ -90,7 +90,7 @@ export default function ListingHero({
 
       <div className="relative max-w-6xl mx-auto">
         <div className="mb-5">
-          <Breadcrumbs items={crumbs} />
+          <Breadcrumbs items={crumbs.map((c, i) => i === crumbs.length - 1 ? { ...c, label: title } : c)} />
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg border border-border p-6 md:p-7 lg:min-w-2xl">
