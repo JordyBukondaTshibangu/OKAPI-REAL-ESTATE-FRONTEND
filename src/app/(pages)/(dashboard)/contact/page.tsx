@@ -1,36 +1,47 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const schema = z.object({
-  name: z.string().min(2, "Le nom est requis"),
-  email: z.string().email("Adresse e-mail invalide"),
-  subject: z.string().min(3, "Le sujet est requis"),
-  message: z
-    .string()
-    .min(10, "Le message doit contenir au moins 10 caractères"),
-});
-
-type FormData = z.infer<typeof schema>;
-
-const contactDetails = [
-  {
-    icon: MapPin,
-    label: "Adresse",
-    value: "123, Avenue du Commerce, Gombe, Kinshasa, RDC",
-  },
-  { icon: Phone, label: "Téléphone", value: "+243 999 000 111" },
-  { icon: Mail, label: "E-mail", value: "contact@okapiimmobilier.cd" },
-  { icon: Clock, label: "Horaires", value: "Lun – Ven : 8h00 – 17h00" },
-];
+type FormData = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+};
 
 export default function ContactPage() {
+  const t = useT();
+  const p = t.pages.contact;
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(2, p.validationName),
+        email: z.string().email(p.validationEmail),
+        subject: z.string().min(3, p.validationSubject),
+        message: z.string().min(10, p.validationMessage),
+      }),
+    [p.validationName, p.validationEmail, p.validationSubject, p.validationMessage],
+  );
+
+  const contactDetails = [
+    {
+      icon: MapPin,
+      label: p.labelAddress,
+      value: "123, Avenue du Commerce, Gombe, Kinshasa, RDC",
+    },
+    { icon: Phone, label: p.labelPhone, value: "+243 999 000 111" },
+    { icon: Mail, label: p.labelEmail, value: "contact@okapiimmobilier.cd" },
+    { icon: Clock, label: p.labelHours, value: "Lun – Ven : 8h00 – 17h00" },
+  ];
+
   const [sent, setSent] = useState(false);
 
   const {
@@ -51,14 +62,13 @@ export default function ContactPage() {
       {/* Hero */}
       <section className="bg-navy text-white py-20 px-6 text-center">
         <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-4">
-          Nous contacter
+          {p.badge}
         </p>
         <h1 className="text-4xl md:text-5xl font-semibold mb-4">
-          Une question ? Écrivez-nous
+          {p.heading}
         </h1>
         <p className="text-white/75 max-w-xl mx-auto text-base">
-          Notre équipe est disponible du lundi au vendredi pour répondre à
-          toutes vos questions.
+          {p.subtitle}
         </p>
       </section>
 
@@ -68,7 +78,7 @@ export default function ContactPage() {
           {/* Contact details */}
           <div>
             <h2 className="text-xl font-semibold text-text-dark mb-8">
-              Informations de contact
+              {p.infoHeading}
             </h2>
             <ul className="space-y-6">
               {contactDetails.map(({ icon: Icon, label, value }) => (
@@ -96,27 +106,27 @@ export default function ContactPage() {
           {/* Form */}
           <div>
             <h2 className="text-xl font-semibold text-text-dark mb-8">
-              Envoyer un message
+              {p.formHeading}
             </h2>
             {sent ? (
               <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
                 <p className="text-green-700 font-medium text-base mb-1">
-                  Message envoyé !
+                  {p.successTitle}
                 </p>
                 <p className="text-green-600 text-sm">
-                  Nous vous répondrons dans les plus brefs délais.
+                  {p.successBody}
                 </p>
                 <Button className="mt-6" onClick={() => setSent(false)}>
-                  Envoyer un autre message
+                  {p.sendAnother}
                 </Button>
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div>
                   <label className="text-sm font-medium text-text-dark block mb-1.5">
-                    Nom complet
+                    {p.fieldName}
                   </label>
-                  <Input {...register("name")} placeholder="Jean Makiese" />
+                  <Input {...register("name")} placeholder={p.placeholderName} />
                   {errors.name && (
                     <p className="text-xs text-destructive mt-1">
                       {errors.name.message}
@@ -125,12 +135,12 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-text-dark block mb-1.5">
-                    Adresse e-mail
+                    {p.fieldEmail}
                   </label>
                   <Input
                     {...register("email")}
                     type="email"
-                    placeholder="jean@exemple.cd"
+                    placeholder={p.placeholderEmail}
                   />
                   {errors.email && (
                     <p className="text-xs text-destructive mt-1">
@@ -140,11 +150,11 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-text-dark block mb-1.5">
-                    Sujet
+                    {p.fieldSubject}
                   </label>
                   <Input
                     {...register("subject")}
-                    placeholder="Demande d'information"
+                    placeholder={p.placeholderSubject}
                   />
                   {errors.subject && (
                     <p className="text-xs text-destructive mt-1">
@@ -154,12 +164,12 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-text-dark block mb-1.5">
-                    Message
+                    {p.fieldMessage}
                   </label>
                   <textarea
                     {...register("message")}
                     rows={5}
-                    placeholder="Décrivez votre demande..."
+                    placeholder={p.placeholderMessage}
                     className="flex w-full rounded-lg border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
                   />
                   {errors.message && (
@@ -173,7 +183,7 @@ export default function ContactPage() {
                   className="w-full"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Envoi en cours…" : "Envoyer le message"}
+                  {isSubmitting ? p.sending : p.send}
                 </Button>
               </form>
             )}

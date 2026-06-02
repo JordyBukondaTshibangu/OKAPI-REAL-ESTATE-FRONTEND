@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Clock, Tag } from "lucide-react";
@@ -18,11 +19,12 @@ export default function BlogClient({
   posts: Article[];
   categories: string[];
 }) {
-  const [activeCategory, setActiveCategory] = useState("Tous");
+  const t = useT();
+  const [activeCategory, setActiveCategory] = useState(t.blog.allCategories);
   const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
 
   const filtered =
-    activeCategory === "Tous"
+    activeCategory === t.blog.allCategories
       ? posts
       : posts.filter((p) => p.category === activeCategory);
 
@@ -57,7 +59,7 @@ export default function BlogClient({
         </div>
 
         {/* Featured article — only shown on "Tous" */}
-        {activeCategory === "Tous" && (
+        {activeCategory === t.blog.allCategories && (
           <Link
             href={`/blog/${featured.slug}`}
             className="block bg-navy text-white rounded-2xl p-8 mb-8 group hover:ring-2 hover:ring-secondary/50 transition-all"
@@ -82,11 +84,11 @@ export default function BlogClient({
                   <Tag className="w-3.5 h-3.5" /> {featured.date}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" /> {featured.readTime} de lecture
+                  <Clock className="w-3.5 h-3.5" /> {featured.readTime} {t.blog.readTime}
                 </span>
               </div>
               <span className="text-sm font-semibold text-secondary flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
-                Lire l&apos;article <ArrowRight className="w-4 h-4" />
+                {t.blog.readArticle} <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </Link>
@@ -95,7 +97,7 @@ export default function BlogClient({
         {/* Posts grid */}
         {visible.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
-            Aucun article dans cette catégorie pour le moment.
+            {t.blog.noArticles}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -140,8 +142,7 @@ export default function BlogClient({
               size="lg"
               onClick={() => setVisibleCount((v) => v + LOAD_MORE_COUNT)}
             >
-              Voir plus d&apos;articles ({filtered.length - visibleCount} restant
-              {filtered.length - visibleCount > 1 ? "s" : ""})
+              {t.blog.loadMore.replace("{count}", String(filtered.length - visibleCount))}
             </Button>
           </div>
         )}

@@ -1,10 +1,13 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import { Smartphone } from "lucide-react";
 import AppleIcon from "./AppleIcon";
 import PlayIcon from "./PlayIcon";
 
 export default function MobileApp() {
+  const t = useT();
+
   return (
     <section className="relative bg-navy text-white py-48 px-6 overflow-visible">
       <div
@@ -41,18 +44,13 @@ export default function MobileApp() {
 
         <div>
           <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
-            Application mobile
+            {t.home.mobileApp.badge}
           </p>
           <h2 className="text-3xl md:text-4xl font-semibold mb-5 leading-tight">
-            Okapi Real Estate sur Mobile <br className="hidden md:block" /> et
-            Tablette
+            {t.home.mobileApp.heading}
           </h2>
           <p className="text-sm text-white/80 leading-relaxed max-w-md mb-8">
-            Retrouvez tous les biens à vendre ou à louer des principales agences
-            immobilières de Kinshasa sur votre appareil Android ou Apple. Grâce
-            à l&apos;interface intuitive de Okapi Real Estate, trouvez et gérez
-            vos biens favoris en toute simplicité. Téléchargez
-            l&apos;application pour commencer.
+            {t.home.mobileApp.body}
           </p>
 
           <div className="flex flex-wrap gap-3">
@@ -62,7 +60,7 @@ export default function MobileApp() {
             >
               <AppleIcon className="w-7 h-7" />
               <div className="leading-tight">
-                <p className="text-[10px] opacity-80">Télécharger sur</p>
+                <p className="text-[10px] opacity-80">{t.home.mobileApp.downloadOn}</p>
                 <p className="text-base font-semibold -mt-0.5">App Store</p>
               </div>
             </a>
@@ -73,7 +71,7 @@ export default function MobileApp() {
             >
               <PlayIcon className="w-7 h-7" />
               <div className="leading-tight">
-                <p className="text-[10px] opacity-80">DISPONIBLE SUR</p>
+                <p className="text-[10px] opacity-80">{t.home.mobileApp.availableOn}</p>
                 <p className="text-base font-semibold -mt-0.5">Google Play</p>
               </div>
             </a>
