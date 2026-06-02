@@ -192,6 +192,68 @@ export type Messages = {
     ctaHeading: string; ctaBody: string; ctaBtn: string;
   };
   blog: { allCategories: string; readTime: string; readArticle: string; noArticles: string; loadMore: string; };
+  detail: {
+    property: {
+      backToResults: string; saved: string; saveBtn: string; reportBtn: string;
+      viewPhotos: string; verified: string; premium: string;
+      bedroom: string; bedrooms: string; bathroom: string;
+      viewOnMap: string; initialCosts: string; rentOrBuy: string;
+      toRent: string; toSell: string;
+      descHeading: string; availableFrom: string; amenitiesHeading: string;
+      locationHeading: string; viewOnMapBtn: string;
+      buildingTab: string; neighborhoodTab: string;
+      aboutBuildingTitle: string; buildingActiveListings: string; priceRange: string; learnMore: string;
+      pricesTrendsHeading: string;
+      costMorePct: string; costLessPct: string; avgPriceLabel: string;
+      biggerPct: string; smallerPct: string; avgSizeLabel: string; dataNote: string;
+      presentedByHeading: string; agentPropertiesLink: string;
+      transLabel: string; responseLabel: string; volumeLabel: string;
+      enquiryHeading: string; enquiryIntro: string; enquiryPlaceholder: string;
+      enquirySentTitle: string; enquirySentDesc: string;
+      sendingLabel: string; sendBtn: string; loginBtn: string; enquiryError: string;
+      propertyDetailsHeading: string; regulatoryHeading: string;
+      typeLabel: string; surfaceLabel: string; bedroomsLabel: string; bathroomsLabel: string; availableLabel: string;
+      referenceLabel: string; listedLabel: string; licenseLabel: string; agencyLabel: string; zoneLabel: string; permitLabel: string;
+      responseTime: string; reviewsCount: string; agencySection: string; viewAgency: string;
+      callBtn: string; whatsappMsg: string;
+      recommendedHeading: string; prevBtn: string; nextBtn: string;
+      breadHome: string; breadRent: string; breadBuy: string;
+    };
+    agent: {
+      backToResults: string;
+      forSaleStatLabel: string; forRentStatLabel: string; closedDealsLabel: string; totalValueLabel: string; closedDealsHint: string;
+      trackRecordHeading: string; last12MonthsLabel: string; submittedByNote: string;
+      colLocation: string; colDealType: string; colDate: string; colPropertyType: string; colBedrooms: string;
+      showAll: string; collapse: string;
+      personalInfoHeading: string;
+      specialization: string; experienceSince: string; license: string; agencyLabel: string;
+      areasHeading: string; areasSubtitle: string; learnMoreArea: string;
+      forSaleAreaLabel: string; forRentAreaLabel: string; dealsAreaLabel: string;
+      aboutMeHeading: string; readMore: string; reduce: string;
+      propertiesOfHeading: string; listing: string; listings: string;
+      forSaleTab: string; forRentTab: string; sortLabel: string; featuredOption: string;
+      noListingsMsg: string;
+      reviewsHeading: string; leaveReviewLabel: string; loginToReviewLabel: string;
+      ratingLabel1: string; ratingLabel2: string; ratingLabel3: string; ratingLabel4: string; ratingLabel5: string;
+      reviewPlaceholder: string; publishBtn: string; publishingLabel: string;
+      reviewPosted: string; reviewError: string;
+      noReviewsMsg: string; loadingReviewsMsg: string; verifiedUser: string;
+      whatsappMsg: string; agencySection: string; aboutAgencyLink: string;
+      seePropertiesBtn: string; responseDesc: string; reviewsCountLabel: string;
+      breadHome: string; breadFindAgent: string;
+      ratingsLabel: string;
+    };
+    agency: {
+      backToAgencies: string; partnerSince: string;
+      aboutHeading: string; specializationsHeading: string; areasHeading: string;
+      teamHeading: string; certificationsHeading: string;
+      contactAgencyHeading: string;
+      addressLabel: string; phoneLabel: string; emailLabel: string; websiteLabel: string; languagesLabel: string;
+      callBtn: string; whatsappMsg: string;
+      listingsHeading: string; property: string; properties: string;
+      statAgentsLabel: string; statListingsLabel: string; statDealsLabel: string; statYearsLabel: string;
+    };
+  };
   regions: {
     sectionLabel: string; heading: string;
     liveLabel: string; liveTitle: string; liveTag: string;
