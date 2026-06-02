@@ -253,6 +253,11 @@ export type Messages = {
       listingsHeading: string; property: string; properties: string;
       statAgentsLabel: string; statListingsLabel: string; statDealsLabel: string; statYearsLabel: string;
     };
+    blog: {
+      backToBlog: string; breadHome: string; breadBlog: string;
+      ctaHeading: string; ctaBody: string; ctaFindAgent: string; ctaViewListings: string;
+      relatedHeading: string;
+    };
   };
   regions: {
     sectionLabel: string; heading: string;

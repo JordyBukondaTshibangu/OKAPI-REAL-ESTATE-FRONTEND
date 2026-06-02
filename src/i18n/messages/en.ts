@@ -303,6 +303,13 @@ const en: Messages = {
       listingsHeading: "{name} listings", property: "property", properties: "properties",
       statAgentsLabel: "Agents", statListingsLabel: "Active listings", statDealsLabel: "Transactions", statYearsLabel: "Years of experience",
     },
+    blog: {
+      backToBlog: "Back to blog", breadHome: "Home", breadBlog: "Blog",
+      ctaHeading: "Do you have a property project?",
+      ctaBody: "Our Okapi Real Estate agents are experts in the Kinshasa market. Get in touch for personalised guidance.",
+      ctaFindAgent: "Find an agent", ctaViewListings: "View listings",
+      relatedHeading: "Similar articles",
+    },
   },
   regions: {
     sectionLabel: "Neighbourhoods",

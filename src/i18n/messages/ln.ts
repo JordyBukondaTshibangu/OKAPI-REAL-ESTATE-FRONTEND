@@ -304,6 +304,13 @@ const ln: Messages = {
       listingsHeading: "Annonces ya {name}", property: "bien", properties: "biens",
       statAgentsLabel: "Bato ya mosala", statListingsLabel: "Annonces ezali", statDealsLabel: "Transactions", statYearsLabel: "Bambula ya experience",
     },
+    blog: {
+      backToBlog: "Zonga na blog", breadHome: "Ndako", breadBlog: "Blog",
+      ctaHeading: "Ozali na projet ya ndako?",
+      ctaBody: "Baazhaa ya Okapi Real Estate bazali bato ya bozoba ya marchée ya Kinshasa. Benga biso mpo na lisalisi ya monene.",
+      ctaFindAgent: "Yeba moazhaa", ctaViewListings: "Tala annonces",
+      relatedHeading: "Makomi ya ndenge moko",
+    },
   },
   regions: {
     sectionLabel: "Quartiers",

@@ -335,6 +335,13 @@ const fr: Messages = {
       listingsHeading: "Annonces de {name}", property: "bien", properties: "biens",
       statAgentsLabel: "Agents", statListingsLabel: "Annonces actives", statDealsLabel: "Transactions", statYearsLabel: "Ans d'expérience",
     },
+    blog: {
+      backToBlog: "Retour au blog", breadHome: "Accueil", breadBlog: "Blog",
+      ctaHeading: "Vous avez un projet immobilier ?",
+      ctaBody: "Nos agents Okapi Real Estate sont des experts du marché kinois. Prenez contact pour un accompagnement personnalisé.",
+      ctaFindAgent: "Trouver un agent", ctaViewListings: "Voir les annonces",
+      relatedHeading: "Articles similaires",
+    },
   },
   regions: {
     sectionLabel: "Quartiers",
