@@ -22,7 +22,7 @@ export default function AgentSelect({
         />
       </button>
       {open && (
-        <div className="absolute left-0 right-0 mt-1 rounded-lg border border-border bg-white shadow-lg z-30 overflow-hidden">
+        <div className="absolute left-0 right-0 mt-1 rounded-lg border border-border bg-white dark:bg-card shadow-lg z-30 overflow-hidden">
           {children}
         </div>
       )}

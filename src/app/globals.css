@@ -48,14 +48,45 @@
 }
 
 .dark {
-  --background: 217 68% 14%;
-  --foreground: 0 0% 98%;
+  /* Backgrounds */
+  --background: 217 68% 10%;
+  --background-alt: 217 60% 14%;
 
+  /* Text */
+  --foreground: 0 0% 95%;
+
+  /* Primary */
   --primary: 214 72% 60%;
-  --secondary: 46 65% 58%;
+  --primary-foreground: 217 68% 10%;
+  --primary-hover: 214 72% 70%;
 
-  --card: 217 60% 18%;
+  /* Secondary */
+  --secondary: 46 65% 58%;
+  --secondary-foreground: 217 68% 10%;
+
+  /* Navy — stays dark in dark mode */
+  --navy: 217 70% 8%;
+  --navy-foreground: 0 0% 95%;
+
+  /* Muted / surface */
+  --muted: 217 50% 18%;
+  --muted-foreground: 215 20% 60%;
+
+  /* Borders & inputs */
   --border: 217 33% 25%;
+  --input: 217 33% 25%;
+
+  /* Cards */
+  --card: 217 60% 14%;
+  --card-foreground: 0 0% 95%;
+
+  /* Accent */
+  --accent: 214 50% 20%;
+  --accent-foreground: 214 72% 70%;
+
+  /* States */
+  --destructive: 0 72% 60%;
+  --ring: 214 72% 60%;
 }
 
 @theme inline {

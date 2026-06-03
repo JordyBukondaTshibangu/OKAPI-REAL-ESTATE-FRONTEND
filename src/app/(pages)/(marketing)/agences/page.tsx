@@ -67,7 +67,7 @@ export default function AgencesPage() {
             </Button>
             <Button
               variant="outline"
-              className="border-white/40 text-white hover:bg-white/10"
+              className="border-white/40 text-white hover:bg-white dark:bg-card/10"
               asChild
             >
               <Link href="#agences">{t.agenciesPage.seeAgencies}</Link>
@@ -77,7 +77,7 @@ export default function AgencesPage() {
       </section>
 
       {/* Stats bar */}
-      <section className="bg-white border-b border-border">
+      <section className="bg-white dark:bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
           {[
             { label: t.agenciesPage.statPartners, value: meta.total },
@@ -97,7 +97,7 @@ export default function AgencesPage() {
 
       {/* Filters */}
       <section className="max-w-6xl mx-auto px-6 pt-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-border p-5 flex flex-col sm:flex-row gap-3">
+        <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border p-5 flex flex-col sm:flex-row gap-3">
           <label className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -138,11 +138,11 @@ export default function AgencesPage() {
         </div>
 
         {isLoading ? (
-          <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
+          <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
             {t.agenciesPage.loading}
           </div>
         ) : agencies.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
+          <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
             {t.agenciesPage.noAgencies}
           </div>
         ) : (
@@ -202,7 +202,7 @@ function AgencyLanguageSelect({
         />
       </button>
       {open && (
-        <div className="absolute left-0 right-0 mt-1 rounded-lg border border-border bg-white shadow-lg z-30 overflow-hidden">
+        <div className="absolute left-0 right-0 mt-1 rounded-lg border border-border bg-white dark:bg-card shadow-lg z-30 overflow-hidden">
           <button
             onClick={() => onChange(null)}
             className={`w-full text-left px-3 py-2 text-sm hover:bg-accent ${

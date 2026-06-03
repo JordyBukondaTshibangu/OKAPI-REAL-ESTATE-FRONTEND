@@ -71,13 +71,13 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-card rounded-2xl shadow-lg p-8">
-          <h1 className="text-xl font-semibold text-text-dark mb-6 text-center">
+          <h1 className="text-xl font-semibold  mb-6 text-center">
             Connexion
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium  block mb-1.5">
                 Adresse e-mail
               </label>
               <Input
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-text-dark">
+                <label className="text-sm font-medium ">
                   Mot de passe
                 </label>
                 <Link href="/mot-de-passe-oublie" className="text-xs text-primary hover:underline">

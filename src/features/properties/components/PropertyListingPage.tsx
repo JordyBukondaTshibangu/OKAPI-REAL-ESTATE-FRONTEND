@@ -77,7 +77,7 @@ export default function PropertyListingPage({
               {visible.length > 0 ? (
                 visible.map((p) => <PropertyCard key={p.id} property={p} />)
               ) : (
-                <div className="rounded-2xl border border-dashed border-border bg-white p-12 text-center">
+                <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-12 text-center">
                   <p className="text-muted-foreground text-sm mb-2">
                     {t.listing.noResults}
                   </p>

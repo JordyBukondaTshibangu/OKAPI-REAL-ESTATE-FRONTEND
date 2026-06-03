@@ -61,7 +61,7 @@ export default function ReviewsPage() {
   return (
     <UserSidebarLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-text-dark">
+        <h1 className="text-2xl font-semibold ">
           Mes Avis &amp; Notes
         </h1>
 
@@ -82,7 +82,7 @@ export default function ReviewsPage() {
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
               <Star className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h2 className="text-base font-semibold text-text-dark mb-2">
+            <h2 className="text-base font-semibold  mb-2">
               Aucun avis publié
             </h2>
             <p className="text-sm text-muted-foreground mb-6 max-w-xs">
@@ -99,7 +99,7 @@ export default function ReviewsPage() {
             {/* Summary */}
             <div className="bg-card rounded-2xl shadow-sm p-6 flex items-center gap-6">
               <div className="text-center shrink-0">
-                <p className="text-4xl font-bold text-text-dark">
+                <p className="text-4xl font-bold ">
                   {avgRating.toFixed(1)}
                 </p>
                 <StarRating rating={Math.round(avgRating)} />
@@ -137,7 +137,7 @@ export default function ReviewsPage() {
                 <div key={review.id} className="bg-card rounded-2xl shadow-sm p-6">
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div>
-                      <p className="text-sm font-semibold text-text-dark">
+                      <p className="text-sm font-semibold ">
                         {reviewSubject(review)}
                       </p>
                       <div className="flex items-center gap-2 mt-1">

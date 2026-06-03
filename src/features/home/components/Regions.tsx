@@ -42,10 +42,10 @@ export default function Regions() {
           <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
             {t.regions.sectionLabel}
           </p>
-          <h2 className="text-2xl md:text-3xl font-semibold mb-6">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-white">
             {t.regions.heading}
           </h2>
-          <div className="grid grid-cols-3 gap-4 text-sm text-primary-foreground/85">
+          <div className="grid grid-cols-3 gap-4 text-sm text-primary-foreground/85 dark:text-white">
             {suburbs.map((suburb) => (
               <Link
                 key={suburb}
@@ -58,7 +58,7 @@ export default function Regions() {
           </div>
         </div>
 
-        <Card className="bg-white text-foreground p-6 rounded-xl shadow-lg border-0">
+        <Card className="bg-white dark:bg-card text-foreground p-6 rounded-xl shadow-lg border-0">
           <div className="flex items-center justify-between mb-1">
             <p className="text-xs text-muted-foreground tracking-wide uppercase">
               {t.regions.liveLabel}
