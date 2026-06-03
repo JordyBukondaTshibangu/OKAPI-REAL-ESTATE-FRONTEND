@@ -209,12 +209,12 @@ function ProfileMenu() {
         <Button
           variant="outline"
           size="sm"
-          className="border-white/40 text-white hover:bg-white/10 hover:text-white min-w-max"
+          className="hidden xl:flex border-white/40 text-white hover:bg-white/10 hover:text-white min-w-max"
           asChild
         >
           <Link href="/carrieres" className="min-w-max px-4 w-52">{t.auth.joinTeam}</Link>
         </Button>
-        <Button variant="gold" size="sm" asChild className="hidden md:flex">
+        <Button variant="gold" size="sm" asChild className="hidden xl:flex">
           <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
@@ -233,7 +233,7 @@ function ProfileMenu() {
         >
           <Link href="/connexion" className="min-w-fit">{t.auth.login}</Link>
         </Button>
-        <Button variant="gold" size="sm" asChild className="hidden md:flex">
+        <Button variant="gold" size="sm" asChild className="hidden xl:flex">
           <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
@@ -252,7 +252,7 @@ function ProfileMenu() {
       <Button
         variant="outline"
         size="sm"
-        className="border-white/40 text-white hover:bg-white/10 hover:text-white min-w-max"
+        className="hidden xl:flex border-white/40 text-white hover:bg-white/10 hover:text-white min-w-max"
         asChild
       >
         <Link href="/carrieres">{t.auth.joinTeam}</Link>
@@ -427,7 +427,7 @@ function NavListButton({
     <Link
       href="/vendre"
       onMouseEnter={() => setOpenMenu(sellItem?.label ?? null)}
-      className="ml-2 inline-flex items-center rounded-full border border-white/40 px-4 h-9 text-sm font-medium text-white hover:bg-white hover:text-navy transition-colors"
+      className="hidden xl:inline-flex ml-2  items-center rounded-full border border-white/40 px-4 h-9 text-sm font-medium text-white hover:bg-white hover:text-navy transition-colors"
     >
       {t.nav.list}
     </Link>
