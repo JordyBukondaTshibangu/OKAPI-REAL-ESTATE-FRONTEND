@@ -1,23 +1,29 @@
+"use client";
+
+import { useT } from "@/i18n/useT";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 
+
+export default function ContentSections() {
+
+  const t = useT();
+
+  
 const sections = [
   {
     image : "/assets/images/article-1.jpg",
-    title: "Actualités",
-    excerpt:
-      "Louer ou acheter à Kinshasa — quelle est la meilleure décision financière selon votre situation ?",
+    title: t.home.content.card1Title,
+    excerpt: t.home.content.card1Excerpt,
   },
   {
     image : "/assets/images/article-2.jpg",
-    title: "Conseils",
-    excerpt:
-      "Pourquoi les vendeurs bien préparés obtiennent de meilleurs prix sur le marché immobilier de Kinshasa.",
+    title: t.home.content.card2Title,
+    excerpt: t.home.content.card2Excerpt,
   },
 ];
 
-export default function ContentSections() {
   return (
     <section className="bg-background-alt py-16 px-8">
       <div className="max-w-6xl mx-auto">

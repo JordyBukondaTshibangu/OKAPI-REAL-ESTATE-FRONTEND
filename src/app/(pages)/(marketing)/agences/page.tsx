@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,6 +13,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 const LIMIT = 12;
 
 export default function AgencesPage() {
+  const t = useT();
   const name = useAgenciesStore((s) => s.name);
   const language = useAgenciesStore((s) => s.language);
   const page = useAgenciesStore((s) => s.page);
@@ -51,25 +53,24 @@ export default function AgencesPage() {
         />
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 text-center">
           <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-4">
-            Agences partenaires
+            {t.agenciesPage.heroBadge}
           </p>
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            Trouvez votre agence immobilière
+            {t.agenciesPage.heroHeading}
           </h1>
           <p className="text-white/80 max-w-2xl mx-auto text-base">
-            {meta.total} agences vérifiées à travers Kinshasa et la RDC, prêtes à vous
-            accompagner sur l&apos;achat, la vente ou la location de votre bien.
+            {t.agenciesPage.heroSubtitle.replace("{count}", String(meta.total))}
           </p>
           <div className="flex justify-center gap-4 mt-8">
             <Button variant="gold" asChild>
-              <Link href="/agents">Trouver un agent</Link>
+              <Link href="/agents">{t.agenciesPage.findAgent}</Link>
             </Button>
             <Button
               variant="outline"
               className="border-white/40 text-white hover:bg-white/10"
               asChild
             >
-              <Link href="#agences">Voir les agences</Link>
+              <Link href="#agences">{t.agenciesPage.seeAgencies}</Link>
             </Button>
           </div>
         </div>
@@ -79,10 +80,10 @@ export default function AgencesPage() {
       <section className="bg-white border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
           {[
-            { label: "Agences partenaires", value: meta.total },
-            { label: "Agents actifs", value: agencies.reduce((s, a) => s + a.agentCount, 0) },
+            { label: t.agenciesPage.statPartners, value: meta.total },
+            { label: t.agenciesPage.statAgents, value: agencies.reduce((s, a) => s + a.agentCount, 0) },
             {
-              label: "Transactions réalisées",
+              label: t.agenciesPage.statTransactions,
               value: `${agencies.reduce((s, a) => s + a.closedDeals, 0).toLocaleString("fr-FR")}+`,
             },
           ].map((stat) => (
@@ -101,7 +102,7 @@ export default function AgencesPage() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Rechercher une agence..."
+              placeholder={t.agenciesPage.searchPlaceholder}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full h-11 pl-9 pr-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring/40 text-sm"
@@ -111,13 +112,15 @@ export default function AgencesPage() {
             value={language}
             options={languageOptions}
             onChange={setLanguage}
+            allLabel={t.agenciesPage.filterAll}
+            placeholder={t.agenciesPage.filterLanguage}
           />
           {(name || language) && (
             <button
               onClick={resetFilters}
               className="text-xs text-primary hover:underline self-center"
             >
-              Réinitialiser
+              {t.agenciesPage.reset}
             </button>
           )}
         </div>
@@ -126,17 +129,21 @@ export default function AgencesPage() {
       {/* Agency grid */}
       <section id="agences" className="max-w-6xl mx-auto px-6 py-10 pb-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl font-semibold text-foreground">Toutes les agences</h2>
-          <p className="text-sm text-muted-foreground">{meta.total} agences</p>
+          <h2 className="text-xl font-semibold text-foreground">
+            {t.agenciesPage.allAgencies}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {t.agenciesPage.agencyCount.replace("{count}", String(meta.total))}
+          </p>
         </div>
 
         {isLoading ? (
           <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
-            Chargement des agences...
+            {t.agenciesPage.loading}
           </div>
         ) : agencies.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
-            Aucune agence ne correspond à votre recherche.
+            {t.agenciesPage.noAgencies}
           </div>
         ) : (
           <>
@@ -155,14 +162,13 @@ export default function AgencesPage() {
       {/* CTA */}
       <section className="bg-primary text-primary-foreground py-16 px-6 text-center">
         <h2 className="text-2xl font-semibold mb-3">
-          Votre agence n&apos;est pas encore listée ?
+          {t.agenciesPage.ctaHeading}
         </h2>
         <p className="text-primary-foreground/80 text-sm mb-8 max-w-lg mx-auto">
-          Rejoignez le réseau Okapi Real Estate et accédez à des milliers d&apos;acheteurs,
-          vendeurs et locataires actifs chaque jour.
+          {t.agenciesPage.ctaBody}
         </p>
         <Button variant="gold" asChild>
-          <Link href="/contact">Inscrire mon agence</Link>
+          <Link href="/contact">{t.agenciesPage.ctaBtn}</Link>
         </Button>
       </section>
     </div>
@@ -173,10 +179,14 @@ function AgencyLanguageSelect({
   value,
   options,
   onChange,
+  allLabel,
+  placeholder,
 }: {
   value: string | null;
   options: string[];
   onChange: (v: string | null) => void;
+  allLabel: string;
+  placeholder: string;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -186,7 +196,7 @@ function AgencyLanguageSelect({
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         className="w-full h-11 px-3 rounded-lg border border-input bg-background flex items-center justify-between text-sm text-foreground/85 hover:border-primary/40 transition-colors"
       >
-        <span className="truncate">{value ?? "Langue"}</span>
+        <span className="truncate">{value ?? placeholder}</span>
         <ChevronDown
           className={`w-4 h-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
         />
@@ -199,7 +209,7 @@ function AgencyLanguageSelect({
               !value ? "bg-accent text-primary font-semibold" : ""
             }`}
           >
-            Toutes
+            {allLabel}
           </button>
           {options.map((l) => (
             <button

@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import type { Property } from "@/features/properties/types/property";
 import { categoryLabel, formatListedAgo, formatPrice } from "@/lib/properties";
 import { addFavourite, removeFavourite } from "@/services/auth";
@@ -22,6 +23,7 @@ import PremiumBadge from "./badges/PremiumBadge";
 import VerifiedBadge from "./badges/VerifiedBadge";
 
 export default function PropertyCard({ property }: { property: Property }) {
+  const t = useT();
   const { iconType } = property;
   const { token, isAuthenticated } = useAuthStore();
   const router = useRouter();
@@ -50,6 +52,13 @@ export default function PropertyCard({ property }: { property: Property }) {
   }
 
   const detailHref = `/property/${property.id}`;
+
+  const whatsappMessage = t.cards.whatsappMsg
+    .replace("{title}", property.title)
+    .replace("{neighborhood}", property.neighborhood)
+    .replace("{suburb}", property.suburb)
+    .replace("{id}", property.id);
+
   return (
     <article className="bg-white rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
@@ -87,7 +96,7 @@ export default function PropertyCard({ property }: { property: Property }) {
           {/* Heart */}
           <button
             onClick={handleToggleFavourite}
-            aria-label={saved ? "Retirer des favoris" : "Ajouter aux favoris"}
+            aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
             disabled={saving}
             className={`absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors disabled:opacity-60 ${
               saved ? "text-secondary" : "text-foreground/70 hover:text-secondary"
@@ -173,17 +182,17 @@ export default function PropertyCard({ property }: { property: Property }) {
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" className="gap-1.5" asChild>
                 <Link href={detailHref}>
-                  <PhoneIcon className="w-4 h-4" /> Appeler
+                  <PhoneIcon className="w-4 h-4" /> {t.cards.call}
                 </Link>
               </Button>
               <Button variant="default" size="sm" className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53]" asChild>
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`Bonjour, je suis intéressé(e) par ce bien : ${property.title} — ${property.neighborhood}, ${property.suburb}. Réf : ${property.id}`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <WhatsAppIcon className="w-4 h-4" /> WhatsApp
+                  <WhatsAppIcon className="w-4 h-4" /> {t.cards.whatsapp}
                 </a>
               </Button>
             </div>
