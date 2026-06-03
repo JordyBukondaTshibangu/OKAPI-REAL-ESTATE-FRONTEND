@@ -162,11 +162,11 @@ export default function ProfilePage() {
   return (
     <UserSidebarLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-text-dark">Mon Profil</h1>
+        <h1 className="text-2xl font-semibold text-not-dark">Mon Profil</h1>
 
         {/* Avatar card */}
         <div className="bg-card rounded-2xl shadow-sm p-8">
-          <h2 className="text-base font-semibold text-text-dark mb-6">
+          <h2 className="text-base font-semibold text-not-dark mb-6">
             Photo de profil
           </h2>
           <div className="flex items-center gap-6">
@@ -238,13 +238,13 @@ export default function ProfilePage() {
 
         {/* Profile info card */}
         <div className="bg-card rounded-2xl shadow-sm p-8">
-          <h2 className="text-base font-semibold text-text-dark mb-6">
+          <h2 className="text-base font-semibold text-not-dark mb-6">
             Informations personnelles
           </h2>
           <form onSubmit={handleProfile(onProfileSubmit)} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-text-dark block mb-1.5">
+                <label className="text-sm font-medium text-not-dark block mb-1.5">
                   Prénom
                 </label>
                 <Input {...regProfile("firstName")} />
@@ -255,7 +255,7 @@ export default function ProfilePage() {
                 )}
               </div>
               <div>
-                <label className="text-sm font-medium text-text-dark block mb-1.5">
+                <label className="text-sm font-medium text-not-dark block mb-1.5">
                   Nom
                 </label>
                 <Input {...regProfile("lastName")} />
@@ -267,7 +267,7 @@ export default function ProfilePage() {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium text-not-dark block mb-1.5">
                 Adresse e-mail
               </label>
               <Input {...regProfile("email")} type="email" />
@@ -278,7 +278,7 @@ export default function ProfilePage() {
               )}
             </div>
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium text-not-dark block mb-1.5">
                 Téléphone
               </label>
               <Input {...regProfile("phoneNumber")} type="tel" />
@@ -307,12 +307,12 @@ export default function ProfilePage() {
 
         {/* Password card */}
         <div className="bg-card rounded-2xl shadow-sm p-8">
-          <h2 className="text-base font-semibold text-text-dark mb-6">
+          <h2 className="text-base font-semibold text-not-dark mb-6">
             Changer le mot de passe
           </h2>
           <form onSubmit={handlePwd(onPasswordSubmit)} className="space-y-5">
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium text-not-dark block mb-1.5">
                 Mot de passe actuel
               </label>
               <div className="relative">
@@ -337,7 +337,7 @@ export default function ProfilePage() {
               )}
             </div>
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium text-not-dark block mb-1.5">
                 Nouveau mot de passe
               </label>
               <div className="relative">
@@ -362,7 +362,7 @@ export default function ProfilePage() {
               )}
             </div>
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium text-not-dark block mb-1.5">
                 Confirmer le nouveau mot de passe
               </label>
               <div className="relative">

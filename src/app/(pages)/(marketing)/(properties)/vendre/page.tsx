@@ -21,7 +21,7 @@ function FeatureRow({ feature }: { feature: Feature | null }) {
     );
   }
   return (
-    <li className="flex items-start gap-2 text-sm text-text-dark min-h-[28px]">
+    <li className="flex items-start gap-2 text-sm text-not-dark min-h-[28px]">
       <Check className="w-4 h-4 mt-0.5 text-emerald-500 shrink-0" />
       <span className="flex items-center gap-1.5">
         {feature.label}
@@ -43,8 +43,8 @@ function PackageCard({ pkg, listBtn, included, plus }: { pkg: Package; listBtn: 
         </div>
       )}
       <div className="px-6 pt-8 pb-6 text-center">
-        <h3 className="text-2xl font-light text-text-dark">{pkg.name}</h3>
-        <p className="mt-3 text-2xl font-semibold text-text-dark">{pkg.price}</p>
+        <h3 className="text-2xl font-light text-not-dark">{pkg.name}</h3>
+        <p className="mt-3 text-2xl font-semibold text-not-dark">{pkg.price}</p>
         <p className="mt-4 text-sm text-muted-foreground leading-relaxed min-h-[60px]">{pkg.blurb}</p>
       </div>
       <div className="px-6 pb-6 border-t border-border pt-6 flex-1">
@@ -119,8 +119,8 @@ export default function VendrePage() {
   return (
     <div className="bg-background-alt">
       <section className="max-w-6xl mx-auto px-6 py-14">
-        <p className="text-center text-text-dark">{s.tagline}</p>
-        <h1 className="text-center text-4xl md:text-5xl font-light text-text-dark mt-8">
+        <p className="text-center text-not-dark">{s.tagline}</p>
+        <h1 className="text-center text-4xl md:text-5xl font-light text-not-dark mt-8">
           {s.heading}
         </h1>
         <p className="text-center mt-3">
@@ -137,20 +137,20 @@ export default function VendrePage() {
 
       <section className="bg-background">
         <div className="max-w-6xl mx-auto px-6 py-16 text-center">
-          <h2 className="text-3xl md:text-4xl font-light text-text-dark">{s.whyHeading}</h2>
-          <p className="mt-6 max-w-3xl mx-auto text-text-dark">{s.whyPara}</p>
+          <h2 className="text-3xl md:text-4xl font-light text-not-dark">{s.whyHeading}</h2>
+          <p className="mt-6 max-w-3xl mx-auto text-not-dark">{s.whyPara}</p>
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="rounded-xl bg-background-alt p-8">
               <p className="text-4xl font-semibold text-primary">{s.stat1Value}</p>
-              <p className="mt-3 text-sm text-text-dark">{s.stat1Label}</p>
+              <p className="mt-3 text-sm text-not-dark">{s.stat1Label}</p>
             </div>
             <div className="rounded-xl bg-background-alt p-8">
               <p className="text-4xl font-semibold text-primary">{s.stat2Value}</p>
-              <p className="mt-3 text-sm text-text-dark">{s.stat2Label}</p>
+              <p className="mt-3 text-sm text-not-dark">{s.stat2Label}</p>
             </div>
             <div className="rounded-xl bg-background-alt p-8">
               <p className="text-4xl font-semibold text-primary">{s.stat3Value}</p>
-              <p className="mt-3 text-sm text-text-dark">{s.stat3Label}</p>
+              <p className="mt-3 text-sm text-not-dark">{s.stat3Label}</p>
             </div>
           </div>
           <div className="mt-12">

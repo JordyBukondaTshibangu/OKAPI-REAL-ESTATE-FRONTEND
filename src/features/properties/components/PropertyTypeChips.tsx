@@ -12,7 +12,7 @@ export default function PropertyTypeChips({
   return (
     <div className="flex flex-wrap items-center gap-3">
       {categories.map((c, idx) => {
-        const chipClass = `inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm transition-colors bg-white ${
+        const chipClass = `inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm transition-colors bg-white dark:bg-card ${
           idx === 0
             ? "border-primary text-foreground"
             : "border-border text-foreground/85 hover:border-primary/50"

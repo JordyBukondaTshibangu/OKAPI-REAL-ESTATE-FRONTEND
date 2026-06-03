@@ -32,6 +32,18 @@ export type DiscoverCard = {
   Badge: LucideIcon;
 };
 
+function GoldWord({ text, highlight }: { text: string; highlight: string }) {
+  const parts = text.split(highlight);
+  if (parts.length < 2) return <>{text}</>;
+  return (
+    <>
+      {parts[0]}
+      <span className="text-secondary">{highlight}</span>
+      {parts.slice(1).join(highlight)}
+    </>
+  );
+}
+
 export default function Discover() {
   const t = useT();
 
@@ -116,55 +128,33 @@ export default function Discover() {
     },
   ];
 
+  const tabClass = "rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-200 text-muted-foreground bg-transparent hover:bg-black/5 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground data-[state=active]:shadow-none";
+
   return (
     <section className="relative bg-background-alt py-16 px-6">
       <div className="max-w-6xl mx-auto">
         {/* Heading */}
-        <h2 className="text-3xl md:text-4xl font-semibold text-text-dark text-center mb-8">
-          {t.home.discover.heading}
+        <h2 className="text-3xl md:text-4xl font-semibold text-foreground text-center mb-8">
+          <GoldWord text={t.home.discover.heading} highlight={t.home.discover.headingHighlight} />
         </h2>
 
         <Tabs defaultValue="buying" className="w-full">
           {/* Tabs */}
           <div className="flex justify-center mb-10">
-            <TabsList className="bg-transparent h-auto p-0 gap-2  rounded-none">
-              <TabsTrigger
-                value="buying"
-                className="rounded-md px-6 py-3 text-base font-medium text-text-light data-[state=active]:bg-transparent data-[state=active]:text-text-dark data-[state=active]:shadow-none data-[state=active]:border data-[state=active]:border-secondary data-[state=active]:rounded-md relative -mb-px"
-              >
-                {t.home.discover.tabBuy}
-              </TabsTrigger>
-              <TabsTrigger
-                value="renting"
-                className="rounded-md px-6 py-3 text-base font-medium text-text-light data-[state=active]:bg-transparent data-[state=active]:text-text-dark data-[state=active]:shadow-none data-[state=active]:border data-[state=active]:border-secondary data-[state=active]:rounded-md relative -mb-px"
-              >
-                {t.home.discover.tabRent}
-              </TabsTrigger>
-              <TabsTrigger
-                value="selling"
-                className="rounded-md px-6 py-3 text-base font-medium text-text-light data-[state=active]:bg-transparent data-[state=active]:text-text-dark data-[state=active]:shadow-none data-[state=active]:border data-[state=active]:border-secondary data-[state=active]:rounded-md relative -mb-px"
-              >
-                {t.home.discover.tabSell}
-              </TabsTrigger>
+            <TabsList className="bg-white dark:bg-card border border-border rounded-full h-auto p-1 gap-1 shadow-sm">
+              <TabsTrigger value="buying"  className={tabClass}>{t.home.discover.tabBuy}</TabsTrigger>
+              <TabsTrigger value="renting" className={tabClass}>{t.home.discover.tabRent}</TabsTrigger>
+              <TabsTrigger value="selling" className={tabClass}>{t.home.discover.tabSell}</TabsTrigger>
             </TabsList>
           </div>
 
           {/* Layered effect: navy band behind the card */}
           <div className="relative">
-            <div
-              className="absolute inset-x-0 bottom-0 h-24 bg-navy rounded-b-xl"
-              aria-hidden="true"
-            />
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-navy rounded-b-xl" aria-hidden="true" />
             <div className="relative">
-              <TabsContent value="buying" className="mt-0">
-                <CardsGrid cards={buyingCards} />
-              </TabsContent>
-              <TabsContent value="renting" className="mt-0">
-                <CardsGrid cards={rentingCards} />
-              </TabsContent>
-              <TabsContent value="selling" className="mt-0">
-                <CardsGrid cards={sellingCards} />
-              </TabsContent>
+              <TabsContent value="buying"  className="mt-0"><CardsGrid cards={buyingCards} /></TabsContent>
+              <TabsContent value="renting" className="mt-0"><CardsGrid cards={rentingCards} /></TabsContent>
+              <TabsContent value="selling" className="mt-0"><CardsGrid cards={sellingCards} /></TabsContent>
             </div>
           </div>
         </Tabs>

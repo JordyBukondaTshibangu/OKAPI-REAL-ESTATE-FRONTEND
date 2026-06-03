@@ -170,7 +170,7 @@ export default function AgentsListClient() {
 
         {/* Search panel */}
         <div className="relative max-w-6xl mx-auto px-6 -mb-12 -translate-y-12 z-99">
-          <div className="bg-white text-foreground rounded-2xl shadow-lg p-5 md:p-6">
+          <div className="bg-white dark:bg-card text-foreground rounded-2xl shadow-lg p-5 md:p-6">
             {/* Tabs */}
             <div className="flex items-center gap-2 mb-4">
               <button
@@ -428,7 +428,7 @@ export default function AgentsListClient() {
                   <ChevronDown className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
                 </button>
                 {sortOpen && (
-                  <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl border border-border shadow-lg z-30">
+                  <div className="absolute right-0 mt-1 w-44 bg-white dark:bg-card rounded-xl border border-border shadow-lg z-30">
                     {(["pertinence", "title"] as const).map((opt) => (
                       <button
                         key={opt}
@@ -444,11 +444,11 @@ export default function AgentsListClient() {
             </div>
 
             {agentLoading ? (
-              <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
+              <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
                 {t.agentsPage.loadingAgents}
               </div>
             ) : displayedAgents.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
+              <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
                 {t.agentsPage.noAgents}
               </div>
             ) : (
@@ -480,11 +480,11 @@ export default function AgentsListClient() {
             </div>
 
             {agencyLoading ? (
-              <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
+              <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
                 {t.agentsPage.loadingAgencies}
               </div>
             ) : agencies.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
+              <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
                 {t.agentsPage.noAgencies}
               </div>
             ) : (

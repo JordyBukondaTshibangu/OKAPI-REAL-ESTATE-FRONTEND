@@ -34,7 +34,7 @@ export default function EstimationPage() {
       <section className="bg-background py-20 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
           <div>
-            <h2 className="text-xl font-semibold text-text-dark mb-8">
+            <h2 className="text-xl font-semibold text-not-dark mb-8">
               Votre estimation en 3 étapes
             </h2>
             <div className="space-y-6">
@@ -44,7 +44,7 @@ export default function EstimationPage() {
                     <p.icon className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-text-dark mb-1">{p.title}</h3>
+                    <h3 className="text-sm font-semibold text-not-dark mb-1">{p.title}</h3>
                     <p className="text-sm text-text-light leading-relaxed">{p.body}</p>
                   </div>
                 </div>
@@ -53,16 +53,16 @@ export default function EstimationPage() {
           </div>
 
           <div className="bg-card rounded-2xl shadow-md p-8">
-            <h2 className="text-lg font-semibold text-text-dark mb-6">
+            <h2 className="text-lg font-semibold text-not-dark mb-6">
               Demander une estimation
             </h2>
             <form className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-text-dark block mb-1.5">Commune / Quartier</label>
+                <label className="text-sm font-medium text-not-dark block mb-1.5">Commune / Quartier</label>
                 <Input placeholder="ex: Gombe, Ngaliema, Limete…" />
               </div>
               <div>
-                <label className="text-sm font-medium text-text-dark block mb-1.5">Type de bien</label>
+                <label className="text-sm font-medium text-not-dark block mb-1.5">Type de bien</label>
                 <select className="flex h-11 w-full rounded-lg border border-input bg-background px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <option value="">Sélectionner…</option>
                   <option>Appartement</option>
@@ -75,20 +75,20 @@ export default function EstimationPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-text-dark block mb-1.5">Surface (m²)</label>
+                  <label className="text-sm font-medium text-not-dark block mb-1.5">Surface (m²)</label>
                   <Input type="number" placeholder="ex: 150" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-text-dark block mb-1.5">Chambres</label>
+                  <label className="text-sm font-medium text-not-dark block mb-1.5">Chambres</label>
                   <Input type="number" placeholder="ex: 3" />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-text-dark block mb-1.5">Votre nom</label>
+                <label className="text-sm font-medium text-not-dark block mb-1.5">Votre nom</label>
                 <Input placeholder="Prénom et nom" />
               </div>
               <div>
-                <label className="text-sm font-medium text-text-dark block mb-1.5">Téléphone</label>
+                <label className="text-sm font-medium text-not-dark block mb-1.5">Téléphone</label>
                 <Input type="tel" placeholder="+243 999 000 111" />
               </div>
               <Button type="submit" className="w-full mt-2">

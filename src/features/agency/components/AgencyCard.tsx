@@ -11,14 +11,14 @@ export default function AgencyCard({ agency }: { agency: Agency }) {
   return (
     <Link
       href={`/agences/${agency.id}`}
-      className="group block bg-white rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden"
+      className="group block bg-white dark:bg-card rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden"
     >
       <div className="grid grid-cols-[140px_1fr]">
         {/* Logo panel */}
         <div
           className={`${agency?.accentClass? agency?.accentClass : 'bg-yellow-600'} flex flex-col items-center justify-center gap-2 p-6`}
         >
-          <div className="w-16 h-16 rounded-xl bg-white/15 flex items-center justify-center text-white text-2xl font-bold tracking-tight">
+          <div className="w-16 h-16 rounded-xl bg-white dark:bg-card/15 flex items-center justify-center text-white text-2xl font-bold tracking-tight">
             {agency.monogram}
           </div>
           <p className="text-white/80 text-[10px] font-semibold tracking-wider text-center leading-tight">

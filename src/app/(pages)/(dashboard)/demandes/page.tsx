@@ -47,7 +47,7 @@ export default function EnquiriesPage() {
   return (
     <UserSidebarLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-text-dark">Mes Demandes</h1>
+        <h1 className="text-2xl font-semibold text-not-dark">Mes Demandes</h1>
 
         {loading && (
           <div className="bg-card rounded-2xl p-12 text-center text-muted-foreground text-sm">
@@ -66,7 +66,7 @@ export default function EnquiriesPage() {
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
               <MessageSquare className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h2 className="text-base font-semibold text-text-dark mb-2">
+            <h2 className="text-base font-semibold text-not-dark mb-2">
               Aucune demande envoyée
             </h2>
             <p className="text-sm text-muted-foreground mb-6 max-w-xs">
@@ -84,7 +84,7 @@ export default function EnquiriesPage() {
               <div key={enq.id} className="bg-card rounded-2xl shadow-sm p-6">
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div>
-                    <p className="text-sm font-semibold text-text-dark">
+                    <p className="text-sm font-semibold text-not-dark">
                       {enq.property?.title ?? "Propriété inconnue"}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">

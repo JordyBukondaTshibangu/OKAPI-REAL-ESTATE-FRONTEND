@@ -14,7 +14,7 @@ export default function AgentCard({ agent }: { agent: Agent }) {
   return (
     <Link
       href={`/agents/${agent.id}`}
-      className="group block bg-white rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden"
+      className="group block bg-white dark:bg-card rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden"
     >
       <div className="grid grid-cols-[160px_1fr]">
         {/* Photo */}

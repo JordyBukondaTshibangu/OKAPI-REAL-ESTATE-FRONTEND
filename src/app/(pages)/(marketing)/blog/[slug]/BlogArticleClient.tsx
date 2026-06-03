@@ -18,7 +18,7 @@ export default function BlogArticleClient({
   return (
     <div className="bg-background-alt min-h-screen">
       {/* Top bar */}
-      <div className="bg-white border-b border-border">
+      <div className="bg-white dark:bg-card border-b border-border">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <Link
             href="/blog"
@@ -88,7 +88,7 @@ export default function BlogArticleClient({
             <Button asChild variant="gold">
               <Link href="/agents">{t.detail.blog.ctaFindAgent}</Link>
             </Button>
-            <Button asChild className="border border-white/30 bg-transparent hover:bg-white/10">
+            <Button asChild className="border border-white/30 bg-transparent hover:bg-white dark:bg-card/10">
               <Link href="/acheter">{t.detail.blog.ctaViewListings}</Link>
             </Button>
           </div>
@@ -105,7 +105,7 @@ export default function BlogArticleClient({
                 <Link
                   key={rel.slug}
                   href={`/blog/${rel.slug}`}
-                  className="bg-white rounded-xl border border-border p-4 hover:shadow-md hover:border-primary/30 transition-all group"
+                  className="bg-white dark:bg-card rounded-xl border border-border p-4 hover:shadow-md hover:border-primary/30 transition-all group"
                 >
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2">
                     {rel.category}

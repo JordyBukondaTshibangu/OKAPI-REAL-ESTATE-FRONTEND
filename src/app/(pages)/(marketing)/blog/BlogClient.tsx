@@ -50,7 +50,7 @@ export default function BlogClient({
               className={`px-4 h-9 rounded-full text-sm font-medium transition-colors ${
                 activeCategory === cat
                   ? "bg-primary text-white"
-                  : "bg-white border border-border text-foreground/80 hover:border-primary/40 hover:text-primary"
+                  : "bg-white dark:bg-card border border-border text-foreground/80 hover:border-primary/40 hover:text-primary"
               }`}
             >
               {cat}
@@ -96,7 +96,7 @@ export default function BlogClient({
 
         {/* Posts grid */}
         {visible.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
+          <div className="bg-white dark:bg-card rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
             {t.blog.noArticles}
           </div>
         ) : (
@@ -105,7 +105,7 @@ export default function BlogClient({
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="bg-white rounded-2xl border border-border shadow-sm p-6 hover:shadow-md transition-shadow group flex flex-col"
+                className="bg-white dark:bg-card rounded-2xl border border-border shadow-sm p-6 hover:shadow-md transition-shadow group flex flex-col"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">

@@ -58,7 +58,7 @@ export default function Regions() {
           </div>
         </div>
 
-        <Card className="bg-white text-foreground p-6 rounded-xl shadow-lg border-0">
+        <Card className="bg-white dark:bg-card text-foreground p-6 rounded-xl shadow-lg border-0">
           <div className="flex items-center justify-between mb-1">
             <p className="text-xs text-muted-foreground tracking-wide uppercase">
               {t.regions.liveLabel}

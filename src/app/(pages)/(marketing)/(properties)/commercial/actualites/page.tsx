@@ -55,7 +55,7 @@ export default function ActualitesCommercialesPage() {
       </section>
 
       {/* Stats strip */}
-      <section className="bg-white border-b border-border">
+      <section className="bg-white dark:bg-card border-b border-border">
         <div className="max-w-5xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
@@ -77,7 +77,7 @@ export default function ActualitesCommercialesPage() {
                 <Link
                   key={article.slug}
                   href={`/blog/${article.slug}`}
-                  className="bg-white rounded-2xl border border-border shadow-sm p-6 hover:shadow-md transition-shadow group"
+                  className="bg-white dark:bg-card rounded-2xl border border-border shadow-sm p-6 hover:shadow-md transition-shadow group"
                 >
                   <div className="flex items-start gap-5">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
@@ -131,7 +131,7 @@ export default function ActualitesCommercialesPage() {
             <Button asChild variant="gold" size="lg">
               <Link href="/commercial">Voir les biens commerciaux</Link>
             </Button>
-            <Button asChild size="lg" className="border border-white/30 bg-transparent hover:bg-white/10">
+            <Button asChild size="lg" className="border border-white/30 bg-transparent hover:bg-white dark:bg-card/10">
               <Link href="/agents">Contacter un agent</Link>
             </Button>
           </div>

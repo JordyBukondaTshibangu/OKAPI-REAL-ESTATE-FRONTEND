@@ -27,7 +27,7 @@ export default function BlogPage() {
             <span>/</span>
             <span className="text-white">{t.pages.blog.breadBlog}</span>
           </nav>
-          <div className="inline-flex items-center gap-2 bg-white/10 text-white/90 text-xs font-medium px-3 py-1 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-white dark:bg-card/10 text-white/90 text-xs font-medium px-3 py-1 rounded-full mb-4">
             <BookOpen className="w-3.5 h-3.5" />
             {t.pages.blog.badge}
           </div>
@@ -47,7 +47,7 @@ export default function BlogPage() {
       />
 
       {/* Newsletter CTA */}
-      <section className="py-16 px-6 bg-white border-t border-border">
+      <section className="py-16 px-6 bg-white dark:bg-card border-t border-border">
         <div className="max-w-xl mx-auto text-center">
           <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-6 h-6 text-primary" />
