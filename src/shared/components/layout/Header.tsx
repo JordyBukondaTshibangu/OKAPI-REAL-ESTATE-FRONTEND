@@ -214,7 +214,7 @@ function ProfileMenu() {
         >
           <Link href="/carrieres" className="min-w-max px-4 w-52">{t.auth.joinTeam}</Link>
         </Button>
-        <Button variant="gold" size="sm" asChild>
+        <Button variant="gold" size="sm" asChild className="hidden md:flex">
           <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
@@ -233,7 +233,7 @@ function ProfileMenu() {
         >
           <Link href="/connexion" className="min-w-fit">{t.auth.login}</Link>
         </Button>
-        <Button variant="gold" size="sm" asChild>
+        <Button variant="gold" size="sm" asChild className="hidden md:flex">
           <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
