@@ -92,7 +92,7 @@ export default function CarreresPage() {
       <section className="bg-muted py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-semibold text-not-dark">
+            <h2 className="text-2xl font-semibold ">
               {p.whyHeading}
             </h2>
           </div>
@@ -106,7 +106,7 @@ export default function CarreresPage() {
                   <perk.icon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-not-dark mb-1">
+                  <h3 className="text-sm font-semibold  mb-1">
                     {perk.title}
                   </h3>
                   <p className="text-sm text-text-light leading-relaxed">
@@ -126,7 +126,7 @@ export default function CarreresPage() {
             <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
               {p.openingsBadge}
             </p>
-            <h2 className="text-2xl font-semibold text-not-dark">
+            <h2 className="text-2xl font-semibold ">
               {p.openingsHeading}
             </h2>
           </div>
@@ -138,7 +138,7 @@ export default function CarreresPage() {
                 className="bg-card rounded-xl shadow-md p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
               >
                 <div>
-                  <h3 className="text-base font-semibold text-not-dark mb-1">
+                  <h3 className="text-base font-semibold  mb-1">
                     {job.title}
                   </h3>
                   <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">

@@ -94,7 +94,7 @@ export default function AlertsPage() {
     <UserSidebarLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-not-dark">Mes Alertes</h1>
+          <h1 className="text-2xl font-semibold ">Mes Alertes</h1>
           <Button onClick={() => setShowForm((v) => !v)} size="sm">
             {showForm ? (
               <>
@@ -113,12 +113,12 @@ export default function AlertsPage() {
         {/* Create form */}
         {showForm && (
           <div className="bg-card rounded-2xl shadow-sm p-6 border border-primary/20">
-            <h2 className="text-base font-semibold text-not-dark mb-5">
+            <h2 className="text-base font-semibold  mb-5">
               Créer une nouvelle alerte
             </h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-not-dark block mb-1.5">
+                <label className="text-sm font-medium  block mb-1.5">
                   Nom de l&apos;alerte <span className="text-destructive">*</span>
                 </label>
                 <Input {...register("name")} placeholder="Ex : Appartement Gombe" />
@@ -129,7 +129,7 @@ export default function AlertsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     Type d&apos;annonce
                   </label>
                   <select
@@ -142,7 +142,7 @@ export default function AlertsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     Catégorie
                   </label>
                   <select
@@ -162,13 +162,13 @@ export default function AlertsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     Ville
                   </label>
                   <Input {...register("city")} placeholder="Ex : Kinshasa" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     Quartier
                   </label>
                   <Input {...register("suburb")} placeholder="Ex : Gombe" />
@@ -177,13 +177,13 @@ export default function AlertsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     Prix min (USD)
                   </label>
                   <Input {...register("minPrice")} type="number" placeholder="0" min={0} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     Prix max (USD)
                   </label>
                   <Input {...register("maxPrice")} type="number" placeholder="Illimité" min={0} />
@@ -192,13 +192,13 @@ export default function AlertsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     Chambres min
                   </label>
                   <Input {...register("minBedrooms")} type="number" placeholder="0" min={0} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     Chambres max
                   </label>
                   <Input {...register("maxBedrooms")} type="number" placeholder="Illimité" min={0} />
@@ -233,7 +233,7 @@ export default function AlertsPage() {
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
               <Bell className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h2 className="text-base font-semibold text-not-dark mb-2">
+            <h2 className="text-base font-semibold  mb-2">
               Aucune alerte configurée
             </h2>
             <p className="text-sm text-muted-foreground max-w-xs">
@@ -265,7 +265,7 @@ export default function AlertsPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-not-dark">{alert.name}</p>
+                      <p className="text-sm font-semibold ">{alert.name}</p>
                       {alert.active === false && (
                         <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
                           Inactive

@@ -60,7 +60,7 @@ export default function UserSidebarLayout({
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-not-dark truncate">
+                  <p className="text-sm font-semibold  truncate">
                     {user ? `${user.firstName} ${user.lastName}` : "Utilisateur"}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
@@ -80,7 +80,7 @@ export default function UserSidebarLayout({
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         isActive
                           ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:bg-muted hover:text-not-dark"
+                          : "text-muted-foreground hover:bg-muted hover:"
                       }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />

@@ -43,7 +43,7 @@ export default function FavouritesPage() {
     <UserSidebarLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-not-dark">Mes Favoris</h1>
+          <h1 className="text-2xl font-semibold ">Mes Favoris</h1>
           {favourites.length > 0 && (
             <span className="text-sm text-muted-foreground">
               {favourites.length} bien{favourites.length > 1 ? "s" : ""} sauvegardé
@@ -69,7 +69,7 @@ export default function FavouritesPage() {
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
               <Heart className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h2 className="text-base font-semibold text-not-dark mb-2">
+            <h2 className="text-base font-semibold  mb-2">
               Aucun favori pour l&apos;instant
             </h2>
             <p className="text-sm text-muted-foreground mb-6 max-w-xs">
@@ -113,7 +113,7 @@ export default function FavouritesPage() {
                 <div className="p-4">
                   <Link
                     href={`/property/${fav.property.id}`}
-                    className="text-sm font-semibold text-not-dark hover:text-primary line-clamp-1 transition-colors"
+                    className="text-sm font-semibold  hover:text-primary line-clamp-1 transition-colors"
                   >
                     {fav.property.title}
                   </Link>

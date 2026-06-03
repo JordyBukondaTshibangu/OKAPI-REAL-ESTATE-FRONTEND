@@ -77,7 +77,7 @@ export default function ContactPage() {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
           {/* Contact details */}
           <div>
-            <h2 className="text-xl font-semibold text-not-dark mb-8">
+            <h2 className="text-xl font-semibold  mb-8">
               {p.infoHeading}
             </h2>
             <ul className="space-y-6">
@@ -90,7 +90,7 @@ export default function ContactPage() {
                     <p className="text-xs text-muted-foreground mb-0.5">
                       {label}
                     </p>
-                    <p className="text-sm text-not-dark font-medium">
+                    <p className="text-sm  font-medium">
                       {value}
                     </p>
                   </div>
@@ -105,7 +105,7 @@ export default function ContactPage() {
 
           {/* Form */}
           <div>
-            <h2 className="text-xl font-semibold text-not-dark mb-8">
+            <h2 className="text-xl font-semibold  mb-8">
               {p.formHeading}
             </h2>
             {sent ? (
@@ -123,7 +123,7 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     {p.fieldName}
                   </label>
                   <Input {...register("name")} placeholder={p.placeholderName} />
@@ -134,7 +134,7 @@ export default function ContactPage() {
                   )}
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     {p.fieldEmail}
                   </label>
                   <Input
@@ -149,7 +149,7 @@ export default function ContactPage() {
                   )}
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     {p.fieldSubject}
                   </label>
                   <Input
@@ -163,7 +163,7 @@ export default function ContactPage() {
                   )}
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-not-dark block mb-1.5">
+                  <label className="text-sm font-medium  block mb-1.5">
                     {p.fieldMessage}
                   </label>
                   <textarea
