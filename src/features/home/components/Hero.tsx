@@ -5,13 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-
-const FILTER_PILLS = [
-  { label: "Type de bien", param: "type" },
-  { label: "Prix min",     param: "minPrice" },
-  { label: "Prix max",     param: "maxPrice" },
-  { label: "Chambres",     param: "beds" },
-];
+import { useT } from "@/i18n/useT";
 
 const TAB_ROUTES: Record<string, string> = {
   buy:  "/acheter",
@@ -21,8 +15,16 @@ const TAB_ROUTES: Record<string, string> = {
 
 export default function Hero() {
   const router = useRouter();
+  const t = useT();
   const [tab, setTab] = useState("buy");
   const [query, setQuery] = useState("");
+
+  const FILTER_PILLS = [
+    { label: t.hero.filterType, param: "type" },
+    { label: t.hero.filterMinPrice, param: "minPrice" },
+    { label: t.hero.filterMaxPrice, param: "maxPrice" },
+    { label: t.hero.filterBedrooms, param: "beds" },
+  ];
 
   function handleSearch() {
     const base = TAB_ROUTES[tab] ?? "/acheter";
@@ -44,18 +46,19 @@ export default function Hero() {
 
       <div className="relative max-w-5xl mx-auto text-center">
         <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-4">
-          Enraciné au Congo, bâtir votre avenir
+          {t.hero.tagline}
         </p>
         <h1 className="text-4xl md:text-5xl font-semibold mb-8 leading-tight">
-          Trouvez un bien à vendre à <span className="text-secondary">Kinshasa</span>
+          {t.hero.title}{" "}
+          <span className="text-secondary">{t.hero.highlight}</span>
         </h1>
 
         <Tabs value={tab} onValueChange={setTab} className="mb-6">
           <TabsList className="bg-transparent gap-6 border-b border-white/15 rounded-none">
             {[
-              { value: "buy",  label: "Acheter" },
-              { value: "rent", label: "Louer"   },
-              { value: "sell", label: "Vendre"  },
+              { value: "buy",  label: t.hero.buyTab  },
+              { value: "rent", label: t.hero.rentTab },
+              { value: "sell", label: t.hero.sellTab },
             ].map(({ value, label }) => (
               <TabsTrigger
                 key={value}
@@ -76,10 +79,10 @@ export default function Hero() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 border-0 rounded-none focus-visible:ring-0 text-foreground h-14 text-base"
-            placeholder="Rechercher par commune, quartier ou référence"
+            placeholder={t.hero.searchPlaceholder}
           />
           <Button type="submit" className="rounded-none h-auto px-8 text-base">
-            Rechercher
+            {t.hero.search}
           </Button>
         </form>
 

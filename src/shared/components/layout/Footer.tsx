@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useT } from "@/i18n/useT";
 
 type IconProps = { className?: string };
 
@@ -63,98 +64,45 @@ function PlayIcon({ className }: IconProps) {
   );
 }
 
-type LinkColumn = {
-  title: string;
-  links: string[];
-  param?: "suburb" | "city";
+const regionSuburbs = {
+  center: ["Gombe", "Lingwala", "Kinshasa", "Kintambo", "Barumbu", "Bandalungwa", "Lemba", "Limete"],
+  west:   ["Ngaliema", "Mont-Ngafula", "Selembao", "Bumbu", "Makala", "Kalamu", "Kasa-Vubu"],
+  east:   ["Masina", "N'Djili", "Kimbanseke", "N'Sele", "Maluku", "Kisenso", "Matete", "Ngiri-Ngiri"],
+  rdc:    ["Lubumbashi", "Goma", "Bukavu", "Kisangani", "Mbuji-Mayi", "Kananga", "Kolwezi", "Matadi", "Boma", "Mbandaka"],
 };
 
-const regions: LinkColumn[] = [
-  {
-    title: "Biens à vendre — Quartiers Centre",
-    param: "suburb",
-    links: [
-      "Gombe",
-      "Lingwala",
-      "Kinshasa",
-      "Kintambo",
-      "Barumbu",
-      "Bandalungwa",
-      "Lemba",
-      "Limete",
-    ],
-  },
-  {
-    title: "Biens à vendre — Quartiers Ouest",
-    param: "suburb",
-    links: [
-      "Ngaliema",
-      "Mont-Ngafula",
-      "Selembao",
-      "Bumbu",
-      "Makala",
-      "Kalamu",
-      "Kasa-Vubu",
-    ],
-  },
-  {
-    title: "Biens à vendre — Quartiers Est",
-    param: "suburb",
-    links: [
-      "Masina",
-      "N'Djili",
-      "Kimbanseke",
-      "N'Sele",
-      "Maluku",
-      "Kisenso",
-      "Matete",
-      "Ngiri-Ngiri",
-    ],
-  },
-  {
-    title: "Reste de la RDC",
-    param: "city",
-    links: [
-      "Lubumbashi",
-      "Goma",
-      "Bukavu",
-      "Kisangani",
-      "Mbuji-Mayi",
-      "Kananga",
-      "Kolwezi",
-      "Matadi",
-      "Boma",
-      "Mbandaka",
-    ],
-  },
-];
-
-const companyLinks = [
-  { label: "À propos", href: "/a-propos" },
-  { label: "Nous contacter", href: "/contact" },
-  { label: "Notre Blog", href: "/blog" },
-  { label: "Plan du site", href: "/plan-du-site" },
-];
-const legalLinks = [
-  { label: "Conditions générales", href: "/conditions-generales" },
-  { label: "Politique de confidentialité", href: "/confidentialite" },
-  { label: "Politique des cookies", href: "/cookies" },
-  { label: "Mentions légales", href: "/conditions-generales" },
-];
-const partnerLinks = [
-  { label: "Rejoindre notre équipe", href: "/carrieres" },
-  { label: "Espace agents", href: "/agents" },
-  { label: "Produits pour agences", href: "/agences" },
-];
-
 export default function Footer() {
+  const t = useT();
+
+  const companyLinks = [
+    { label: t.footer.about, href: "/a-propos" },
+    { label: t.footer.contact, href: "/contact" },
+    { label: t.footer.blog, href: "/blog" },
+    { label: t.footer.sitemap, href: "/plan-du-site" },
+  ];
+  const legalLinks = [
+    { label: t.footer.terms, href: "/conditions-generales" },
+    { label: t.footer.privacy, href: "/confidentialite" },
+    { label: t.footer.cookies, href: "/cookies" },
+    { label: t.footer.legalMentions, href: "/conditions-generales" },
+  ];
+  const partnerLinks = [
+    { label: t.footer.joinTeam, href: "/carrieres" },
+    { label: t.footer.agentSpace, href: "/agents" },
+    { label: t.footer.agencyProducts, href: "/agences" },
+  ];
+
+  const regions = [
+    { title: t.footer.col_regions_center, param: "suburb" as const, links: regionSuburbs.center },
+    { title: t.footer.col_regions_west,   param: "suburb" as const, links: regionSuburbs.west   },
+    { title: t.footer.col_regions_east,   param: "suburb" as const, links: regionSuburbs.east   },
+    { title: t.footer.col_regions_rdc,    param: "city"   as const, links: regionSuburbs.rdc    },
+  ];
+
   return (
     <footer className="bg-navy text-white">
-      {/* Top gold accent line */}
-      <div
-        className="h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent"
-        aria-hidden="true"
-      />
+      <div className="h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" aria-hidden="true" />
+
       {/* Top — Property by region */}
       <div className="max-w-6xl mx-auto px-6 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -167,7 +115,7 @@ export default function Footer() {
                 {col.links.map((link) => (
                   <li key={link}>
                     <Link
-                      href={`/acheter?${col.param ?? "suburb"}=${encodeURIComponent(link)}`}
+                      href={`/acheter?${col.param}=${encodeURIComponent(link)}`}
                       className="text-sm text-white/80 hover:text-secondary hover:underline transition-colors"
                     >
                       {link}
@@ -180,12 +128,11 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Divider */}
       <div className="border-t border-white/15" />
 
-      {/* Bottom — brand, links, downloads */}
+      {/* Bottom */}
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Brand + socials row */}
+        {/* Brand + socials */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
           <div>
             <Link href="/" className="flex items-center">
@@ -197,9 +144,7 @@ export default function Footer() {
                 className="h-24 w-auto"
               />
             </Link>
-            <p className="text-xs text-white/60 mt-2 tracking-wide">
-              Enraciné au Congo, bâtir votre avenir
-            </p>
+            <p className="text-xs text-white/60 mt-2 tracking-wide">{t.footer.tagline}</p>
           </div>
           <div className="flex items-center gap-5">
             <a href="#" aria-label="Instagram" className="text-white/85 hover:text-secondary transition-colors">
@@ -223,7 +168,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <ul className="space-y-3">
             {companyLinks.map((link) => (
-              <li key={link.label}>
+              <li key={link.href}>
                 <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
                   {link.label}
                 </Link>
@@ -232,8 +177,8 @@ export default function Footer() {
           </ul>
 
           <ul className="space-y-3">
-            {legalLinks.map((link) => (
-              <li key={link.label}>
+            {legalLinks.map((link, index) => (
+              <li key={index}>
                 <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
                   {link.label}
                 </Link>
@@ -242,8 +187,8 @@ export default function Footer() {
           </ul>
 
           <ul className="space-y-3">
-            {partnerLinks.map((link) => (
-              <li key={link.label}>
+            {partnerLinks.map((link, index) => (
+              <li key={index}>
                 <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
                   {link.label}
                 </Link>
@@ -252,7 +197,7 @@ export default function Footer() {
           </ul>
 
           <div>
-            <p className="text-sm font-semibold mb-3">Télécharger l&apos;application</p>
+            <p className="text-sm font-semibold mb-3">{t.footer.downloadApp}</p>
             <div className="flex flex-wrap gap-3">
               <a
                 href="#"
@@ -260,7 +205,7 @@ export default function Footer() {
               >
                 <AppleIcon className="w-5 h-5" />
                 <div className="leading-tight">
-                  <p className="text-[9px] opacity-80">Télécharger sur</p>
+                  <p className="text-[9px] opacity-80">{t.footer.downloadOnAppStore}</p>
                   <p className="text-xs font-semibold -mt-0.5">App Store</p>
                 </div>
               </a>
@@ -270,7 +215,7 @@ export default function Footer() {
               >
                 <PlayIcon className="w-5 h-5" />
                 <div className="leading-tight">
-                  <p className="text-[9px] opacity-80">DISPONIBLE SUR</p>
+                  <p className="text-[9px] opacity-80">{t.footer.availableOnPlay}</p>
                   <p className="text-xs font-semibold -mt-0.5">Google Play</p>
                 </div>
               </a>
@@ -278,9 +223,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
         <p className="text-xs text-white/70 mt-10">
-          Copyright © {new Date().getFullYear()} Okapi Real Estate
+          {t.footer.copyright.replace("{year}", String(new Date().getFullYear()))}
         </p>
       </div>
     </footer>
