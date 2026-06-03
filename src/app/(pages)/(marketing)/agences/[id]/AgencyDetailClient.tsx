@@ -38,7 +38,7 @@ export default function AgencyDetailClient({
             {da.backToAgencies}
           </Link>
           <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
-            <div className="w-24 h-24 rounded-2xl bg-white/15 flex items-center justify-center text-white text-3xl font-bold shrink-0">
+            <div className="w-24 h-24 rounded-2xl bg-white dark:bg-card/15 flex items-center justify-center text-white text-3xl font-bold shrink-0">
               {agency.monogram}
             </div>
             <div className="flex-1">
@@ -53,7 +53,7 @@ export default function AgencyDetailClient({
       </section>
 
       {/* Stats */}
-      <section className="bg-white border-b border-border">
+      <section className="bg-white dark:bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {stats.map(({ label, value, icon: Icon }) => (
             <div key={label}>
@@ -103,7 +103,7 @@ export default function AgencyDetailClient({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {agencyAgents.map((agent) => (
                   <Link key={agent.id} href={`/agents/${agent.id}`}
-                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-border hover:border-primary/30 hover:shadow-sm transition-all">
+                    className="flex items-center gap-4 p-4 bg-white dark:bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-sm transition-all">
                     <AgentAvatar name={agent.name} photo={agent.photo} size={48} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground truncate">{agent.name}</p>
@@ -132,7 +132,7 @@ export default function AgencyDetailClient({
 
         {/* RIGHT — Contact card */}
         <aside className="space-y-5">
-          <div className="bg-white rounded-2xl border border-border shadow-sm p-6 lg:sticky lg:top-28">
+          <div className="bg-white dark:bg-card rounded-2xl border border-border shadow-sm p-6 lg:sticky lg:top-28">
             <h3 className="text-base font-semibold text-foreground mb-5">{da.contactAgencyHeading}</h3>
             <ul className="space-y-4 mb-6">
               <li className="flex items-start gap-3">

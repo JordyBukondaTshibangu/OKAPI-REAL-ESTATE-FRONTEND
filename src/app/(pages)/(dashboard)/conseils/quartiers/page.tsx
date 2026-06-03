@@ -183,7 +183,7 @@ export default function QuartiersPage() {
             <span>/</span>
             <span className="text-white">Infos quartiers</span>
           </nav>
-          <div className="inline-flex items-center gap-2 bg-white/10 text-white/90 text-xs font-medium px-3 py-1 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-white dark:bg-card/10 text-white/90 text-xs font-medium px-3 py-1 rounded-full mb-4">
             8 quartiers analysés
           </div>
           <h1 className="text-4xl font-bold mb-4 leading-tight">

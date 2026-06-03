@@ -291,7 +291,7 @@ export default function EcolesUniversitesPage() {
           </Button>
           <Button
             variant="outline"
-            className="border-white/40 text-white hover:bg-white/10"
+            className="border-white/40 text-white hover:bg-white dark:bg-card/10"
             asChild
           >
             <Link href="/louer?type=studio">Studios étudiants</Link>

@@ -92,7 +92,7 @@ export default function PlanDuSitePage() {
           {sections.map((section) => {
             const Icon = section.icon;
             return (
-              <div key={section.titleKey} className="bg-white rounded-2xl border border-border shadow-sm p-6">
+              <div key={section.titleKey} className="bg-white dark:bg-card rounded-2xl border border-border shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${section.color}`}>
                     <Icon className="w-4 h-4" />

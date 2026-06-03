@@ -175,7 +175,7 @@ export default function AgentDetailClient({
   return (
     <div className="bg-background-alt pb-20">
       {/* Top sub-nav */}
-      <div className="bg-white border-b border-border">
+      <div className="bg-white dark:bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <Link
             href="/agents"
@@ -211,7 +211,7 @@ export default function AgentDetailClient({
                 <span className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground text-[10px] font-bold tracking-widest px-2 py-1 rounded-md">
                   <Trophy className="w-3 h-3" /> {agent.title}
                 </span>
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/15 text-white/80">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white dark:bg-card/15 text-white/80">
                   <Info className="w-3 h-3" />
                 </span>
               </div>
@@ -236,7 +236,7 @@ export default function AgentDetailClient({
               </div>
 
               <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
-                <Button className="h-11 gap-2 bg-white text-foreground hover:bg-white/90" asChild>
+                <Button className="h-11 gap-2 bg-white dark:bg-card text-foreground hover:bg-white dark:bg-card/90" asChild>
                   <a
                     href={agent.phone
                       ? `https://wa.me/${agent.phone.replace(/[\s+\-()]/g, "")}?text=${encodeURIComponent(da.whatsappMsg.replace("{name}", agent.name))}`
@@ -252,7 +252,7 @@ export default function AgentDetailClient({
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-11 gap-2 border-white/40 text-white hover:bg-white/10 hover:text-white"
+                  className="h-11 gap-2 border-white/40 text-white hover:bg-white dark:bg-card/10 hover:text-white"
                   asChild
                 >
                   <a href="#properties">
@@ -264,7 +264,7 @@ export default function AgentDetailClient({
           </div>
 
           {/* Brokerage card */}
-          <aside className="rounded-2xl bg-white/8 border border-white/15 backdrop-blur-sm p-5 text-center self-start">
+          <aside className="rounded-2xl bg-white dark:bg-card/8 border border-white/15 backdrop-blur-sm p-5 text-center self-start">
             <p className="text-[10px] font-bold tracking-widest text-white/70 mb-3">
               {da.agencySection}
             </p>
@@ -307,7 +307,7 @@ export default function AgentDetailClient({
       {/* Body */}
       <div className="max-w-6xl mx-auto px-6 mt-10 space-y-12">
         {/* Track record */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
           <div className="flex items-end justify-between mb-2">
             <h2 className="text-lg md:text-xl font-semibold text-foreground">{da.trackRecordHeading}</h2>
             <p className="text-xs text-muted-foreground">{da.last12MonthsLabel}</p>
@@ -359,7 +359,7 @@ export default function AgentDetailClient({
         </section>
 
         {/* Personal information */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
           <h2 className="text-lg md:text-xl font-semibold text-foreground mb-5">{da.personalInfoHeading}</h2>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 text-sm">
             <div className="flex justify-between gap-3 sm:block">
@@ -382,7 +382,7 @@ export default function AgentDetailClient({
         </section>
 
         {/* Areas of expertise */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
           <h2 className="text-lg md:text-xl font-semibold text-foreground">
             {da.areasHeading.replace("{name}", agent.name.split(" ")[0])}
           </h2>
@@ -443,7 +443,7 @@ export default function AgentDetailClient({
         </section>
 
         {/* About me */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
           <h2 className="text-lg md:text-xl font-semibold text-foreground mb-3">{da.aboutMeHeading}</h2>
           <p
             className={`text-sm leading-relaxed text-foreground/85 ${
@@ -461,7 +461,7 @@ export default function AgentDetailClient({
         </section>
 
         {/* Avis & Notes */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
           <div className="flex items-end justify-between mb-5">
             <h2 className="text-lg md:text-xl font-semibold text-foreground">
               {da.reviewsHeading}
@@ -520,7 +520,7 @@ export default function AgentDetailClient({
               onChange={(e) => setReviewComment(e.target.value)}
               placeholder={da.reviewPlaceholder}
               rows={3}
-              className="w-full text-sm border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white"
+              className="w-full text-sm border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white dark:bg-card"
               disabled={!isAuthenticated}
             />
             {reviewError && (
@@ -600,7 +600,7 @@ export default function AgentDetailClient({
               className={`px-4 h-9 rounded-lg text-sm font-medium transition-colors border ${
                 propertiesTab === "sale"
                   ? "bg-primary text-white border-primary"
-                  : "bg-white text-foreground border-border hover:border-primary/40"
+                  : "bg-white dark:bg-card text-foreground border-border hover:border-primary/40"
               }`}
             >
               {da.forSaleTab}
@@ -610,7 +610,7 @@ export default function AgentDetailClient({
               className={`px-4 h-9 rounded-lg text-sm font-medium transition-colors border ${
                 propertiesTab === "rent"
                   ? "bg-primary text-white border-primary"
-                  : "bg-white text-foreground border-border hover:border-primary/40"
+                  : "bg-white dark:bg-card text-foreground border-border hover:border-primary/40"
               }`}
             >
               {da.forRentTab}
@@ -623,7 +623,7 @@ export default function AgentDetailClient({
           </div>
 
           {filteredProps.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
               {da.noListingsMsg}
             </div>
           ) : (
@@ -665,7 +665,7 @@ function Breadcrumb({ agent }: { agent: Agent }) {
 
 function AreaStat({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-lg bg-white border border-border px-3 py-2 text-center">
+    <div className="rounded-lg bg-white dark:bg-card border border-border px-3 py-2 text-center">
       <p className="text-xl font-extrabold text-foreground">{value}</p>
       <p className="text-[11px] text-muted-foreground">{label}</p>
     </div>

@@ -53,7 +53,7 @@ function DropdownPill({
         className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${
           active
             ? "border-primary text-primary bg-accent font-medium"
-            : "border-border text-foreground/80 hover:border-primary/50 bg-white"
+            : "border-border text-foreground/80 hover:border-primary/50 bg-white dark:bg-card"
         }`}
       >
         {label}
@@ -80,7 +80,7 @@ function DropdownPill({
       </button>
 
       {open && (
-        <div className="absolute left-0 mt-1.5 min-w-50 bg-white rounded-xl border border-border shadow-lg z-100 overflow-hidden">
+        <div className="absolute left-0 mt-1.5 min-w-50 bg-white dark:bg-card rounded-xl border border-border shadow-lg z-100 overflow-hidden">
           {children}
         </div>
       )}
@@ -240,7 +240,7 @@ export default function SearchFilterBar({
           e.preventDefault();
           setFilter("q", localQ.trim() || null);
         }}
-        className="flex items-center gap-2 border border-border rounded-full px-5 h-12 bg-white"
+        className="flex items-center gap-2 border border-border rounded-full px-5 h-12 bg-white dark:bg-card"
       >
         <Search className="w-4 h-4 text-muted-foreground shrink-0" />
         <input
@@ -374,13 +374,13 @@ export default function SearchFilterBar({
           <>
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white hover:border-primary/50"
+              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white dark:bg-card hover:border-primary/50"
             >
               {t.filters.offPlan} <ChevronDown className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white hover:border-primary/50"
+              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white dark:bg-card hover:border-primary/50"
             >
               {t.filters.ready} <ChevronDown className="w-3.5 h-3.5" />
             </button>
@@ -392,13 +392,13 @@ export default function SearchFilterBar({
 
         <button
           aria-label={t.filters.ariaSortBtn}
-          className="w-10 h-10 rounded-full border border-border bg-white flex items-center justify-center text-foreground/70 hover:border-primary/50"
+          className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
         >
           <SlidersHorizontal className="w-4 h-4" />
         </button>
         <button
           aria-label={t.filters.ariaAlertsBtn}
-          className="w-10 h-10 rounded-full border border-border bg-white flex items-center justify-center text-foreground/70 hover:border-primary/50"
+          className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
         >
           <Bell className="w-4 h-4" />
         </button>

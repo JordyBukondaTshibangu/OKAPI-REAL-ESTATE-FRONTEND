@@ -89,14 +89,14 @@ export default function RegisterPage() {
         </div>
 
         <div className="bg-card rounded-2xl shadow-lg p-8">
-          <h1 className="text-xl font-semibold text-text-dark mb-6 text-center">
+          <h1 className="text-xl font-semibold  mb-6 text-center">
             Inscription
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-text-dark block mb-1.5">
+                <label className="text-sm font-medium  block mb-1.5">
                   Prénom
                 </label>
                 <Input {...register("firstName")} placeholder="Jean" />
@@ -107,7 +107,7 @@ export default function RegisterPage() {
                 )}
               </div>
               <div>
-                <label className="text-sm font-medium text-text-dark block mb-1.5">
+                <label className="text-sm font-medium  block mb-1.5">
                   Nom
                 </label>
                 <Input {...register("lastName")} placeholder="Makiese" />
@@ -120,7 +120,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium  block mb-1.5">
                 Adresse e-mail
               </label>
               <Input
@@ -137,7 +137,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium  block mb-1.5">
                 Téléphone
               </label>
               <Input
@@ -153,7 +153,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium  block mb-1.5">
                 Mot de passe
               </label>
               <div className="relative">
@@ -184,7 +184,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium  block mb-1.5">
                 Confirmer le mot de passe
               </label>
               <div className="relative">

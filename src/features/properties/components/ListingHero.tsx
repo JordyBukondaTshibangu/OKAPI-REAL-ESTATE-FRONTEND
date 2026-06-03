@@ -93,7 +93,7 @@ export default function ListingHero({
           <Breadcrumbs items={crumbs.map((c, i) => i === crumbs.length - 1 ? { ...c, label: title } : c)} />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-border p-6 md:p-7 lg:min-w-2xl">
+        <div className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border p-6 md:p-7 lg:min-w-2xl">
           <div className="mb-5">
             <h1 className="text-2xl md:text-3xl font-semibold text-foreground inline">
               {title}

@@ -68,13 +68,22 @@ export type Messages = {
     filterMinPrice: string;
     filterMaxPrice: string;
     filterBedrooms: string;
+    popularAreas: string;
+    trendProperties: string;
+    trendAvgPrice: string;
+    trendNewToday: string;
   };
   footer: {
     tagline: string;
+    description: string;
+    descriptionHighlight: string;
+    listCta: string;
+    followUs: string;
     downloadApp: string;
     downloadOnAppStore: string;
     availableOnPlay: string;
     copyright: string;
+    exploreByArea: string;
     col_regions_center: string;
     col_regions_west: string;
     col_regions_east: string;
@@ -124,7 +133,7 @@ export type Messages = {
   };
   home: {
     discover: {
-      heading: string;
+      heading: string; headingHighlight: string;
       tabBuy: string; tabRent: string; tabSell: string;
       buyCard1Title: string; buyCard1Desc: string; buyCard1Cta: string;
       buyCard2Title: string; buyCard2Desc: string; buyCard2Cta: string;
@@ -137,15 +146,19 @@ export type Messages = {
       sellCard3Title: string; sellCard3Desc: string; sellCard3Cta: string;
     };
     about: {
-      badge: string; heading: string; para1: string; para2: string; learnMore: string;
-      networkBadge: string; networkHeading: string; networkPara: string; findAgent: string;
+      badge: string; heading: string; headingHighlight: string; para: string; learnMore: string;
+      stat1Value: string; stat1Label: string;
+      stat2Value: string; stat2Label: string;
+      stat3Value: string; stat3Label: string;
+      networkBadge: string; networkHeading: string; networkHeadingHighlight: string; networkPara: string; findAgent: string;
+      agentCount: string;
     };
     content: {
-      journal: string; heading: string;
-      card1Title: string; card1Excerpt: string;
-      card2Title: string; card2Excerpt: string;
+      journal: string; heading: string; headingHighlight: string; viewAll: string;
+      card1Title: string; card1Excerpt: string; card1Author: string; card1Date: string; card1ReadTime: string;
+      card2Title: string; card2Excerpt: string; card2Author: string; card2Date: string; card2ReadTime: string;
     };
-    mobileApp: { badge: string; heading: string; body: string; downloadOn: string; availableOn: string; };
+    mobileApp: { badge: string; heading: string; headingHighlight: string; body: string; downloadOn: string; availableOn: string; feature1: string; feature2: string; feature3: string; notification: string; };
   };
   listing: { foundWithFilters: string; noResults: string; noResultsHint: string; };
   filters: {

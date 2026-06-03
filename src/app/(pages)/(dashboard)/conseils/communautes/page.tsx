@@ -173,7 +173,7 @@ export default function CommunautesPage() {
             <span>/</span>
             <span className="text-white">Guides communautaires</span>
           </nav>
-          <div className="inline-flex items-center gap-2 bg-white/10 text-white/90 text-xs font-medium px-3 py-1 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-white dark:bg-card/10 text-white/90 text-xs font-medium px-3 py-1 rounded-full mb-4">
             4 profils d&apos;acheteurs
           </div>
           <h1 className="text-4xl font-bold mb-4 leading-tight">

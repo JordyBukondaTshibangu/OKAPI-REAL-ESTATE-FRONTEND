@@ -58,7 +58,7 @@ export default function Pagination({
         href={current < total ? pageHref(current + 1) : undefined}
         aria-label="Page suivante"
         aria-disabled={current === total}
-        className={`w-10 h-10 rounded-lg border border-border bg-white flex items-center justify-center text-foreground transition-colors ${
+        className={`w-10 h-10 rounded-lg border border-border bg-white dark:bg-card flex items-center justify-center text-foreground transition-colors ${
           current === total ? "opacity-40 pointer-events-none" : "hover:bg-muted"
         }`}
       >

@@ -70,18 +70,18 @@ function ImageSlider({ images, initialIndex, onClose }: { images: string[]; init
     <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col">
       <div className="flex items-center justify-between px-6 py-4 shrink-0">
         <span className="text-white/70 text-sm">{current + 1} / {images.length}</span>
-        <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+        <button onClick={onClose} className="w-10 h-10 rounded-full bg-white dark:bg-card/10 hover:bg-white dark:bg-card/20 flex items-center justify-center text-white transition-colors">
           <X className="w-5 h-5" />
         </button>
       </div>
       <div className="flex-1 relative flex items-center justify-center px-16 min-h-0">
-        <button onClick={prev} className="absolute left-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors z-10">
+        <button onClick={prev} className="absolute left-4 w-10 h-10 rounded-full bg-white dark:bg-card/10 hover:bg-white dark:bg-card/25 flex items-center justify-center text-white transition-colors z-10">
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div className="relative w-full h-full max-w-4xl max-h-[75vh]">
           <Image key={current} src={images[current]} alt={`Photo ${current + 1}`} fill className="object-contain" sizes="100vw" priority />
         </div>
-        <button onClick={next} className="absolute right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors z-10">
+        <button onClick={next} className="absolute right-4 w-10 h-10 rounded-full bg-white dark:bg-card/10 hover:bg-white dark:bg-card/25 flex items-center justify-center text-white transition-colors z-10">
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
@@ -144,7 +144,7 @@ function AgentInitials({ name, profile }: { name: string; profile?: string }) {
 function AgentCard({ detail, t }: { detail: PropertyDetail; t: ReturnType<typeof useT> }) {
   const dp = t.detail.property;
   return (
-    <aside className="bg-white rounded-2xl border border-border shadow-sm p-5 lg:sticky lg:top-28">
+    <aside className="bg-white dark:bg-card rounded-2xl border border-border shadow-sm p-5 lg:sticky lg:top-28">
       <div className="flex items-center gap-3 mb-4">
         <AgentInitials name={detail.agent.name} profile={detail.agent.photo} />
         <div className="leading-tight">
@@ -236,7 +236,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
   return (
     <div className="bg-background-alt pb-20">
       {/* Top sub-nav */}
-      <div className="bg-white border-b border-border">
+      <div className="bg-white dark:bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <Link href={listingHref(detail)} className="inline-flex items-center gap-2 text-sm text-foreground/80 hover:text-primary">
             <ArrowLeft className="w-4 h-4" /> {dp.backToResults}
@@ -348,7 +348,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                 <span className="px-3 py-1.5 rounded-full bg-primary text-white font-semibold">{dp.buildingTab}</span>
                 <span className="px-3 py-1.5 rounded-full bg-muted text-foreground/80 font-medium">{dp.neighborhoodTab}</span>
               </div>
-              <div className="mt-4 rounded-xl border border-border p-5 bg-white">
+              <div className="mt-4 rounded-xl border border-border p-5 bg-white dark:bg-card">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-sm font-semibold text-foreground">{dp.aboutBuildingTitle.replace("{zone}", detail.zone ?? "")}</p>
@@ -398,7 +398,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
             {/* Presented by */}
             <section className="pt-2 border-t border-border">
               <SectionHeading>{dp.presentedByHeading}</SectionHeading>
-              <div className="rounded-xl border border-border bg-white p-5">
+              <div className="rounded-xl border border-border bg-white dark:bg-card p-5">
                 <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
                   <AgentInitials name={detail.agent.name} profile={detail.agent.photo} />
                   <div className="flex-1">
@@ -424,14 +424,14 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                   <p className="text-xs text-green-600">{dp.enquirySentDesc}</p>
                 </div>
               ) : (
-                <div className="rounded-xl border border-border bg-white p-5">
+                <div className="rounded-xl border border-border bg-white dark:bg-card p-5">
                   <p className="text-sm text-foreground/80 mb-4">{dp.enquiryIntro}</p>
                   <textarea
                     value={enquiryMessage}
                     onChange={(e) => setEnquiryMessage(e.target.value)}
                     placeholder={dp.enquiryPlaceholder.replace("{title}", detail.title).replace("{ref}", detail.reference ?? "")}
                     rows={4}
-                    className="w-full text-sm border border-border rounded-lg px-3 py-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white mb-3"
+                    className="w-full text-sm border border-border rounded-lg px-3 py-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white dark:bg-card mb-3"
                   />
                   {enquiryError && <p className="text-xs text-destructive mb-3">{enquiryError}</p>}
                   <Button onClick={handleEnquiry} disabled={enquirySending} className="w-full">
@@ -443,7 +443,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
 
             {/* Property details */}
             <section className="pt-2 border-t border-border">
-              <div className="rounded-xl border border-border bg-white p-6 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+              <div className="rounded-xl border border-border bg-white dark:bg-card p-6 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-3">{dp.propertyDetailsHeading}</h3>
                   <DetailRow label={dp.typeLabel} value={categoryLabel(detail.category)} />
@@ -475,10 +475,10 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg md:text-xl font-semibold text-foreground">{dp.recommendedHeading}</h2>
               <div className="flex items-center gap-2">
-                <button className="w-9 h-9 rounded-full border border-border bg-white text-foreground/70 hover:bg-muted" aria-label={dp.prevBtn}>
+                <button className="w-9 h-9 rounded-full border border-border bg-white dark:bg-card text-foreground/70 hover:bg-muted" aria-label={dp.prevBtn}>
                   <ChevronLeft className="w-4 h-4 mx-auto" />
                 </button>
-                <button className="w-9 h-9 rounded-full border border-border bg-white text-foreground/70 hover:bg-muted" aria-label={dp.nextBtn}>
+                <button className="w-9 h-9 rounded-full border border-border bg-white dark:bg-card text-foreground/70 hover:bg-muted" aria-label={dp.nextBtn}>
                   <ChevronRight className="w-4 h-4 mx-auto" />
                 </button>
               </div>
@@ -502,7 +502,7 @@ function MapModal({ neighborhood, suburb, city, onClose, t }: {
   const query = encodeURIComponent(`${neighborhood}, ${suburb}, ${city}, République Démocratique du Congo`);
   return (
     <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div className="relative bg-white rounded-2xl overflow-hidden w-full max-w-3xl shadow-2xl">
+      <div className="relative bg-white dark:bg-card rounded-2xl overflow-hidden w-full max-w-3xl shadow-2xl">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
             <p className="text-sm font-semibold text-foreground">{neighborhood}</p>
@@ -588,7 +588,7 @@ function Gallery({ images, title, active, onActive, onOpenSlider, verified, isPr
 
 function TrendCard({ positive, headline, detail }: { positive: boolean; headline: string; detail: string }) {
   return (
-    <div className="rounded-xl border border-border bg-white p-5 flex items-start justify-between gap-4">
+    <div className="rounded-xl border border-border bg-white dark:bg-card p-5 flex items-start justify-between gap-4">
       <div>
         <p className="text-sm font-semibold text-foreground leading-snug">{headline}</p>
         <p className="text-xs text-muted-foreground mt-1">{detail}</p>
@@ -613,7 +613,7 @@ function RecommendedCard({ property, t }: { property: Property; t: ReturnType<ty
   const dp = t.detail.property;
   const coverSrc = property.gallery?.[0];
   return (
-    <Link href={`/property/${property.id}`} className="block bg-white rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
+    <Link href={`/property/${property.id}`} className="block bg-white dark:bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative aspect-[4/3] bg-muted">
         {coverSrc
           ? <Image src={coverSrc} alt={property.title} fill className="object-cover" sizes="280px" />

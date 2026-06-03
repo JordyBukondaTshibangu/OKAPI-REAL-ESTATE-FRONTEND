@@ -30,14 +30,14 @@ export default function CookiesPage() {
             <p className="text-sm text-text-light leading-relaxed">{c.intro2}</p>
           </div>
 
-          <h2 className="text-base font-semibold text-text-dark mb-6">{c.typesHeading}</h2>
+          <h2 className="text-base font-semibold  mb-6">{c.typesHeading}</h2>
 
           <div className="space-y-4">
             {types.map((type) => (
               <div key={type.name} className="bg-card rounded-xl shadow-md p-6 flex items-start gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-sm font-semibold text-text-dark">{type.name}</h3>
+                    <h3 className="text-sm font-semibold ">{type.name}</h3>
                     {type.required && (
                       <span className="text-[10px] font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                         {c.required}
@@ -51,7 +51,7 @@ export default function CookiesPage() {
           </div>
 
           <div className="border-t border-border pt-8 mt-10">
-            <h2 className="text-base font-semibold text-text-dark mb-3">{c.manageHeading}</h2>
+            <h2 className="text-base font-semibold  mb-3">{c.manageHeading}</h2>
             <p className="text-sm text-text-light leading-relaxed mb-4">{c.managePara}</p>
             <p className="text-xs text-muted-foreground">
               {c.question}{" "}

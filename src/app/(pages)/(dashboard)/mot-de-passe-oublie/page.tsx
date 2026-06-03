@@ -45,12 +45,12 @@ export default function ForgotPasswordPage() {
           <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-7 h-7 text-green-600" />
           </div>
-          <h2 className="text-xl font-semibold text-text-dark mb-2">
+          <h2 className="text-xl font-semibold  mb-2">
             E-mail envoyé !
           </h2>
           <p className="text-sm text-muted-foreground mb-1">
             Si un compte existe pour{" "}
-            <span className="font-medium text-text-dark">{getValues("email")}</span>,
+            <span className="font-medium ">{getValues("email")}</span>,
             vous recevrez un lien de réinitialisation dans quelques instants.
           </p>
           <p className="text-xs text-muted-foreground mb-6">
@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         <div className="bg-card rounded-2xl shadow-lg p-8">
-          <h1 className="text-xl font-semibold text-text-dark mb-2 text-center">
+          <h1 className="text-xl font-semibold  mb-2 text-center">
             Mot de passe oublié
           </h1>
           <p className="text-sm text-muted-foreground text-center mb-6">
@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="text-sm font-medium text-text-dark block mb-1.5">
+              <label className="text-sm font-medium  block mb-1.5">
                 Adresse e-mail
               </label>
               <Input

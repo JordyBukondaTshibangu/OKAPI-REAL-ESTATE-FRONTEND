@@ -22,7 +22,7 @@ export default function TravelTimes() {
   ];
 
   return (
-    <aside className="bg-white rounded-xl border border-border shadow-sm p-5 sticky top-28">
+    <aside className="bg-white dark:bg-card rounded-xl border border-border shadow-sm p-5 sticky top-28">
       <div className="flex items-start justify-between mb-5">
         <div className="flex items-center gap-2">
           <ClockIcon className="w-5 h-5 text-foreground" />
@@ -91,7 +91,7 @@ export default function TravelTimes() {
             className={`flex-1 h-11 rounded-lg border flex items-center justify-center transition-colors ${
               mode === key
                 ? "border-primary text-primary bg-accent"
-                : "border-border text-foreground/70 bg-white hover:border-primary/40"
+                : "border-border text-foreground/70 bg-white dark:bg-card hover:border-primary/40"
             }`}
           >
             <Icon className="w-5 h-5" />
