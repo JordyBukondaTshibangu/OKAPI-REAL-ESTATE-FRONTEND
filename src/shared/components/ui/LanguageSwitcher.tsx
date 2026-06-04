@@ -26,7 +26,7 @@ export default function LanguageSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-white/80 hover:text-white hover:bg-white dark:bg-card/10 text-sm font-medium transition-colors duration-200 min-w-max"
+        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-foreground dark:text-white/80 bg-primary/10 dark:bg-card/10 hover:bg-primary/20 dark:hover:bg-white/10 text-sm font-medium transition-colors duration-200 min-w-max"
         aria-label="Changer de langue / Change language"
       >
         <Globe className="w-4 h-4" />
@@ -36,7 +36,7 @@ export default function LanguageSwitcher() {
 
       {open && (
         <div
-          className="absolute right-0 top-full mt-2 w-44 bg-card rounded-xl shadow-xl shadow-black/15 border border-border py-1.5 z-[60]"
+          className="absolute right-0 top-full mt-2 w-44 rounded-xl shadow-xl shadow-black/20 border border-border py-1.5 z-[99] bg-white dark:bg-card"
           onMouseLeave={() => setOpen(false)}
         >
           {LOCALES.map(({ code, label, flag }) => (
@@ -45,8 +45,8 @@ export default function LanguageSwitcher() {
               onClick={() => handleSelect(code)}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors ${
                 code === locale
-                  ? "bg-accent text-primary font-semibold"
-                  : " hover:bg-muted"
+                  ? "bg-primary/10 dark:bg-primary/10 text-primary font-semibold overflow-hidden"
+                  : "text-foreground hover:bg-muted overflow-hidden"
               }`}
             >
               <span className="text-base">{flag}</span>

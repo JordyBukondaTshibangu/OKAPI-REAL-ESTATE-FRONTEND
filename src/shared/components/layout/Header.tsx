@@ -176,7 +176,7 @@ function useNavItems(): NavItem[] {
 
 function UtilityCluster() {
   return (
-    <div className="flex items-center gap-0.5 rounded-lg border border-white/15 bg-white dark:bg-card/5 px-1 py-0.5">
+    <div className="flex items-center gap-0.5 rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-card/5 px-1 py-0.5">
       <LanguageSwitcher />
       <ThemeToggle />
     </div>
