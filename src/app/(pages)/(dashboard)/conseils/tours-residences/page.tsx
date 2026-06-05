@@ -148,7 +148,7 @@ export default function ToursResidencesPage() {
             { label: "Fourchette de prix", value: "800 – 8 000 $" },
             { label: "Types de biens", value: "3" },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-xl p-4 shadow-sm">
+            <div key={s.label} className="bg-white dark:bg-card rounded-xl p-4 shadow-sm">
               <p className="text-xl font-bold text-primary">{s.value}</p>
               <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
             </div>
@@ -223,7 +223,7 @@ export default function ToursResidencesPage() {
           </Button>
           <Button
             variant="outline"
-            className="border-white/40 text-white hover:bg-white/10"
+            className="border-white/40 text-white hover:bg-white dark:bg-card/10"
             asChild
           >
             <Link href="/agents">Parler à un agent</Link>

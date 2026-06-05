@@ -1,92 +1,90 @@
+"use client";
+
+import { useT } from "@/i18n/useT";
 import { Button } from "@/shared/components/ui/button";
 import { Briefcase, Globe, Heart, Zap } from "lucide-react";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Carrières — Okapi Real Estate",
-  description:
-    "Rejoignez l'équipe Okapi Real Estate et contribuez à transformer l'immobilier en RDC.",
-};
-
-const perks = [
-  {
-    icon: Heart,
-    title: "Mission qui a du sens",
-    body: "Aider les Congolais à trouver leur chez-soi, c'est un travail qui compte.",
-  },
-  {
-    icon: Globe,
-    title: "Impact national",
-    body: "Vos contributions touchent des centaines de milliers d'utilisateurs à travers la RDC.",
-  },
-  {
-    icon: Zap,
-    title: "Croissance rapide",
-    body: "Une startup en pleine expansion — vos idées prennent vie rapidement.",
-  },
-  {
-    icon: Briefcase,
-    title: "Équipe diversifiée",
-    body: "Une équipe passionnée, bienveillante et tournée vers l'excellence.",
-  },
-];
-
-const openings = [
-  {
-    title: "Développeur(se) Front-end",
-    team: "Technologie",
-    location: "Kinshasa (Hybride)",
-    type: "CDI",
-  },
-  {
-    title: "Développeur(se) Back-end",
-    team: "Technologie",
-    location: "Kinshasa (Hybride)",
-    type: "CDI",
-  },
-  {
-    title: "Chef de produit (Product Manager)",
-    team: "Produit",
-    location: "Kinshasa",
-    type: "CDI",
-  },
-  {
-    title: "Responsable marketing digital",
-    team: "Marketing",
-    location: "Kinshasa",
-    type: "CDI",
-  },
-  {
-    title: "Commercial(e) — Partenariats agences",
-    team: "Commercial",
-    location: "Kinshasa / Lubumbashi",
-    type: "CDI",
-  },
-  {
-    title: "Designer UI/UX",
-    team: "Design",
-    location: "Kinshasa (Remote possible)",
-    type: "CDI",
-  },
-];
 
 export default function CarreresPage() {
+  const t = useT();
+  const p = t.pages.carrieres;
+
+  const perks = [
+    {
+      icon: Heart,
+      title: p.perk1Title,
+      body: p.perk1Body,
+    },
+    {
+      icon: Globe,
+      title: p.perk2Title,
+      body: p.perk2Body,
+    },
+    {
+      icon: Zap,
+      title: p.perk3Title,
+      body: p.perk3Body,
+    },
+    {
+      icon: Briefcase,
+      title: p.perk4Title,
+      body: p.perk4Body,
+    },
+  ];
+
+  const openings = [
+    {
+      title: p.job1Title,
+      team: p.job1Team,
+      location: "Kinshasa (Hybride)",
+      type: "CDI",
+    },
+    {
+      title: p.job2Title,
+      team: p.job2Team,
+      location: "Kinshasa (Hybride)",
+      type: "CDI",
+    },
+    {
+      title: p.job3Title,
+      team: p.job3Team,
+      location: "Kinshasa",
+      type: "CDI",
+    },
+    {
+      title: p.job4Title,
+      team: p.job4Team,
+      location: "Kinshasa",
+      type: "CDI",
+    },
+    {
+      title: p.job5Title,
+      team: p.job5Team,
+      location: "Kinshasa / Lubumbashi",
+      type: "CDI",
+    },
+    {
+      title: p.job6Title,
+      team: p.job6Team,
+      location: "Kinshasa (Remote possible)",
+      type: "CDI",
+    },
+  ];
+
   return (
     <>
       {/* Hero */}
       <section className="bg-navy text-white py-24 px-6 text-center">
         <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-4">
-          Rejoindre l&apos;équipe
+          {p.heroBadge}
         </p>
         <h1 className="text-4xl md:text-5xl font-semibold mb-6 leading-tight max-w-2xl mx-auto">
-          Construisons l&apos;avenir de l&apos;immobilier congolais ensemble
+          {p.heroHeading}
         </h1>
         <p className="text-white/75 max-w-xl mx-auto text-base mb-8">
-          Okapi Real Estate grandit vite et cherche des talents passionnés,
-          ambitieux et prêts à changer les règles du jeu.
+          {p.heroSubtitle}
         </p>
         <Button variant="gold" asChild>
-          <a href="#offres">Voir les offres</a>
+          <a href="#offres">{p.heroBtn}</a>
         </Button>
       </section>
 
@@ -94,25 +92,25 @@ export default function CarreresPage() {
       <section className="bg-muted py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-semibold text-text-dark">
-              Pourquoi Okapi Real Estate ?
+            <h2 className="text-2xl font-semibold ">
+              {p.whyHeading}
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {perks.map((p) => (
+            {perks.map((perk) => (
               <div
-                key={p.title}
+                key={perk.title}
                 className="bg-card rounded-xl shadow-md p-6 flex gap-4 items-start"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <p.icon className="w-5 h-5 text-primary" />
+                  <perk.icon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-text-dark mb-1">
-                    {p.title}
+                  <h3 className="text-sm font-semibold  mb-1">
+                    {perk.title}
                   </h3>
                   <p className="text-sm text-text-light leading-relaxed">
-                    {p.body}
+                    {perk.body}
                   </p>
                 </div>
               </div>
@@ -126,10 +124,10 @@ export default function CarreresPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
-              Offres d&apos;emploi
+              {p.openingsBadge}
             </p>
-            <h2 className="text-2xl font-semibold text-text-dark">
-              Postes ouverts
+            <h2 className="text-2xl font-semibold ">
+              {p.openingsHeading}
             </h2>
           </div>
 
@@ -140,7 +138,7 @@ export default function CarreresPage() {
                 className="bg-card rounded-xl shadow-md p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
               >
                 <div>
-                  <h3 className="text-base font-semibold text-text-dark mb-1">
+                  <h3 className="text-base font-semibold  mb-1">
                     {job.title}
                   </h3>
                   <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
@@ -152,19 +150,19 @@ export default function CarreresPage() {
                   </div>
                 </div>
                 <Button variant="outline" size="sm" asChild>
-                  <a href="/contact">Postuler</a>
+                  <a href="/contact">{p.applyBtn}</a>
                 </Button>
               </div>
             ))}
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-10">
-            Vous ne trouvez pas votre poste ?{" "}
+            {p.noRoleText}{" "}
             <a
               href="/contact"
               className="text-primary hover:underline font-medium"
             >
-              Envoyez-nous une candidature spontanée
+              {p.noRoleLink}
             </a>
           </p>
         </div>

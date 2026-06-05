@@ -1,80 +1,72 @@
+"use client";
+
+import { useT } from "@/i18n/useT";
 import { Button } from "@/shared/components/ui/button";
-import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Conseils immobiliers à Kinshasa — Okapi Real Estate",
-  description:
-    "Guides pratiques pour acheter, vendre, louer, choisir son quartier et trouver les meilleures écoles à Kinshasa — par Okapi Real Estate.",
-};
-
-const guides = [
-  {
-    href: "/conseils/guide-acheteur",
-    label: "Guide de l'acheteur",
-    description:
-      "Définir votre budget, choisir le bon quartier, vérifier le titre foncier, signer en sécurité. Tout ce qu'il faut savoir avant d'acheter à Kinshasa.",
-    icon: "🏠",
-    tag: "Achat",
-    color: "border-primary",
-  },
-  {
-    href: "/conseils/guide-vendeur",
-    label: "Guide du vendeur",
-    description:
-      "Estimez votre bien, préparez-le pour la vente, fixez le bon prix et finalisez votre transaction dans les meilleures conditions.",
-    icon: "📋",
-    tag: "Vente",
-    color: "border-secondary",
-  },
-  {
-    href: "/conseils/guide-locataire",
-    label: "Guide du locataire",
-    description:
-      "Comprendre le marché locatif kinois, vérifier le bail, connaître vos droits et obligations en tant que locataire.",
-    icon: "🔑",
-    tag: "Location",
-    color: "border-primary",
-  },
-  {
-    href: "/conseils/quartiers",
-    label: "Infos quartiers",
-    description:
-      "Analyse détaillée de 8 quartiers de Kinshasa : ambiance, fourchettes de prix, points forts et points de vigilance.",
-    icon: "🗺",
-    tag: "Quartiers",
-    color: "border-secondary",
-  },
-  {
-    href: "/conseils/communautes",
-    label: "Guides communautaires",
-    description:
-      "Conseils sur mesure pour les expatriés, primo-accédants, investisseurs et retraités qui s'installent ou investissent à Kinshasa.",
-    icon: "👥",
-    tag: "Profils",
-    color: "border-primary",
-  },
-  {
-    href: "/conseils/tours-residences",
-    label: "Tours & Résidences",
-    description:
-      "Les immeubles et résidences sécurisées de standing à Kinshasa : emplacements, équipements, prix et conseils de choix.",
-    icon: "🏢",
-    tag: "Premium",
-    color: "border-secondary",
-  },
-  {
-    href: "/conseils/ecoles-universites",
-    label: "Écoles & Universités",
-    description:
-      "Guide des établissements scolaires et universitaires de Kinshasa par commune, avec conseils pour les familles.",
-    icon: "🎓",
-    tag: "Familles",
-    color: "border-primary",
-  },
-];
-
 export default function ConseilsPage() {
+  const t = useT();
+  const p = t.pages.conseils;
+
+  const guides = [
+    {
+      href: "/conseils/guide-acheteur",
+      label: p.guide1Label,
+      description: p.guide1Desc,
+      icon: "🏠",
+      tag: p.guide1Tag,
+      color: "border-primary",
+    },
+    {
+      href: "/conseils/guide-vendeur",
+      label: p.guide2Label,
+      description: p.guide2Desc,
+      icon: "📋",
+      tag: p.guide2Tag,
+      color: "border-secondary",
+    },
+    {
+      href: "/conseils/guide-locataire",
+      label: p.guide3Label,
+      description: p.guide3Desc,
+      icon: "🔑",
+      tag: p.guide3Tag,
+      color: "border-primary",
+    },
+    {
+      href: "/conseils/quartiers",
+      label: p.guide4Label,
+      description: p.guide4Desc,
+      icon: "🗺",
+      tag: p.guide4Tag,
+      color: "border-secondary",
+    },
+    {
+      href: "/conseils/communautes",
+      label: p.guide5Label,
+      description: p.guide5Desc,
+      icon: "👥",
+      tag: p.guide5Tag,
+      color: "border-primary",
+    },
+    {
+      href: "/conseils/tours-residences",
+      label: p.guide6Label,
+      description: p.guide6Desc,
+      icon: "🏢",
+      tag: p.guide6Tag,
+      color: "border-secondary",
+    },
+    {
+      href: "/conseils/ecoles-universites",
+      label: p.guide7Label,
+      description: p.guide7Desc,
+      icon: "🎓",
+      tag: p.guide7Tag,
+      color: "border-primary",
+    },
+  ];
+
   return (
     <>
       {/* Hero */}
@@ -82,21 +74,19 @@ export default function ConseilsPage() {
         <div className="max-w-4xl mx-auto">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link href="/" className="hover:text-white transition-colors">
-              Accueil
+              {p.breadHome}
             </Link>
             <span>/</span>
-            <span className="text-white">Conseils</span>
+            <span className="text-white">{p.breadConseils}</span>
           </nav>
-          <div className="inline-flex items-center gap-2 bg-white/10 text-white/90 text-xs font-medium px-3 py-1 rounded-full mb-4">
-            7 guides disponibles
+          <div className="inline-flex items-center gap-2 bg-white dark:bg-card/10 text-white/90 text-xs font-medium px-3 py-1 rounded-full mb-4">
+            {p.availableBadge}
           </div>
           <h1 className="text-4xl font-bold mb-4 leading-tight">
-            Conseils immobiliers à Kinshasa
+            {p.heading}
           </h1>
           <p className="text-lg text-white/80 max-w-2xl">
-            Que vous achetiez, vendiez, louiez ou investissiez, nos guides
-            rédigés par des experts locaux vous accompagnent à chaque étape de
-            votre projet immobilier en RDC.
+            {p.subtitle}
           </p>
         </div>
       </section>
@@ -124,7 +114,7 @@ export default function ConseilsPage() {
                   {guide.description}
                 </p>
                 <div className="mt-4 text-sm font-medium text-primary flex items-center gap-1">
-                  Lire le guide
+                  {p.readGuide}
                   <span className="group-hover:translate-x-1 transition-transform inline-block">
                     →
                   </span>
@@ -139,18 +129,17 @@ export default function ConseilsPage() {
       <section className="py-16 px-6 bg-muted">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl font-bold text-foreground mb-3">
-            Besoin d&apos;un conseil personnalisé ?
+            {p.ctaHeading}
           </h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Nos agents Okapi Real Estate sont des experts du marché kinois.
-            Contactez-nous pour un accompagnement sur mesure.
+            {p.ctaBody}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg">
-              <Link href="/contact">Contacter un expert</Link>
+              <Link href="/contact">{p.ctaContact}</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/acheter">Parcourir les annonces</Link>
+              <Link href="/acheter">{p.ctaBrowse}</Link>
             </Button>
           </div>
         </div>

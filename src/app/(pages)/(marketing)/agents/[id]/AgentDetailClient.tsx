@@ -13,13 +13,16 @@ import {
   Home,
   Info,
   MapPin,
-  Share2,
   Star,
   Trophy,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ShareButton from "@/shared/components/ui/ShareButton";
+import { useAuthStore } from "@/store/useAuthStore";
+import { getAgentReviews, createReview, type Review } from "@/services/auth";
+import { useT } from "@/i18n/useT";
 
 function StarRating({ value, max = 5 }: { value: number; max?: number }) {
   const full = Math.floor(value);
@@ -108,6 +111,56 @@ export default function AgentDetailClient({
   const [bioExpanded, setBioExpanded] = useState(false);
   const [showAllRecord, setShowAllRecord] = useState(false);
   const [propertiesTab, setPropertiesTab] = useState<"sale" | "rent">("sale");
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewHover, setReviewHover] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const { token, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  const t = useT();
+  const da = t.detail.agent;
+  const ratingLabels = ["", da.ratingLabel1, da.ratingLabel2, da.ratingLabel3, da.ratingLabel4, da.ratingLabel5];
+
+  const forSaleCount = agentProperties.filter((p) => p.listingType !== "rent").length;
+  const forRentCount = agentProperties.filter((p) => p.listingType === "rent").length;
+
+  useEffect(() => {
+    getAgentReviews(id)
+      .then(setReviews)
+      .catch(() => {})
+      .finally(() => setReviewsLoading(false));
+  }, [id]);
+
+  async function handleSubmitReview() {
+    if (!isAuthenticated || !token) {
+      router.push("/connexion");
+      return;
+    }
+    if (reviewRating === 0) return;
+    setReviewSubmitting(true);
+    setReviewError(null);
+    try {
+      const review = await createReview(token, {
+        agentId: id,
+        rating: reviewRating,
+        comment: reviewComment || undefined,
+      });
+      setReviews((prev) => [review, ...prev]);
+      setReviewSuccess(true);
+      setReviewRating(0);
+      setReviewComment("");
+      setTimeout(() => setReviewSuccess(false), 4000);
+    } catch {
+      setReviewError(da.reviewError);
+    } finally {
+      setReviewSubmitting(false);
+    }
+  }
 
   const filteredProps = agentProperties.filter((p) =>
     propertiesTab === "sale"
@@ -122,13 +175,13 @@ export default function AgentDetailClient({
   return (
     <div className="bg-background-alt pb-20">
       {/* Top sub-nav */}
-      <div className="bg-white border-b border-border">
+      <div className="bg-white dark:bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <Link
             href="/agents"
             className="inline-flex items-center gap-2 text-sm text-foreground/80 hover:text-primary"
           >
-            <ArrowLeft className="w-4 h-4" /> Retour aux résultats
+            <ArrowLeft className="w-4 h-4" /> {da.backToResults}
           </Link>
           <Breadcrumb agent={agent} />
           <ShareButton title={`${agent.name} — Agent immobilier — Okapi Real Estate`} />
@@ -158,7 +211,7 @@ export default function AgentDetailClient({
                 <span className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground text-[10px] font-bold tracking-widest px-2 py-1 rounded-md">
                   <Trophy className="w-3 h-3" /> {agent.title}
                 </span>
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/15 text-white/80">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white dark:bg-card/15 text-white/80">
                   <Info className="w-3 h-3" />
                 </span>
               </div>
@@ -168,7 +221,7 @@ export default function AgentDetailClient({
               <div className="flex items-center gap-3 mt-3 text-sm">
                 <span className="font-semibold">{agent.rating.toFixed(1)}</span>
                 <StarRating value={agent.rating} />
-                <span className="text-white/80">{agent.ratingsCount} avis</span>
+                <span className="text-white/80">{agent.ratingsCount} {da.ratingsLabel}</span>
               </div>
               <p className="mt-3 text-sm md:text-base text-white/85">
                 {agent.nationality} · {agent.languages.join(", ")} · +
@@ -178,17 +231,16 @@ export default function AgentDetailClient({
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 <span className="inline-flex items-center gap-2 text-sm text-white/85">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  {agent.name.split(" ")[0]} répond habituellement en moins de{" "}
-                  {agent.responseMinutes} min
+                  {da.responseDesc.replace("{name}", agent.name.split(" ")[0]).replace("{n}", String(agent.responseMinutes))}
                 </span>
               </div>
 
               <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
-                <Button className="h-11 gap-2 bg-white text-foreground hover:bg-white/90" asChild>
+                <Button className="h-11 gap-2 bg-white dark:bg-card text-foreground hover:bg-white dark:bg-card/90" asChild>
                   <a
                     href={agent.phone
-                      ? `https://wa.me/${agent.phone.replace(/[\s+\-()]/g, "")}?text=${encodeURIComponent(`Bonjour ${agent.name}, je vous contacte via Okapi Real Estate.`)}`
-                      : `https://wa.me/?text=${encodeURIComponent(`Bonjour ${agent.name}, je vous contacte via Okapi Real Estate.`)}`}
+                      ? `https://wa.me/${agent.phone.replace(/[\s+\-()]/g, "")}?text=${encodeURIComponent(da.whatsappMsg.replace("{name}", agent.name))}`
+                      : `https://wa.me/?text=${encodeURIComponent(da.whatsappMsg.replace("{name}", agent.name))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -200,11 +252,11 @@ export default function AgentDetailClient({
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-11 gap-2 border-white/40 text-white hover:bg-white/10 hover:text-white"
+                  className="h-11 gap-2 border-white/40 text-white hover:bg-white dark:bg-card/10 hover:text-white"
                   asChild
                 >
                   <a href="#properties">
-                    <Home className="w-4 h-4" /> Voir les biens
+                    <Home className="w-4 h-4" /> {da.seePropertiesBtn}
                   </a>
                 </Button>
               </div>
@@ -212,9 +264,9 @@ export default function AgentDetailClient({
           </div>
 
           {/* Brokerage card */}
-          <aside className="rounded-2xl bg-white/8 border border-white/15 backdrop-blur-sm p-5 text-center self-start">
+          <aside className="rounded-2xl bg-white dark:bg-card/8 border border-white/15 backdrop-blur-sm p-5 text-center self-start">
             <p className="text-[10px] font-bold tracking-widest text-white/70 mb-3">
-              AGENCE
+              {da.agencySection}
             </p>
             <div
               className={`w-28 h-28 mx-auto rounded-md ${agent.agencyAccent} text-white flex items-center justify-center text-2xl font-bold tracking-tight shadow-md`}
@@ -228,7 +280,7 @@ export default function AgentDetailClient({
               href="/a-propos"
               className="text-xs text-secondary hover:underline mt-1 inline-block"
             >
-              À propos de l&apos;agence
+              {da.aboutAgencyLink}
             </Link>
           </aside>
         </div>
@@ -237,30 +289,16 @@ export default function AgentDetailClient({
         <div className="relative bg-navy/60 border-t border-white/10">
           <div className="max-w-6xl mx-auto px-6 py-7 grid grid-cols-2 md:grid-cols-4 gap-5 divide-y md:divide-y-0 md:divide-x divide-white/15">
             <div className="md:px-2 first:md:pl-0">
-              <StatColumn
-                value={String(agent.forSaleCount)}
-                label="Biens à vendre"
-              />
+              <StatColumn value={String(forSaleCount)} label={da.forSaleStatLabel} />
             </div>
             <div className="md:px-2">
-              <StatColumn
-                value={String(agent.forRentCount)}
-                label="Biens à louer"
-              />
+              <StatColumn value={String(forRentCount)} label={da.forRentStatLabel} />
             </div>
             <div className="md:px-2">
-              <StatColumn
-                value={String(agent.closedDeals)}
-                label="Transactions conclues"
-                hint="12 derniers mois"
-              />
+              <StatColumn value={String(agent.closedDeals)} label={da.closedDealsLabel} hint={da.closedDealsHint} />
             </div>
             <div className="md:px-2 last:md:pr-0">
-              <StatColumn
-                value={formatTotalValue(agent.totalDealsValueUsd)}
-                label="Valeur totale"
-                hint="USD"
-              />
+              <StatColumn value={formatTotalValue(agent.totalDealsValueUsd)} label={da.totalValueLabel} hint="USD" />
             </div>
           </div>
         </div>
@@ -269,24 +307,20 @@ export default function AgentDetailClient({
       {/* Body */}
       <div className="max-w-6xl mx-auto px-6 mt-10 space-y-12">
         {/* Track record */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
           <div className="flex items-end justify-between mb-2">
-            <h2 className="text-lg md:text-xl font-semibold text-foreground">
-              Historique des transactions
-            </h2>
-            <p className="text-xs text-muted-foreground">12 derniers mois</p>
+            <h2 className="text-lg md:text-xl font-semibold text-foreground">{da.trackRecordHeading}</h2>
+            <p className="text-xs text-muted-foreground">{da.last12MonthsLabel}</p>
           </div>
-          <p className="text-xs text-muted-foreground mb-5">
-            Transactions soumises par l&apos;agent à Okapi Real Estate.
-          </p>
+          <p className="text-xs text-muted-foreground mb-5">{da.submittedByNote}</p>
 
           <div className="rounded-xl border border-border overflow-hidden">
             <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_0.9fr_1fr_0.6fr] bg-muted text-xs font-semibold text-foreground/85 px-4 py-3">
-              <span>Localisation</span>
-              <span>Type d&apos;opération</span>
-              <span>Date</span>
-              <span>Type de bien</span>
-              <span>Chambres</span>
+              <span>{da.colLocation}</span>
+              <span>{da.colDealType}</span>
+              <span>{da.colDate}</span>
+              <span>{da.colPropertyType}</span>
+              <span>{da.colBedrooms}</span>
             </div>
             {trackRecord.map((row, i) => (
               <div
@@ -315,7 +349,7 @@ export default function AgentDetailClient({
                 onClick={() => setShowAllRecord((v) => !v)}
                 className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
               >
-                {showAllRecord ? "Réduire" : "Tout afficher"}
+                {showAllRecord ? da.collapse : da.showAll}
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${showAllRecord ? "rotate-180" : ""}`}
                 />
@@ -325,46 +359,35 @@ export default function AgentDetailClient({
         </section>
 
         {/* Personal information */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
-          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-5">
-            Informations personnelles
-          </h2>
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
+          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-5">{da.personalInfoHeading}</h2>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 text-sm">
             <div className="flex justify-between gap-3 sm:block">
-              <dt className="text-muted-foreground">Spécialisation</dt>
-              <dd className="font-medium text-foreground">
-                {agent.specialization}
-              </dd>
+              <dt className="text-muted-foreground">{da.specialization}</dt>
+              <dd className="font-medium text-foreground">{agent.specialization}</dd>
             </div>
             <div className="flex justify-between gap-3 sm:block">
-              <dt className="text-muted-foreground">Expérience depuis</dt>
-              <dd className="font-medium text-foreground">
-                {agent.experienceSince}
-              </dd>
+              <dt className="text-muted-foreground">{da.experienceSince}</dt>
+              <dd className="font-medium text-foreground">{agent.experienceSince}</dd>
             </div>
             <div className="flex justify-between gap-3 sm:block">
-              <dt className="text-muted-foreground">
-                Licence d&apos;agent (BLN)
-              </dt>
-              <dd className="font-medium text-foreground">
-                {agent.brokerLicense}
-              </dd>
+              <dt className="text-muted-foreground">{da.license}</dt>
+              <dd className="font-medium text-foreground">{agent.brokerLicense}</dd>
             </div>
             <div className="flex justify-between gap-3 sm:block">
-              <dt className="text-muted-foreground">Agence</dt>
+              <dt className="text-muted-foreground">{da.agencyLabel}</dt>
               <dd className="font-medium text-foreground">{agent.agency}</dd>
             </div>
           </dl>
         </section>
 
         {/* Areas of expertise */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
           <h2 className="text-lg md:text-xl font-semibold text-foreground">
-            Zones d&apos;expertise de {agent.name.split(" ")[0]}
+            {da.areasHeading.replace("{name}", agent.name.split(" ")[0])}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Découvrez les quartiers où {agent.name.split(" ")[0]} est
-            spécialisé(e) et possède une connaissance approfondie du marché.
+            {da.areasSubtitle.replace("{name}", agent.name.split(" ")[0])}
           </p>
 
           <div className="mt-5 border-b border-border flex flex-wrap gap-1 overflow-x-auto">
@@ -396,11 +419,8 @@ export default function AgentDetailClient({
                   <h3 className="text-lg font-semibold text-foreground">
                     {activeAreaData.name}
                   </h3>
-                  <Link
-                    href="#"
-                    className="text-xs text-primary hover:underline whitespace-nowrap"
-                  >
-                    En savoir plus
+                  <Link href="#" className="text-xs text-primary hover:underline whitespace-nowrap">
+                    {da.learnMoreArea}
                   </Link>
                 </div>
                 <div className="flex items-center gap-2 mt-2 text-xs">
@@ -413,12 +433,9 @@ export default function AgentDetailClient({
                   {activeAreaData.description}
                 </p>
                 <div className="grid grid-cols-3 gap-2 mt-5">
-                  <AreaStat value={activeAreaData.forSale} label="à vendre" />
-                  <AreaStat value={activeAreaData.forRent} label="à louer" />
-                  <AreaStat
-                    value={activeAreaData.closedDeals}
-                    label="transactions"
-                  />
+                  <AreaStat value={activeAreaData.forSale} label={da.forSaleAreaLabel} />
+                  <AreaStat value={activeAreaData.forRent} label={da.forRentAreaLabel} />
+                  <AreaStat value={activeAreaData.closedDeals} label={da.dealsAreaLabel} />
                 </div>
               </div>
             </div>
@@ -426,10 +443,8 @@ export default function AgentDetailClient({
         </section>
 
         {/* About me */}
-        <section className="bg-white rounded-2xl border border-border p-6 md:p-8">
-          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-3">
-            À propos de moi
-          </h2>
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
+          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-3">{da.aboutMeHeading}</h2>
           <p
             className={`text-sm leading-relaxed text-foreground/85 ${
               !bioExpanded ? "line-clamp-4" : ""
@@ -441,21 +456,141 @@ export default function AgentDetailClient({
             onClick={() => setBioExpanded((v) => !v)}
             className="mt-3 inline-flex items-center gap-1 text-sm text-primary hover:underline border border-primary rounded-md px-3 py-1.5"
           >
-            {bioExpanded ? "Réduire" : "Lire plus"}
+            {bioExpanded ? da.reduce : da.readMore}
           </button>
+        </section>
+
+        {/* Avis & Notes */}
+        <section className="bg-white dark:bg-card rounded-2xl border border-border p-6 md:p-8">
+          <div className="flex items-end justify-between mb-5">
+            <h2 className="text-lg md:text-xl font-semibold text-foreground">
+              {da.reviewsHeading}
+            </h2>
+            {reviews.length > 0 && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-bold text-foreground">
+                  {(reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)}
+                </span>
+                <StarRatingDark
+                  value={reviews.reduce((s, r) => s + r.rating, 0) / reviews.length}
+                />
+                <span className="text-muted-foreground">{da.reviewsCountLabel.replace("{n}", String(reviews.length))}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Submit review */}
+          <div className="mb-6 rounded-xl bg-accent/50 border border-accent p-5">
+            <h3 className="text-sm font-semibold text-foreground mb-3">
+              {isAuthenticated ? da.leaveReviewLabel : da.loginToReviewLabel}
+            </h3>
+            <div className="flex items-center gap-1 mb-3">
+              {Array.from({ length: 5 }).map((_, i) => {
+                const val = i + 1;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onMouseEnter={() => setReviewHover(val)}
+                    onMouseLeave={() => setReviewHover(0)}
+                    onClick={() =>
+                      isAuthenticated ? setReviewRating(val) : router.push("/connexion")
+                    }
+                    className="p-0.5"
+                    aria-label={`${val} étoile${val > 1 ? "s" : ""}`}
+                  >
+                    <Star
+                      className={`w-7 h-7 transition-colors ${
+                        val <= (reviewHover || reviewRating)
+                          ? "fill-secondary text-secondary"
+                          : "text-foreground/20"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+              {reviewRating > 0 && (
+                <span className="ml-2 text-sm text-muted-foreground">
+                  {ratingLabels[reviewRating]}
+                </span>
+              )}
+            </div>
+            <textarea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder={da.reviewPlaceholder}
+              rows={3}
+              className="w-full text-sm border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white dark:bg-card"
+              disabled={!isAuthenticated}
+            />
+            {reviewError && (
+              <p className="text-xs text-destructive mt-2">{reviewError}</p>
+            )}
+            {reviewSuccess && (
+              <p className="text-xs text-green-600 mt-2">{da.reviewPosted}</p>
+            )}
+            <div className="mt-3 flex justify-end">
+              <Button
+                onClick={handleSubmitReview}
+                disabled={reviewSubmitting || reviewRating === 0 || !isAuthenticated}
+                className="h-9 text-sm"
+              >
+                {reviewSubmitting ? da.publishingLabel : da.publishBtn}
+              </Button>
+            </div>
+          </div>
+
+          {/* Reviews list */}
+          {reviewsLoading ? (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              {da.loadingReviewsMsg}
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              {da.noReviewsMsg}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="border-t border-border pt-4 first:border-t-0 first:pt-0"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{da.verifiedUser}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <StarRatingDark value={review.rating} />
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(review.createdAt).toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {review.comment && (
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      {review.comment}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* My properties */}
         <section id="properties">
           <div className="flex items-end justify-between mb-5">
             <h2 className="text-lg md:text-xl font-semibold text-foreground">
-              Biens de {agent.name.split(" ")[0]}
+              {da.propertiesOfHeading.replace("{name}", agent.name.split(" ")[0])}
             </h2>
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">
-                {filteredProps.length}
-              </span>{" "}
-              annonce{filteredProps.length > 1 ? "s" : ""}
+              <span className="font-semibold text-foreground">{filteredProps.length}</span>{" "}
+              {filteredProps.length > 1 ? da.listings : da.listing}
             </p>
           </div>
 
@@ -465,31 +600,31 @@ export default function AgentDetailClient({
               className={`px-4 h-9 rounded-lg text-sm font-medium transition-colors border ${
                 propertiesTab === "sale"
                   ? "bg-primary text-white border-primary"
-                  : "bg-white text-foreground border-border hover:border-primary/40"
+                  : "bg-white dark:bg-card text-foreground border-border hover:border-primary/40"
               }`}
             >
-              À vendre
+              {da.forSaleTab}
             </button>
             <button
               onClick={() => setPropertiesTab("rent")}
               className={`px-4 h-9 rounded-lg text-sm font-medium transition-colors border ${
                 propertiesTab === "rent"
                   ? "bg-primary text-white border-primary"
-                  : "bg-white text-foreground border-border hover:border-primary/40"
+                  : "bg-white dark:bg-card text-foreground border-border hover:border-primary/40"
               }`}
             >
-              À louer
+              {da.forRentTab}
             </button>
             <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
-              Tri :{" "}
-              <span className="font-medium text-foreground">À la une</span>
+              {da.sortLabel}{" "}
+              <span className="font-medium text-foreground">{da.featuredOption}</span>
               <ChevronDown className="w-3.5 h-3.5" />
             </span>
           </div>
 
           {filteredProps.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
-              Aucune annonce dans cette catégorie pour le moment.
+            <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
+              {da.noListingsMsg}
             </div>
           ) : (
             <div className="space-y-5">
@@ -507,17 +642,16 @@ export default function AgentDetailClient({
 /* ------------------------------ subcomponents ------------------------------ */
 
 function Breadcrumb({ agent }: { agent: Agent }) {
+  const t = useT();
+  const da = t.detail.agent;
   return (
     <nav className="hidden md:flex items-center text-xs text-muted-foreground gap-1.5">
-      <Link
-        href="/"
-        className="hover:text-primary inline-flex items-center gap-1"
-      >
-        Accueil
+      <Link href="/" className="hover:text-primary inline-flex items-center gap-1">
+        {da.breadHome}
       </Link>
       <ChevronRight className="w-3 h-3 text-foreground/30" />
       <Link href="/agents" className="hover:text-primary">
-        Trouver un agent
+        {da.breadFindAgent}
       </Link>
       <ChevronRight className="w-3 h-3 text-foreground/30" />
       <span className="hover:text-primary">{agent.agency}</span>
@@ -531,7 +665,7 @@ function Breadcrumb({ agent }: { agent: Agent }) {
 
 function AreaStat({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-lg bg-white border border-border px-3 py-2 text-center">
+    <div className="rounded-lg bg-white dark:bg-card border border-border px-3 py-2 text-center">
       <p className="text-xl font-extrabold text-foreground">{value}</p>
       <p className="text-[11px] text-muted-foreground">{label}</p>
     </div>

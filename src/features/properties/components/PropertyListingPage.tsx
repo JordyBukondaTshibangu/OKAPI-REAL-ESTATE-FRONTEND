@@ -1,3 +1,6 @@
+"use client";
+
+import { useT } from "@/i18n/useT";
 import { Property } from "@/features/properties/types/property";
 import { Crumb } from "./Breadcrumbs";
 import ListingHero from "./ListingHero";
@@ -35,6 +38,8 @@ export default function PropertyListingPage({
   totalPages,
   activeFilters = 0,
 }: PropertyListingPageProps) {
+  const t = useT();
+
   const pages =
     totalPages ?? Math.max(1, Math.ceil(properties.length / PER_PAGE));
   // When totalPages is provided the caller already paginated server-side
@@ -63,9 +68,7 @@ export default function PropertyListingPage({
               <span className="font-semibold text-foreground">
                 {properties.length}
               </span>{" "}
-              bien
-              {properties.length !== 1 ? "s" : ""} trouvé
-              {properties.length !== 1 ? "s" : ""} avec les filtres actifs
+              {t.listing.foundWithFilters.replace("{count}", String(properties.length))}
             </p>
           )}
 
@@ -74,13 +77,12 @@ export default function PropertyListingPage({
               {visible.length > 0 ? (
                 visible.map((p) => <PropertyCard key={p.id} property={p} />)
               ) : (
-                <div className="rounded-2xl border border-dashed border-border bg-white p-12 text-center">
+                <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-12 text-center">
                   <p className="text-muted-foreground text-sm mb-2">
-                    Aucun bien ne correspond à vos critères.
+                    {t.listing.noResults}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Essayez de modifier vos filtres ou d&apos;élargir votre
-                    recherche.
+                    {t.listing.noResultsHint}
                   </p>
                 </div>
               )}

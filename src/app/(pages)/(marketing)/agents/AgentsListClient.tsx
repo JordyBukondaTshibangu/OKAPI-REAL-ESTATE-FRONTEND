@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import AgencyCard from "@/features/agency/components/AgencyCard";
 import AgentCard from "@/features/agents/components/AgentCard";
 import AgentPagination from "@/features/agents/components/AgentPagination";
@@ -15,21 +16,22 @@ import { ChevronDown, Search, Sparkles, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const TRANSACTIONS: { label: string; value: "all" | "sale" | "rent" }[] = [
-  { label: "Vente résidentielle", value: "sale" },
-  { label: "Location résidentielle", value: "rent" },
-  { label: "Tous", value: "all" },
-];
-
 const LIMIT = 12;
 
 export default function AgentsListClient() {
+  const t = useT();
   const [tab, setTab] = useState<"agents" | "agencies">("agents");
   const [sortBy, setSortBy] = useState<"pertinence" | "title">("pertinence");
   const [sortOpen, setSortOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const titleFilter = searchParams.get("title"); // e.g. "SUPERAGENT"
+
+  const TRANSACTIONS: { label: string; value: "all" | "sale" | "rent" }[] = [
+    { label: t.agentsPage.transactionSale, value: "sale" },
+    { label: t.agentsPage.transactionRent, value: "rent" },
+    { label: t.agentsPage.transactionAll, value: "all" },
+  ];
 
   const TITLE_RANK: Record<string, number> = {
     SUPERAGENT: 0,
@@ -159,17 +161,16 @@ export default function AgentsListClient() {
         </div>
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-32 text-center">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
-            Trouvez votre agent pour trouver votre bien
+            {t.agentsPage.heroHeading}
           </h1>
           <p className="mt-3 text-white/80 max-w-2xl mx-auto">
-            Des agents vérifiés à travers Kinshasa, prêts à vous accompagner sur
-            l&apos;achat, la vente ou la location de votre prochain bien.
+            {t.agentsPage.heroSubtitle}
           </p>
         </div>
 
         {/* Search panel */}
         <div className="relative max-w-6xl mx-auto px-6 -mb-12 -translate-y-12 z-99">
-          <div className="bg-white text-foreground rounded-2xl shadow-lg p-5 md:p-6">
+          <div className="bg-white dark:bg-card text-foreground rounded-2xl shadow-lg p-5 md:p-6">
             {/* Tabs */}
             <div className="flex items-center gap-2 mb-4">
               <button
@@ -180,7 +181,7 @@ export default function AgentsListClient() {
                     : "bg-muted text-foreground/80 hover:bg-muted/70"
                 }`}
               >
-                Agents
+                {t.agentsPage.tabAgents}
               </button>
               <button
                 onClick={() => setTab("agencies")}
@@ -190,7 +191,7 @@ export default function AgentsListClient() {
                     : "bg-muted text-foreground/80 hover:bg-muted/70"
                 }`}
               >
-                Agences
+                {t.agentsPage.tabAgencies}
               </button>
             </div>
 
@@ -202,7 +203,7 @@ export default function AgentsListClient() {
                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input
                       type="text"
-                      placeholder="Saisissez un quartier ou un nom d'agent"
+                      placeholder={t.agentsPage.agentSearchPlaceholder}
                       value={agentQuery}
                       onChange={(e) => setQuery(e.target.value)}
                       className="w-full h-11 pl-9 pr-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring/40 text-sm"
@@ -212,7 +213,7 @@ export default function AgentsListClient() {
                     variant="default"
                     className="h-11 px-6 rounded-lg gap-2"
                   >
-                    <Search className="w-4 h-4" /> Rechercher
+                    <Search className="w-4 h-4" /> {t.agentsPage.searchBtn}
                   </Button>
                 </div>
 
@@ -220,26 +221,26 @@ export default function AgentsListClient() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
                   <AgentSelect
                     label={
-                      TRANSACTIONS.find((t) => t.value === agentTransaction)
-                        ?.label ?? "Transaction"
+                      TRANSACTIONS.find((tx) => tx.value === agentTransaction)
+                        ?.label ?? t.agentsPage.filterTransaction
                     }
                   >
-                    {TRANSACTIONS.map((t) => (
+                    {TRANSACTIONS.map((tx) => (
                       <button
-                        key={t.value}
-                        onClick={() => setTransaction(t.value)}
+                        key={tx.value}
+                        onClick={() => setTransaction(tx.value)}
                         className={`w-full text-left px-3 py-2 text-sm hover:bg-accent ${
-                          agentTransaction === t.value
+                          agentTransaction === tx.value
                             ? "bg-accent text-primary font-semibold"
                             : ""
                         }`}
                       >
-                        {t.label}
+                        {tx.label}
                       </button>
                     ))}
                   </AgentSelect>
 
-                  <AgentSelect label={agentLanguage ?? "Langue"}>
+                  <AgentSelect label={agentLanguage ?? t.agentsPage.filterLanguage}>
                     <button
                       onClick={() => setLanguage(null)}
                       className={`w-full text-left px-3 py-2 text-sm hover:bg-accent ${
@@ -248,7 +249,7 @@ export default function AgentsListClient() {
                           : ""
                       }`}
                     >
-                      Toutes
+                      {t.agentsPage.filterAll}
                     </button>
                     {languageOptions.map((l) => (
                       <button
@@ -265,7 +266,7 @@ export default function AgentsListClient() {
                     ))}
                   </AgentSelect>
 
-                  <AgentSelect label={agentNationality ?? "Nationalité"}>
+                  <AgentSelect label={agentNationality ?? t.agentsPage.filterNationality}>
                     <button
                       onClick={() => setNationality(null)}
                       className={`w-full text-left px-3 py-2 text-sm hover:bg-accent ${
@@ -274,7 +275,7 @@ export default function AgentsListClient() {
                           : ""
                       }`}
                     >
-                      Toutes
+                      {t.agentsPage.filterAll}
                     </button>
                     {nationalityOptions.map((n) => (
                       <button
@@ -298,7 +299,7 @@ export default function AgentsListClient() {
                       className="text-xs text-primary hover:underline"
                       onClick={resetAgentFilters}
                     >
-                      Réinitialiser les filtres
+                      {t.agentsPage.resetFilters}
                     </button>
                   </div>
                 )}
@@ -311,7 +312,7 @@ export default function AgentsListClient() {
                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input
                       type="text"
-                      placeholder="Rechercher une agence..."
+                      placeholder={t.agentsPage.agencySearchPlaceholder}
                       value={agencyName}
                       onChange={(e) => setAgencyName(e.target.value)}
                       className="w-full h-11 pl-9 pr-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring/40 text-sm"
@@ -321,13 +322,13 @@ export default function AgentsListClient() {
                     variant="default"
                     className="h-11 px-6 rounded-lg gap-2"
                   >
-                    <Search className="w-4 h-4" /> Rechercher
+                    <Search className="w-4 h-4" /> {t.agentsPage.searchBtn}
                   </Button>
                 </div>
 
                 {/* Agency filters */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                  <AgentSelect label={agencyLanguage ?? "Langue"}>
+                  <AgentSelect label={agencyLanguage ?? t.agentsPage.filterLanguage}>
                     <button
                       onClick={() => setAgencyLanguage(null)}
                       className={`w-full text-left px-3 py-2 text-sm hover:bg-accent ${
@@ -336,7 +337,7 @@ export default function AgentsListClient() {
                           : ""
                       }`}
                     >
-                      Toutes
+                      {t.agentsPage.filterAll}
                     </button>
                     {agencyLanguageOptions.map((l) => (
                       <button
@@ -360,7 +361,7 @@ export default function AgentsListClient() {
                       className="text-xs text-primary hover:underline"
                       onClick={resetAgencyFilters}
                     >
-                      Réinitialiser les filtres
+                      {t.agentsPage.resetFilters}
                     </button>
                   </div>
                 )}
@@ -375,18 +376,16 @@ export default function AgentsListClient() {
         <div className="rounded-2xl bg-accent border border-primary/10 p-6 md:p-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-center">
           <div>
             <div className="inline-flex items-center gap-2 text-secondary font-semibold text-xs tracking-widest uppercase mb-2">
-              <Sparkles className="w-4 h-4" /> Programme SuperAgent
+              <Sparkles className="w-4 h-4" /> {t.agentsPage.superAgentBadge}
             </div>
             <h2 className="text-2xl font-bold text-foreground">
-              Trouvez votre SuperAgent
+              {t.agentsPage.superAgentHeading}
             </h2>
             <p className="text-sm text-foreground/80 mt-2 max-w-xl">
-              Les agents les plus réactifs, vérifiés et notés par leurs clients
-              sur Okapi Real Estate. Une réponse en moyenne en moins de 5
-              minutes.
+              {t.agentsPage.superAgentSubtitle}
             </p>
             <Button variant="outlineGold" className="mt-4" onClick={handleSuperAgentFilter}>
-              Trouver un SuperAgent
+              {t.agentsPage.findSuperAgent}
             </Button>
           </div>
           <SuperAgentIllustration />
@@ -403,8 +402,7 @@ export default function AgentsListClient() {
                   <span className="font-semibold text-foreground">
                     {displayedAgents.length}
                   </span>{" "}
-                  agent{displayedAgents.length > 1 ? "s" : ""} trouvé
-                  {displayedAgents.length > 1 ? "s" : ""}
+                  {t.agentsPage.agentCount.replace("{n}", String(displayedAgents.length))}
                 </p>
                 {titleFilter && (
                   <span className="inline-flex items-center gap-1.5 bg-secondary/20 text-secondary-foreground text-xs font-semibold px-3 py-1 rounded-full">
@@ -423,21 +421,21 @@ export default function AgentsListClient() {
                   onClick={() => setSortOpen((v) => !v)}
                   className="inline-flex items-center gap-1.5 text-sm text-foreground/80 hover:text-primary"
                 >
-                  Trier par :{" "}
+                  {t.agentsPage.sortBy}{" "}
                   <span className="font-medium">
-                    {sortBy === "title" ? "Titre" : "Pertinence"}
+                    {sortBy === "title" ? t.agentsPage.sortByTitle : t.agentsPage.sortRelevance}
                   </span>
                   <ChevronDown className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
                 </button>
                 {sortOpen && (
-                  <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl border border-border shadow-lg z-30">
+                  <div className="absolute right-0 mt-1 w-44 bg-white dark:bg-card rounded-xl border border-border shadow-lg z-30">
                     {(["pertinence", "title"] as const).map((opt) => (
                       <button
                         key={opt}
                         onClick={() => { setSortBy(opt); setSortOpen(false); }}
                         className={`w-full text-left px-4 py-2.5 text-sm hover:bg-accent ${sortBy === opt ? "bg-accent text-primary font-semibold" : ""}`}
                       >
-                        {opt === "title" ? "Titre (SuperAgent en tête)" : "Pertinence"}
+                        {opt === "title" ? t.agentsPage.sortByTitle : t.agentsPage.sortRelevance}
                       </button>
                     ))}
                   </div>
@@ -446,12 +444,12 @@ export default function AgentsListClient() {
             </div>
 
             {agentLoading ? (
-              <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
-                Chargement des agents...
+              <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
+                {t.agentsPage.loadingAgents}
               </div>
             ) : displayedAgents.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
-                Aucun agent ne correspond à votre recherche.
+              <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
+                {t.agentsPage.noAgents}
               </div>
             ) : (
               <>
@@ -477,18 +475,17 @@ export default function AgentsListClient() {
                 <span className="font-semibold text-foreground">
                   {agencyMeta.total}
                 </span>{" "}
-                agence{agencyMeta.total > 1 ? "s" : ""} partenaire
-                {agencyMeta.total > 1 ? "s" : ""}
+                {t.agentsPage.agencyCount.replace("{n}", String(agencyMeta.total))}
               </p>
             </div>
 
             {agencyLoading ? (
-              <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
-                Chargement des agences...
+              <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
+                {t.agentsPage.loadingAgencies}
               </div>
             ) : agencies.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border bg-white p-10 text-center text-muted-foreground">
-                Aucune agence ne correspond à votre recherche.
+              <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-10 text-center text-muted-foreground">
+                {t.agentsPage.noAgencies}
               </div>
             ) : (
               <>

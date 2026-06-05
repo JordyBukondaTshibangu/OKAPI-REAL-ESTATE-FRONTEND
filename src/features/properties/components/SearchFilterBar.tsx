@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import { PropertyCategory } from "@/features/properties/types/property";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -14,80 +15,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type Mode = "rent" | "sale" | "buy" | "commercial";
-
-const TYPES_BY_MODE: Record<
-  Mode,
-  { value: PropertyCategory; label: string }[]
-> = {
-  buy: [
-    { value: "apartment", label: "Appartement" },
-    { value: "villa", label: "Villa" },
-    { value: "townhouse", label: "Maison" },
-    { value: "land", label: "Terrain" },
-    { value: "penthouse", label: "Penthouse" },
-    { value: "duplex", label: "Duplex" },
-  ],
-  sale: [
-    { value: "apartment", label: "Appartement" },
-    { value: "villa", label: "Villa" },
-    { value: "townhouse", label: "Maison" },
-    { value: "land", label: "Terrain" },
-    { value: "penthouse", label: "Penthouse" },
-  ],
-  rent: [
-    { value: "apartment", label: "Appartement" },
-    { value: "villa", label: "Villa" },
-    { value: "townhouse", label: "Maison" },
-    { value: "studio", label: "Studio" },
-    { value: "penthouse", label: "Penthouse" },
-  ],
-  commercial: [
-    { value: "office", label: "Bureau" },
-    { value: "retail", label: "Commerce" },
-    { value: "warehouse", label: "Entrepôt" },
-    { value: "land", label: "Terrain" },
-  ],
-};
-
-const PRICE_RANGES_BY_MODE: Record<
-  Mode,
-  { min?: number; max?: number; label: string }[]
-> = {
-  buy: [
-    { label: "Moins de 100 000 $", max: 100000 },
-    { label: "100 000 – 250 000 $", min: 100000, max: 250000 },
-    { label: "250 000 – 500 000 $", min: 250000, max: 500000 },
-    { label: "500 000 – 1 000 000 $", min: 500000, max: 1000000 },
-    { label: "Plus de 1 000 000 $", min: 1000000 },
-  ],
-  sale: [
-    { label: "Moins de 100 000 $", max: 100000 },
-    { label: "100 000 – 250 000 $", min: 100000, max: 250000 },
-    { label: "250 000 – 500 000 $", min: 250000, max: 500000 },
-    { label: "Plus de 500 000 $", min: 500000 },
-  ],
-  rent: [
-    { label: "Moins de 1 000 $/mois", max: 1000 },
-    { label: "1 000 – 3 000 $/mois", min: 1000, max: 3000 },
-    { label: "3 000 – 6 000 $/mois", min: 3000, max: 6000 },
-    { label: "Plus de 6 000 $/mois", min: 6000 },
-  ],
-  commercial: [
-    { label: "Moins de 3 000 $/mois", max: 3000 },
-    { label: "3 000 – 8 000 $/mois", min: 3000, max: 8000 },
-    { label: "Plus de 8 000 $/mois", min: 8000 },
-    { label: "Moins de 300 000 $", max: 300000 },
-    { label: "Plus de 300 000 $", min: 300000 },
-  ],
-};
-
-const BEDS_OPTIONS = [
-  { value: 1, label: "1+ chambre" },
-  { value: 2, label: "2+ chambres" },
-  { value: 3, label: "3+ chambres" },
-  { value: 4, label: "4+ chambres" },
-  { value: 5, label: "5+ chambres" },
-];
 
 function useOutsideClick(
   ref: React.RefObject<HTMLElement | null>,
@@ -126,7 +53,7 @@ function DropdownPill({
         className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${
           active
             ? "border-primary text-primary bg-accent font-medium"
-            : "border-border text-foreground/80 hover:border-primary/50 bg-white"
+            : "border-border text-foreground/80 hover:border-primary/50 bg-white dark:bg-card"
         }`}
       >
         {label}
@@ -153,7 +80,7 @@ function DropdownPill({
       </button>
 
       {open && (
-        <div className="absolute left-0 mt-1.5 min-w-50 bg-white rounded-xl border border-border shadow-lg z-100 overflow-hidden">
+        <div className="absolute left-0 mt-1.5 min-w-50 bg-white dark:bg-card rounded-xl border border-border shadow-lg z-100 overflow-hidden">
           {children}
         </div>
       )}
@@ -172,9 +99,84 @@ export default function SearchFilterBar({
   mode,
   showOffPlanReady,
 }: SearchFilterBarProps) {
+  const t = useT();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const TYPES_BY_MODE: Record<
+    Mode,
+    { value: PropertyCategory; label: string }[]
+  > = {
+    buy: [
+      { value: "apartment", label: t.filters.apartment },
+      { value: "villa", label: t.filters.villa },
+      { value: "townhouse", label: t.filters.townhouse },
+      { value: "land", label: t.filters.land },
+      { value: "penthouse", label: t.filters.penthouse },
+      { value: "duplex", label: t.filters.duplex },
+    ],
+    sale: [
+      { value: "apartment", label: t.filters.apartment },
+      { value: "villa", label: t.filters.villa },
+      { value: "townhouse", label: t.filters.townhouse },
+      { value: "land", label: t.filters.land },
+      { value: "penthouse", label: t.filters.penthouse },
+    ],
+    rent: [
+      { value: "apartment", label: t.filters.apartment },
+      { value: "villa", label: t.filters.villa },
+      { value: "townhouse", label: t.filters.townhouse },
+      { value: "studio", label: t.filters.studio },
+      { value: "penthouse", label: t.filters.penthouse },
+    ],
+    commercial: [
+      { value: "office", label: t.filters.office },
+      { value: "retail", label: t.filters.retail },
+      { value: "warehouse", label: t.filters.warehouse },
+      { value: "land", label: t.filters.land },
+    ],
+  };
+
+  const PRICE_RANGES_BY_MODE: Record<
+    Mode,
+    { min?: number; max?: number; label: string }[]
+  > = {
+    buy: [
+      { label: t.filters.buyPrice1, max: 100000 },
+      { label: t.filters.buyPrice2, min: 100000, max: 250000 },
+      { label: t.filters.buyPrice3, min: 250000, max: 500000 },
+      { label: t.filters.buyPrice4, min: 500000, max: 1000000 },
+      { label: t.filters.buyPrice5, min: 1000000 },
+    ],
+    sale: [
+      { label: t.filters.salePrice1, max: 100000 },
+      { label: t.filters.salePrice2, min: 100000, max: 250000 },
+      { label: t.filters.salePrice3, min: 250000, max: 500000 },
+      { label: t.filters.salePrice4, min: 500000 },
+    ],
+    rent: [
+      { label: t.filters.rentPrice1, max: 1000 },
+      { label: t.filters.rentPrice2, min: 1000, max: 3000 },
+      { label: t.filters.rentPrice3, min: 3000, max: 6000 },
+      { label: t.filters.rentPrice4, min: 6000 },
+    ],
+    commercial: [
+      { label: t.filters.commPrice1, max: 3000 },
+      { label: t.filters.commPrice2, min: 3000, max: 8000 },
+      { label: t.filters.commPrice3, min: 8000 },
+      { label: t.filters.commPrice4, max: 300000 },
+      { label: t.filters.commPrice5, min: 300000 },
+    ],
+  };
+
+  const BEDS_OPTIONS = [
+    { value: 1, label: t.filters.bed1 },
+    { value: 2, label: t.filters.bed2 },
+    { value: 3, label: t.filters.bed3 },
+    { value: 4, label: t.filters.bed4 },
+    { value: 5, label: t.filters.bed5 },
+  ];
 
   const currentQ = searchParams.get("q") ?? "";
   const currentType = searchParams.get("type") ?? "";
@@ -215,9 +217,9 @@ export default function SearchFilterBar({
     if (currentMinPrice && currentMaxPrice)
       return `${Number(currentMinPrice).toLocaleString("fr-FR")} – ${Number(currentMaxPrice).toLocaleString("fr-FR")} $`;
     if (currentMinPrice)
-      return `À partir de ${Number(currentMinPrice).toLocaleString("fr-FR")} $`;
+      return `${t.filters.priceFrom} ${Number(currentMinPrice).toLocaleString("fr-FR")} $`;
     if (currentMaxPrice)
-      return `Jusqu'à ${Number(currentMaxPrice).toLocaleString("fr-FR")} $`;
+      return `${t.filters.priceUpTo} ${Number(currentMaxPrice).toLocaleString("fr-FR")} $`;
     return null;
   })();
 
@@ -227,7 +229,7 @@ export default function SearchFilterBar({
 
   // Beds label
   const bedsLabel = currentBeds
-    ? `${currentBeds}+ chambre${Number(currentBeds) > 1 ? "s" : ""}`
+    ? BEDS_OPTIONS.find((b) => b.value === Number(currentBeds))?.label ?? null
     : null;
 
   return (
@@ -238,14 +240,14 @@ export default function SearchFilterBar({
           e.preventDefault();
           setFilter("q", localQ.trim() || null);
         }}
-        className="flex items-center gap-2 border border-border rounded-full px-5 h-12 bg-white"
+        className="flex items-center gap-2 border border-border rounded-full px-5 h-12 bg-white dark:bg-card"
       >
         <Search className="w-4 h-4 text-muted-foreground shrink-0" />
         <input
           type="search"
           value={localQ}
           onChange={(e) => setLocalQ(e.target.value)}
-          placeholder="Commune, quartier ou référence"
+          placeholder={t.filters.searchPlaceholder}
           className="flex-1 bg-transparent text-sm focus:outline-none placeholder:text-muted-foreground"
         />
         {localQ && (
@@ -263,7 +265,7 @@ export default function SearchFilterBar({
           type="submit"
           className="text-primary text-xs font-medium hover:underline shrink-0"
         >
-          Rechercher
+          {t.filters.searchBtn}
         </button>
       </form>
 
@@ -271,7 +273,7 @@ export default function SearchFilterBar({
       <div className="flex flex-wrap items-center gap-2">
         {/* Type de bien */}
         <DropdownPill
-          label={typeLabel ?? "Type de bien"}
+          label={typeLabel ?? t.filters.typePlaceholder}
           active={!!currentType}
           onClear={() => setFilter("type", null)}
         >
@@ -279,19 +281,19 @@ export default function SearchFilterBar({
             className="w-full text-left px-4 py-2.5 text-sm hover:bg-accent text-muted-foreground"
             onClick={() => setFilter("type", null)}
           >
-            Tous les types
+            {t.filters.allTypes}
           </button>
-          {TYPES_BY_MODE[mode]?.map((t) => (
+          {TYPES_BY_MODE[mode]?.map((item) => (
             <button
-              key={t.value}
+              key={item.value}
               className={`w-full text-left px-4 py-2.5 text-sm hover:bg-accent ${
-                currentType === t.value
+                currentType === item.value
                   ? "bg-accent text-primary font-semibold"
                   : ""
               }`}
-              onClick={() => setFilter("type", t.value)}
+              onClick={() => setFilter("type", item.value)}
             >
-              {t.label}
+              {item.label}
             </button>
           ))}
         </DropdownPill>
@@ -299,7 +301,7 @@ export default function SearchFilterBar({
         {/* Chambres (hide for commercial & land) */}
         {mode !== "commercial" && currentType !== "land" && (
           <DropdownPill
-            label={bedsLabel ?? "Chambres"}
+            label={bedsLabel ?? t.filters.bedsPlaceholder}
             active={!!currentBeds}
             onClear={() => setFilter("beds", null)}
           >
@@ -307,7 +309,7 @@ export default function SearchFilterBar({
               className="w-full text-left px-4 py-2.5 text-sm hover:bg-accent text-muted-foreground"
               onClick={() => setFilter("beds", null)}
             >
-              Toutes
+              {t.filters.allBeds}
             </button>
             {BEDS_OPTIONS.map((b) => (
               <button
@@ -327,7 +329,7 @@ export default function SearchFilterBar({
 
         {/* Prix */}
         <DropdownPill
-          label={priceLabel ?? "Prix"}
+          label={priceLabel ?? t.filters.pricePlaceholder}
           active={!!(currentMinPrice || currentMaxPrice)}
           onClear={() => {
             setFilter("minPrice", null);
@@ -340,7 +342,7 @@ export default function SearchFilterBar({
               router.push(buildUrl({ minPrice: null, maxPrice: null }))
             }
           >
-            Tous les prix
+            {t.filters.allPrices}
           </button>
           {PRICE_RANGES_BY_MODE[mode]?.map((r) => {
             const isActive =
@@ -372,15 +374,15 @@ export default function SearchFilterBar({
           <>
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white hover:border-primary/50"
+              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white dark:bg-card hover:border-primary/50"
             >
-              Sur plan <ChevronDown className="w-3.5 h-3.5" />
+              {t.filters.offPlan} <ChevronDown className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white hover:border-primary/50"
+              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white dark:bg-card hover:border-primary/50"
             >
-              Prêt <ChevronDown className="w-3.5 h-3.5" />
+              {t.filters.ready} <ChevronDown className="w-3.5 h-3.5" />
             </button>
           </>
         )}
@@ -389,20 +391,20 @@ export default function SearchFilterBar({
         <span className="hidden md:inline-block w-px h-6 bg-border mx-1" />
 
         <button
-          aria-label="Trier"
-          className="w-10 h-10 rounded-full border border-border bg-white flex items-center justify-center text-foreground/70 hover:border-primary/50"
+          aria-label={t.filters.ariaSortBtn}
+          className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
         >
           <SlidersHorizontal className="w-4 h-4" />
         </button>
         <button
-          aria-label="Alertes"
-          className="w-10 h-10 rounded-full border border-border bg-white flex items-center justify-center text-foreground/70 hover:border-primary/50"
+          aria-label={t.filters.ariaAlertsBtn}
+          className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
         >
           <Bell className="w-4 h-4" />
         </button>
 
         <Button variant="navy" size="sm" className="gap-2 ml-auto h-10">
-          <Map className="w-4 h-4" /> Carte
+          <Map className="w-4 h-4" /> {t.filters.map}
         </Button>
 
         {hasFilters && (
@@ -411,7 +413,7 @@ export default function SearchFilterBar({
             onClick={clearAll}
             className="text-xs text-destructive py-2.5 px-2 border border-destructive rounded-full cursor-pointer hover:bg-destructive/10"
           >
-            Effacer tout
+            {t.filters.clearAll}
           </button>
         )}
       </div>

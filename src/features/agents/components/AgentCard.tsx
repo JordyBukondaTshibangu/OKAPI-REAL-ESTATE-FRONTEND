@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { Star } from "lucide-react";
 import Link from "next/link";
@@ -8,10 +9,12 @@ import TitleBadge from "./TitleBadge";
 import { Agent } from "@/features/agents/types/agent";
 
 export default function AgentCard({ agent }: { agent: Agent }) {
+  const t = useT();
+
   return (
     <Link
       href={`/agents/${agent.id}`}
-      className="group block bg-white rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden"
+      className="group block bg-white dark:bg-card rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden"
     >
       <div className="grid grid-cols-[160px_1fr]">
         {/* Photo */}
@@ -71,13 +74,13 @@ export default function AgentCard({ agent }: { agent: Agent }) {
           <dl className="mt-3 text-xs text-foreground/85 space-y-1.5">
             <div className="flex gap-2">
               <dt className="text-muted-foreground w-20 shrink-0">
-                Nationalité&nbsp;:
+                {t.cards.nationality}
               </dt>
               <dd>{agent.nationality}</dd>
             </div>
             <div className="flex gap-2">
               <dt className="text-muted-foreground w-20 shrink-0">
-                Langues&nbsp;:
+                {t.cards.languages}
               </dt>
               <dd className="line-clamp-1">{agent.languages.join(", ")}</dd>
             </div>
@@ -85,10 +88,10 @@ export default function AgentCard({ agent }: { agent: Agent }) {
 
           <div className="mt-4 pt-3 border-t border-border flex items-center gap-2 text-xs">
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-accent text-primary font-medium">
-              Vente : {agent.forSaleCount}
+              {t.cards.forSale} {agent.forSaleCount}
             </span>
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-accent text-primary font-medium">
-              Location : {agent.forRentCount}
+              {t.cards.forRent} {agent.forRentCount}
             </span>
           </div>
         </div>

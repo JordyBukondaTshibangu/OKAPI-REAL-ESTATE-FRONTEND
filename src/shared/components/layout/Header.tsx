@@ -1,7 +1,10 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
+import LanguageSwitcher from "@/shared/components/ui/LanguageSwitcher";
+import ThemeToggle from "@/shared/components/ui/ThemeToggle";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useT } from "@/i18n/useT";
 import {
   Bell,
   ChevronDown,
@@ -10,10 +13,11 @@ import {
   MessageSquare,
   Star,
   User,
+  UserPlus,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 type MenuColumn = {
@@ -27,194 +31,157 @@ type NavItem = {
   columns?: MenuColumn[];
 };
 
-const navItems: NavItem[] = [
-  {
-    label: "Acheter",
-    href: "/acheter",
-    columns: [
-      {
-        title: "Biens résidentiels à vendre",
-        links: [
-          { label: "Appartements", href: "/acheter/appartements" },
-          { label: "Villas", href: "/acheter/villas" },
-          { label: "Maisons de ville", href: "/acheter/maisons-ville" },
-          
-        ],
-      },
-      {
-        title: "Conseils d'achat",
-        links: [
-          { label: "Guide de l'acheteur", href: "/conseils/guide-acheteur" },
-          { label: "Infos quartiers", href: "/conseils/quartiers" },
-          { label: "Guides communautaires", href: "/conseils/communautes" },
-          {
-            label: "Guides tours & résidences",
-            href: "/conseils/tours-residences",
-          },
-          {
-            label: "Guides écoles & universités",
-            href: "/conseils/ecoles-universites",
-          },
-        ],
-      },
-      {
-        title: "Services",
-        links: [
-          {
-            label: "Acheter un bien résidentiel",
-            href: "/acheter/villas",
-          },
-          {
-            label: "Acheter un bien commercial",
-            href: "/commercial/magasins",
-          },
-          {
-            label: "Trouver un agent immobilier",
-            href: "/agents",
-          },
-          {
-            label: "Trouver une agence",
-            href: "/agences",
-          },
-        ],
-      },
-    ],
-  },
+function useNavItems(): NavItem[] {
+  const t = useT();
+  return [
+    {
+      label: t.nav.buy,
+      href: "/acheter",
+      columns: [
+        {
+          title: t.nav.col_residential_buy,
+          links: [
+            { label: t.nav.apartments, href: "/acheter/appartements" },
+            { label: t.nav.villas, href: "/acheter/villas" },
+            { label: t.nav.townhouses, href: "/acheter/maisons-ville" },
+          ],
+        },
+        {
+          title: t.nav.col_tips_buy,
+          links: [
+            { label: t.nav.buyerGuide, href: "/conseils/guide-acheteur" },
+            { label: t.nav.neighborhoods, href: "/conseils/quartiers" },
+            { label: t.nav.communities, href: "/conseils/communautes" },
+            { label: t.nav.toursResidences, href: "/conseils/tours-residences" },
+            { label: t.nav.schoolsUniversities, href: "/conseils/ecoles-universites" },
+          ],
+        },
+        {
+          title: t.nav.col_services,
+          links: [
+            { label: t.nav.buyResidential, href: "/acheter/villas" },
+            { label: t.nav.buyCommercial, href: "/commercial/magasins" },
+            { label: t.nav.findAgent, href: "/agents" },
+            { label: t.nav.findAgency, href: "/agences" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.rent,
+      href: "/louer",
+      columns: [
+        {
+          title: t.nav.col_residential_rent,
+          links: [
+            { label: t.nav.apartments, href: "/louer/appartements" },
+            { label: t.nav.studios, href: "/louer/studios" },
+            { label: t.nav.villas, href: "/louer/villas" },
+            { label: t.nav.townhouses, href: "/louer/maisons-ville" },
+          ],
+        },
+        {
+          title: t.nav.col_tips_rent,
+          links: [
+            { label: t.nav.renterGuide, href: "/conseils/guide-locataire" },
+            { label: t.nav.neighborhoods, href: "/conseils/quartiers" },
+            { label: t.nav.communities, href: "/conseils/communautes" },
+            { label: t.nav.toursResidences, href: "/conseils/tours-residences" },
+            { label: t.nav.schoolsUniversities, href: "/conseils/ecoles-universites" },
+          ],
+        },
+        {
+          title: t.nav.col_services,
+          links: [
+            { label: t.nav.rentResidential, href: "/louer/villas" },
+            { label: t.nav.rentCommercial, href: "/commercial/magasins" },
+            { label: t.nav.findAgent, href: "/agents" },
+            { label: t.nav.findAgency, href: "/agences" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.sell,
+      href: "/vendre",
+      columns: [
+        {
+          title: t.nav.col_selling,
+          links: [
+            { label: t.nav.findAgent, href: "/agents" },
+            { label: t.nav.agentProducts, href: "/agences" },
+          ],
+        },
+        {
+          title: t.nav.col_list,
+          links: [
+            { label: t.nav.sellYourProperty, href: "/vendre" },
+          ],
+        },
+        {
+          title: t.nav.col_useful,
+          links: [
+            { label: t.nav.freeEstimation, href: "/vendre/estimation" },
+            { label: t.nav.sellerGuide, href: "/conseils/guide-vendeur" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.agents,
+      href: "/agents",
+      columns: [
+        {
+          title: t.nav.col_find,
+          links: [
+            { label: t.nav.findAgent, href: "/agents" },
+            { label: t.nav.findAgency, href: "/agences" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.commercial,
+      href: "/commercial",
+      columns: [
+        {
+          title: t.nav.col_buy_commercial,
+          links: [
+            { label: t.nav.offices, href: "/commercial/bureaux" },
+            { label: t.nav.stores, href: "/commercial/magasins" },
+            { label: t.nav.warehouses, href: "/commercial/entrepots" },
+            { label: t.nav.lands, href: "/commercial/terrains" },
+          ],
+        },
+        {
+          title: t.nav.col_rent_commercial,
+          links: [
+            { label: t.nav.offices, href: "/commercial/location/bureaux" },
+            { label: t.nav.stores, href: "/commercial/location/magasins" },
+            { label: t.nav.warehouses, href: "/commercial/location/entrepots" },
+          ],
+        },
+        {
+          title: t.nav.col_services,
+          links: [
+            { label: t.nav.findCommercialAgent, href: "/agents" },
+            { label: t.nav.findAgency, href: "/agences" },
+            { label: t.nav.commercialNews, href: "/commercial/actualites" },
+          ],
+        },
+      ],
+    },
+  ];
+}
 
-  {
-    label: "Louer",
-    href: "/louer",
-    columns: [
-      {
-        title: "Biens résidentiels à louer",
-        links: [
-          { label: "Appartements", href: "/louer/appartements" },
-          { label: "Studios", href: "/louer/studios" },
-          { label: "Villas", href: "/louer/villas" },
-          { label: "Maisons de ville", href: "/louer/maisons-ville" },
-        ],
-      },
-      {
-        title: "Conseils location",
-        links: [
-          { label: "Guide du locataire", href: "/conseils/guide-locataire" },
-          { label: "Infos quartiers", href: "/conseils/quartiers" },
-          { label: "Guides communautaires", href: "/conseils/communautes" },
-          {
-            label: "Guides tours & résidences",
-            href: "/conseils/tours-residences",
-          },
-          {
-            label: "Guides écoles & universités",
-            href: "/conseils/ecoles-universites",
-          },
-        ],
-      },
-      {
-        title: "Services",
-        links: [
-          {
-            label: "Louer un bien résidentiel",
-            href: "/louer/villas",
-          },
-          {
-            label: "Louer un bien commercial",
-            href: "/commercial/magasins",
-          },
-          {
-            label: "Trouver un agent immobilier",
-            href: "/agents",
-          },
-          {
-            label: "Trouver une agence",
-            href: "/agences",
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    label: "Vendre",
-    href: "/vendre",
-    columns: [
-      {
-        title: "Vous vendez ?",
-        links: [
-          { label: "Trouver un agent immobilier", href: "/agents" },
-          { label: "Produits agences", href: "/agences" },
-        ],
-      },
-      {
-        title: "Lister ",
-        links: [
-          { label: "Vendre votre bien", href: "/vendre" },
-        ],
-      },
-      {
-        title: "Liens utiles",
-        links: [
-          { label: "Estimation gratuite", href: "/vendre/estimation" },
-          { label: "Guide du vendeur", href: "/conseils/guide-vendeur" },
-        ],
-      },
-    ],
-  },
-
-  {
-    label: "Agents & Agences",
-    href: "/agents",
-    columns: [
-      {
-        title: "Trouver",
-        links: [
-          { label: "Trouver un agent immobilier", href: "/agents" },
-          { label: "Trouver une agence", href: "/agences" },
-        ],
-      },
-    ],
-  },
-
-  {
-    label: "Commercial",
-    href: "/commercial",
-    columns: [
-      {
-        title: "Acheter commercial",
-        links: [
-          { label: "Bureaux", href: "/commercial/bureaux" },
-          { label: "Magasins", href: "/commercial/magasins" },
-          { label: "Entrepôts", href: "/commercial/entrepots" },
-          { label: "Terrains", href: "/commercial/terrains" },
-        ],
-      },
-      {
-        title: "Louer commercial",
-        links: [
-          { label: "Bureaux", href: "/commercial/location/bureaux" },
-          { label: "Magasins", href: "/commercial/location/magasins" },
-          { label: "Entrepôts", href: "/commercial/location/entrepots" },
-        ],
-      },
-      {
-        title: "Services",
-        links: [
-          { label: "Trouver un agent commercial", href: "/agents" },
-          { label: "Trouver une agence", href: "/agences" },
-          { label: "Actualités commerciales", href: "/commercial/actualites" },
-        ],
-      },
-    ],
-  },
-];
-
-const profileMenuItems = [
-  { label: "Mon Profil", href: "/profil", icon: User },
-  { label: "Favoris", href: "/favoris", icon: Heart },
-  { label: "Demandes", href: "/demandes", icon: MessageSquare },
-  { label: "Alertes", href: "/alertes", icon: Bell },
-  { label: "Avis & Notes", href: "/avis", icon: Star },
-];
+function UtilityCluster() {
+  return (
+    <div className="flex items-center gap-0.5 rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-card/5 px-1 py-0.5">
+      <LanguageSwitcher />
+      <ThemeToggle />
+    </div>
+  );
+}
 
 function ProfileMenu() {
   const [open, setOpen] = useState(false);
@@ -222,6 +189,15 @@ function ProfileMenu() {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const t = useT();
+
+  const profileMenuItems = [
+    { label: t.auth.profile, href: "/profil", icon: User },
+    { label: t.auth.favorites, href: "/favoris", icon: Heart },
+    { label: t.auth.enquiries, href: "/demandes", icon: MessageSquare },
+    { label: t.auth.alerts, href: "/alertes", icon: Bell },
+    { label: t.auth.reviews, href: "/avis", icon: Star },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -239,17 +215,11 @@ function ProfileMenu() {
 
   if (!mounted) {
     return (
-      <div className="flex items-center gap-3">
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-white/40 text-white hover:bg-white/10 hover:text-white"
-          asChild
-        >
-          <Link href="/carrieres">Rejoindre l&apos;équipe</Link>
-        </Button>
-        <Button variant="gold" size="sm" asChild>
-          <Link href="/inscription">S&apos;inscrire</Link>
+      <div className="flex items-center gap-2">
+        <UtilityCluster />
+        <div className="w-px h-5 bg-white dark:bg-card/20" />
+        <Button variant="gold" size="sm" asChild className="hidden xl:flex font-semibold">
+          <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
     );
@@ -257,18 +227,19 @@ function ProfileMenu() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="flex items-center gap-3">
-
+      <div className="flex items-center gap-2">
+        <UtilityCluster />
+        <div className="w-px h-5 bg-white dark:bg-card/20" />
         <Button
           variant="outline"
           size="sm"
-          className="border-white/40 text-white hover:bg-white/10 hover:text-white"
+          className="border-white/40 text-white hover:bg-white dark:bg-card/10 hover:text-white"
           asChild
         >
-          <Link href="/connexion" className="min-w-fit ">Se connecter</Link>
+          <Link href="/connexion" className="min-w-fit">{t.auth.login}</Link>
         </Button>
-        <Button variant="gold" size="sm" asChild>
-          <Link href="/inscription">S&apos;inscrire</Link>
+        <Button variant="gold" size="sm" asChild className="hidden xl:flex font-semibold">
+          <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
     );
@@ -282,29 +253,26 @@ function ProfileMenu() {
 
   return (
     <div className="flex items-center gap-3">
-      <Button
-        variant="outline"
-        size="sm"
-        className="border-white/40 text-white hover:bg-white/10 hover:text-white"
-        asChild
-      >
-        <Link href="/carrieres">Rejoindre l&apos;équipe</Link>
-      </Button>
+      <UtilityCluster />
+      <div className="w-px h-5 bg-white dark:bg-card/20" />
 
       <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none ring-2 ring-secondary/40 overflow-hidden relative"
+          style={{ boxShadow: "0 0 0 2px hsl(var(--navy)), 0 0 0 4px hsl(var(--secondary))" }}
+          className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none relative"
           aria-label="Menu profil"
         >
           {user.profileImage ? (
-            <Image
-              src={`/api/proxy/${user.profileImage}`}
-              alt={user.firstName}
-              fill
-              className="object-cover"
-              sizes="36px"
-            />
+            <span className="absolute inset-0 rounded-full overflow-hidden">
+              <Image
+                src={`/api/proxy/${user.profileImage}`}
+                alt={user.firstName}
+                fill
+                className="object-cover"
+                sizes="36px"
+              />
+            </span>
           ) : (
             user.firstName[0].toUpperCase()
           )}
@@ -313,7 +281,7 @@ function ProfileMenu() {
         {open && (
           <div className="absolute right-0 top-full mt-2 w-56 bg-card rounded-xl shadow-lg border border-border py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
             <div className="px-4 py-3 border-b border-border mb-1">
-              <p className="text-sm font-semibold text-text-dark">
+              <p className="text-sm font-semibold text-foreground">
                 {user.firstName} {user.lastName}
               </p>
               <p className="text-xs text-muted-foreground truncate">{user.email}</p>
@@ -324,7 +292,7 @@ function ProfileMenu() {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-dark hover:bg-muted transition-colors"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors duration-150"
               >
                 <Icon className="w-4 h-4 text-muted-foreground" />
                 {label}
@@ -334,10 +302,10 @@ function ProfileMenu() {
             <div className="border-t border-border mt-1 pt-1">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 w-full transition-colors"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 w-full transition-colors duration-150"
               >
                 <LogOut className="w-4 h-4" />
-                Se déconnecter
+                {t.auth.logout}
               </button>
             </div>
           </div>
@@ -349,13 +317,28 @@ function ProfileMenu() {
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const navItems = useNavItems();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <header
-      className="bg-navy text-white border-b border-white/10 sticky top-0 z-50"
+      className={`sticky top-0 z-50 text-white border-b transition-all duration-300 ${
+        scrolled
+          ? "bg-navy/82 backdrop-blur-xl border-white/20 shadow-lg"
+          : "bg-navy border-white/10"
+      }`}
       onMouseLeave={() => setOpenMenu(null)}
     >
-      <div className="max-w-6xl mx-auto px-6 h-24 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-6 h-28 flex items-center justify-between">
         <div className="w-full flex items-center justify-between gap-8">
           <Link href="/" className="flex items-center shrink-0">
             <Image
@@ -367,27 +350,31 @@ export default function Header() {
               priority
             />
           </Link>
-          <nav className="hidden md:flex items-center gap-1">
+
+          <nav className="hidden md:flex items-center">
             {navItems.map((item) => {
-              const isActive = openMenu === item.label;
+              const isMenuOpen = openMenu === item.label;
+              const isCurrentPage = pathname.startsWith(item.href);
+              const isHighlighted = isMenuOpen || isCurrentPage;
               return (
                 <div
                   key={item.label}
+                  className="group"
                   onMouseEnter={() => setOpenMenu(item.label)}
                 >
                   <Link
                     href={item.href}
-                    className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-                      isActive
+                    className={`flex items-center gap-1 px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors duration-200 ${
+                      isHighlighted
                         ? "text-secondary border-secondary"
-                        : "text-white/85 border-transparent hover:text-secondary"
+                        : "text-white/80 border-transparent hover:text-secondary hover:border-secondary/50"
                     }`}
                   >
                     {item.label}
                     {item.columns && (
                       <ChevronDown
-                        className={`w-3.5 h-3.5 transition-transform ${
-                          isActive ? "rotate-180" : ""
+                        className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
+                          isHighlighted ? "rotate-180" : "group-hover:rotate-180"
                         }`}
                       />
                     )}
@@ -395,14 +382,9 @@ export default function Header() {
                 </div>
               );
             })}
-            <Link
-              href="/vendre"
-              onMouseEnter={() => setOpenMenu(null)}
-              className="ml-2 inline-flex items-center rounded-full border border-white/40 px-4 h-9 text-sm font-medium text-white hover:bg-white hover:text-navy transition-colors"
-            >
-              Lister 
-            </Link>
+            <NavListButton navItems={navItems} setOpenMenu={setOpenMenu} />
           </nav>
+
           <ProfileMenu />
         </div>
       </div>
@@ -424,7 +406,7 @@ export default function Header() {
                   {item.columns!.map((column, idx) => (
                     <div key={idx}>
                       {column.title && (
-                        <h3 className="text-sm font-semibold text-text-dark mb-4">
+                        <h3 className="text-sm font-semibold text-foreground mb-4">
                           {column.title}
                         </h3>
                       )}
@@ -434,7 +416,7 @@ export default function Header() {
                           <li key={link.label}>
                             <Link
                               href={link.href}
-                              className="text-sm text-primary hover:underline font-medium"
+                              className="text-sm text-primary hover:text-secondary hover:underline font-medium transition-colors duration-150"
                             >
                               {link.label}
                             </Link>
@@ -449,5 +431,25 @@ export default function Header() {
         </div>
       )}
     </header>
+  );
+}
+
+function NavListButton({
+  navItems,
+  setOpenMenu,
+}: {
+  navItems: NavItem[];
+  setOpenMenu: (v: string | null) => void;
+}) {
+  const t = useT();
+  const sellItem = navItems.find((n) => n.href === "/vendre");
+  return (
+    <Link
+      href="/vendre"
+      onMouseEnter={() => setOpenMenu(sellItem?.label ?? null)}
+      className="hidden xl:inline-flex ml-3 items-center rounded-full bg-secondary text-secondary-foreground px-5 h-9 text-sm font-semibold hover:bg-secondary/90 transition-colors duration-200"
+    >
+      {t.nav.list}
+    </Link>
   );
 }

@@ -2,20 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { useT } from "@/i18n/useT";
 
 type IconProps = { className?: string };
 
 function InstagramIcon({ className }: IconProps) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
@@ -63,112 +57,95 @@ function PlayIcon({ className }: IconProps) {
   );
 }
 
-type LinkColumn = {
-  title: string;
-  links: string[];
-  param?: "suburb" | "city";
+function GoldDivider() {
+  return (
+    <div
+      className="h-[1.5px] bg-gradient-to-r from-transparent via-secondary/60 to-transparent"
+      aria-hidden="true"
+    />
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-sm font-semibold text-secondary tracking-wide mb-6">
+      {children}
+    </p>
+  );
+}
+
+function HighlightedDescription({ text, highlight }: { text: string; highlight: string }) {
+  const parts = text.split(highlight);
+  if (parts.length < 2) return <>{text}</>;
+  return (
+    <>
+      {parts[0]}
+      <strong className="text-secondary font-semibold not-italic">{highlight}</strong>
+      {parts.slice(1).join(highlight)}
+    </>
+  );
+}
+
+const regionSuburbs = {
+  center: ["Gombe", "Lingwala", "Kinshasa", "Kintambo", "Barumbu", "Bandalungwa", "Lemba", "Limete"],
+  west:   ["Ngaliema", "Mont-Ngafula", "Selembao", "Bumbu", "Makala", "Kalamu", "Kasa-Vubu"],
+  east:   ["Masina", "N'Djili", "Kimbanseke", "N'Sele", "Maluku", "Kisenso", "Matete", "Ngiri-Ngiri"],
+  rdc:    ["Lubumbashi", "Goma", "Bukavu", "Kisangani", "Mbuji-Mayi", "Kananga", "Kolwezi", "Matadi", "Boma", "Mbandaka"],
 };
 
-const regions: LinkColumn[] = [
-  {
-    title: "Biens à vendre — Quartiers Centre",
-    param: "suburb",
-    links: [
-      "Gombe",
-      "Lingwala",
-      "Kinshasa",
-      "Kintambo",
-      "Barumbu",
-      "Bandalungwa",
-      "Lemba",
-      "Limete",
-    ],
-  },
-  {
-    title: "Biens à vendre — Quartiers Ouest",
-    param: "suburb",
-    links: [
-      "Ngaliema",
-      "Mont-Ngafula",
-      "Selembao",
-      "Bumbu",
-      "Makala",
-      "Kalamu",
-      "Kasa-Vubu",
-    ],
-  },
-  {
-    title: "Biens à vendre — Quartiers Est",
-    param: "suburb",
-    links: [
-      "Masina",
-      "N'Djili",
-      "Kimbanseke",
-      "N'Sele",
-      "Maluku",
-      "Kisenso",
-      "Matete",
-      "Ngiri-Ngiri",
-    ],
-  },
-  {
-    title: "Reste de la RDC",
-    param: "city",
-    links: [
-      "Lubumbashi",
-      "Goma",
-      "Bukavu",
-      "Kisangani",
-      "Mbuji-Mayi",
-      "Kananga",
-      "Kolwezi",
-      "Matadi",
-      "Boma",
-      "Mbandaka",
-    ],
-  },
-];
-
-const companyLinks = [
-  { label: "À propos", href: "/a-propos" },
-  { label: "Nous contacter", href: "/contact" },
-  { label: "Notre Blog", href: "/blog" },
-  { label: "Plan du site", href: "/plan-du-site" },
-];
-const legalLinks = [
-  { label: "Conditions générales", href: "/conditions-generales" },
-  { label: "Politique de confidentialité", href: "/confidentialite" },
-  { label: "Politique des cookies", href: "/cookies" },
-  { label: "Mentions légales", href: "/conditions-generales" },
-];
-const partnerLinks = [
-  { label: "Rejoindre notre équipe", href: "/carrieres" },
-  { label: "Espace agents", href: "/agents" },
-  { label: "Produits pour agences", href: "/agences" },
-];
+const rdcCol1 = regionSuburbs.rdc.slice(0, 5);
+const rdcCol2 = regionSuburbs.rdc.slice(5);
 
 export default function Footer() {
+  const t = useT();
+
+  const companyLinks = [
+    { label: t.footer.about, href: "/a-propos" },
+    { label: t.footer.contact, href: "/contact" },
+    { label: t.footer.blog, href: "/blog" },
+    { label: t.footer.sitemap, href: "/plan-du-site" },
+  ];
+  const legalLinks = [
+    { label: t.footer.terms, href: "/conditions-generales" },
+    { label: t.footer.privacy, href: "/confidentialite" },
+    { label: t.footer.cookies, href: "/cookies" },
+    { label: t.footer.legalMentions, href: "/conditions-generales" },
+  ];
+  const partnerLinks = [
+    { label: t.footer.joinTeam, href: "/carrieres" },
+    { label: t.footer.agentSpace, href: "/agents" },
+    { label: t.footer.agencyProducts, href: "/agences" },
+  ];
+
+  const kinshasaRegions = [
+    { title: t.footer.col_regions_center, param: "suburb" as const, links: regionSuburbs.center },
+    { title: t.footer.col_regions_west,   param: "suburb" as const, links: regionSuburbs.west   },
+    { title: t.footer.col_regions_east,   param: "suburb" as const, links: regionSuburbs.east   },
+  ];
+
+  const linkClass = "text-sm text-white/70 hover:text-secondary transition-colors duration-200";
+
   return (
     <footer className="bg-navy text-white">
-      {/* Top gold accent line */}
-      <div
-        className="h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent"
-        aria-hidden="true"
-      />
+      <div className="h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" aria-hidden="true" />
+
       {/* Top — Property by region */}
-      <div className="max-w-6xl mx-auto px-6 py-16">
+      <div className="max-w-6xl mx-auto px-6 py-14">
+        <SectionLabel>{t.footer.exploreByArea}</SectionLabel>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {regions.map((col) => (
+          {/* Three Kinshasa region columns */}
+          {kinshasaRegions.map((col) => (
             <div key={col.title}>
-              <h4 className="font-semibold text-sm mb-4 leading-snug text-secondary tracking-wide">
+              <h4 className="font-semibold text-sm mb-4 text-secondary tracking-wide whitespace-nowrap">
                 {col.title}
               </h4>
               <ul className="space-y-2">
                 {col.links.map((link) => (
                   <li key={link}>
                     <Link
-                      href={`/acheter?${col.param ?? "suburb"}=${encodeURIComponent(link)}`}
-                      className="text-sm text-white/80 hover:text-secondary hover:underline transition-colors"
+                      href={`/acheter?${col.param}=${encodeURIComponent(link)}`}
+                      className={linkClass}
                     >
                       {link}
                     </Link>
@@ -177,111 +154,169 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+
+          {/* RDC — single header, two explicit sub-columns */}
+          <div>
+            <h4 className="font-semibold text-sm mb-4 text-secondary tracking-wide whitespace-nowrap">
+              {t.footer.col_regions_rdc}
+            </h4>
+            <div className="grid grid-cols-2 gap-x-3">
+              <ul className="space-y-2">
+                {rdcCol1.map((link) => (
+                  <li key={link}>
+                    <Link
+                      href={`/acheter?city=${encodeURIComponent(link)}`}
+                      className={linkClass}
+                    >
+                      {link}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <ul className="space-y-2">
+                {rdcCol2.map((link) => (
+                  <li key={link}>
+                    <Link
+                      href={`/acheter?city=${encodeURIComponent(link)}`}
+                      className={linkClass}
+                    >
+                      {link}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-white/15" />
+      <GoldDivider />
 
-      {/* Bottom — brand, links, downloads */}
+      {/* Middle — Brand + description + socials */}
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Brand + socials row */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
-          <div>
+        <div className="flex flex-col md:flex-row md:items-start gap-10">
+          {/* Logo + tagline */}
+          <div className="shrink-0">
             <Link href="/" className="flex items-center">
               <Image
                 src="/assets/images/company-logo.png"
                 alt="Okapi Real Estate"
-                width={140}
-                height={56}
-                className="h-24 w-auto"
+                width={160}
+                height={64}
+                className="h-28 w-auto"
               />
             </Link>
-            <p className="text-xs text-white/60 mt-2 tracking-wide">
-              Enraciné au Congo, bâtir votre avenir
-            </p>
+            <p className="text-sm text-white/55 mt-2 tracking-wide">{t.footer.tagline}</p>
           </div>
-          <div className="flex items-center gap-5">
-            <a href="#" aria-label="Instagram" className="text-white/85 hover:text-secondary transition-colors">
-              <InstagramIcon className="w-5 h-5" />
-            </a>
-            <a href="#" aria-label="Facebook" className="text-white/85 hover:text-secondary transition-colors">
-              <FacebookIcon className="w-5 h-5" />
-            </a>
-            <a href="#" aria-label="X (Twitter)" className="text-white/85 hover:text-secondary transition-colors">
-              <TwitterIcon className="w-5 h-5" />
-            </a>
-            <a href="#" aria-label="YouTube" className="text-white/85 hover:text-secondary transition-colors">
-              <YoutubeIcon className="w-5 h-5" />
-            </a>
+
+          {/* Brand description + CTA */}
+          <div className="flex-1 md:px-12 md:border-x md:border-white/10">
+            <p className="text-[15px] text-white/65 leading-relaxed max-w-sm">
+              <HighlightedDescription
+                text={t.footer.description}
+                highlight={t.footer.descriptionHighlight}
+              />
+            </p>
+            <Link
+              href="/vendre"
+              className="group inline-flex items-center gap-2 mt-5 text-secondary text-sm font-semibold"
+            >
+              {t.footer.listCta}
+              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1.5" />
+            </Link>
+          </div>
+
+          {/* Socials */}
+          <div className="shrink-0">
+            <SectionLabel>{t.footer.followUs}</SectionLabel>
+            <div className="flex items-center gap-4">
+              {[
+                { label: "Instagram", Icon: InstagramIcon },
+                { label: "Facebook", Icon: FacebookIcon },
+                { label: "X (Twitter)", Icon: TwitterIcon },
+                { label: "YouTube", Icon: YoutubeIcon },
+              ].map(({ label, Icon }) => (
+                <a
+                  key={label}
+                  href="#"
+                  aria-label={label}
+                  className="text-white/60 hover:text-secondary transition-colors duration-200"
+                >
+                  <Icon className="w-[22px] h-[22px]" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="border-t border-white/15 mb-10" />
+        <div className="my-10">
+          <GoldDivider />
+        </div>
 
         {/* Link columns + app downloads */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <ul className="space-y-3">
             {companyLinks.map((link) => (
-              <li key={link.label}>
-                <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
-                  {link.label}
-                </Link>
+              <li key={link.href}>
+                <Link href={link.href} className={linkClass}>{link.label}</Link>
               </li>
             ))}
           </ul>
 
           <ul className="space-y-3">
-            {legalLinks.map((link) => (
-              <li key={link.label}>
-                <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
-                  {link.label}
-                </Link>
+            {legalLinks.map((link, i) => (
+              <li key={i}>
+                <Link href={link.href} className={linkClass}>{link.label}</Link>
               </li>
             ))}
           </ul>
 
           <ul className="space-y-3">
-            {partnerLinks.map((link) => (
-              <li key={link.label}>
-                <Link href={link.href} className="text-sm text-white/85 hover:text-secondary transition-colors">
-                  {link.label}
-                </Link>
+            {partnerLinks.map((link, i) => (
+              <li key={i}>
+                <Link href={link.href} className={linkClass}>{link.label}</Link>
               </li>
             ))}
           </ul>
 
+          {/* App downloads */}
           <div>
-            <p className="text-sm font-semibold mb-3">Télécharger l&apos;application</p>
+            <SectionLabel>{t.footer.downloadApp}</SectionLabel>
             <div className="flex flex-wrap gap-3">
-              <a
-                href="#"
-                className="inline-flex items-center gap-2 bg-black hover:bg-black/80 transition-colors text-white rounded-md px-3 py-2"
-              >
-                <AppleIcon className="w-5 h-5" />
-                <div className="leading-tight">
-                  <p className="text-[9px] opacity-80">Télécharger sur</p>
-                  <p className="text-xs font-semibold -mt-0.5">App Store</p>
-                </div>
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center gap-2 bg-black hover:bg-black/80 transition-colors text-white rounded-md px-3 py-2"
-              >
-                <PlayIcon className="w-5 h-5" />
-                <div className="leading-tight">
-                  <p className="text-[9px] opacity-80">DISPONIBLE SUR</p>
-                  <p className="text-xs font-semibold -mt-0.5">Google Play</p>
-                </div>
-              </a>
+              {[
+                { Icon: AppleIcon, top: t.footer.downloadOnAppStore, name: "App Store" },
+                { Icon: PlayIcon,  top: t.footer.availableOnPlay,    name: "Google Play" },
+              ].map(({ Icon, top, name }) => (
+                <a
+                  key={name}
+                  href="#"
+                  className="inline-flex items-center gap-2.5 bg-white dark:bg-card/8 hover:bg-white dark:bg-card/12 border border-white/20 hover:border-secondary/40 hover:shadow-[0_0_12px_hsl(var(--secondary)/0.15)] transition-all duration-200 text-white rounded-lg px-3.5 py-2.5"
+                >
+                  <Icon className="w-5 h-5 shrink-0" />
+                  <div className="leading-tight">
+                    <p className="text-[9px] text-white/60 uppercase tracking-wide">{top}</p>
+                    <p className="text-xs font-semibold">{name}</p>
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Copyright */}
-        <p className="text-xs text-white/70 mt-10">
-          Copyright © {new Date().getFullYear()} Okapi Real Estate
-        </p>
+        <div className="flex items-center gap-3 mt-10 pt-6 border-t border-white/10">
+          <Image
+            src="/assets/images/company-logo.png"
+            alt=""
+            width={56}
+            height={22}
+            className="h-[18px] w-auto opacity-40"
+            aria-hidden="true"
+          />
+          <p className="text-xs text-white/45">
+            {t.footer.copyright.replace("{year}", String(new Date().getFullYear()))}
+          </p>
+        </div>
       </div>
     </footer>
   );

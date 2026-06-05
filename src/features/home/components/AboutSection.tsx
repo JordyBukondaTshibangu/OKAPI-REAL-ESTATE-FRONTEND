@@ -1,84 +1,157 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
 import { Button } from "@/shared/components/ui/button";
-import { Home, Laptop, Sofa, Users } from "lucide-react";
+import { Home, MapPin, Shield, Users } from "lucide-react";
+import Link from "next/link";
+
+function GoldWord({ text, highlight }: { text: string; highlight: string }) {
+  const parts = text.split(highlight);
+  if (parts.length < 2) return <>{text}</>;
+  return (
+    <>
+      {parts[0]}
+      <span className="text-secondary">{highlight}</span>
+      {parts.slice(1).join(highlight)}
+    </>
+  );
+}
 
 export default function AboutSection() {
+  const t = useT();
+
+  const stats = [
+    { value: t.home.about.stat1Value, label: t.home.about.stat1Label, icon: Home,   gold: false },
+    { value: t.home.about.stat2Value, label: t.home.about.stat2Label, icon: Users,  gold: false },
+    { value: t.home.about.stat3Value, label: t.home.about.stat3Label, icon: Shield, gold: true  },
+  ];
+
   return (
-    <section className="bg-background py-20 px-6">
-      <div className="max-w-6xl mx-auto space-y-20">
-        {/* Le site immobilier numéro un à Kinshasa */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Image collage */}
-          <div className="relative h-[420px]">
-            {/* Top-left image */}
-            <div className="absolute top-0 left-4 w-56 h-44 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-200 to-gray-400 shadow-lg flex items-center justify-center">
-              <Sofa className="w-16 h-16 text-white/80" strokeWidth={1.5} />
+    <section className="bg-navy text-white py-20 px-6">
+      <div className="max-w-6xl mx-auto space-y-24">
+
+        {/* — Section 1: À propos — */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Large primary card — spans 2 rows */}
+            <div className="bg-white dark:bg-card/5 border border-white/10 rounded-2xl p-6 row-span-2 flex flex-col min-h-[260px]">
+              <div className="w-9 h-9 rounded-xl bg-secondary/15 border border-secondary/25 flex items-center justify-center mb-4">
+                <Home className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-4xl font-bold text-white leading-none">{t.home.about.stat1Value}</p>
+              <p className="text-sm text-white/55 mt-1.5">{t.home.about.stat1Label}</p>
+
+              {/* Mini neighbourhood activity bars */}
+              <div className="mt-auto pt-5 space-y-2.5">
+                {[
+                  { name: "Gombe",    w: "w-full"  },
+                  { name: "Ngaliema", w: "w-4/5"   },
+                  { name: "Limete",   w: "w-[60%]" },
+                ].map(({ name, w }) => (
+                  <div key={name} className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/45 w-14 shrink-0">{name}</span>
+                    <div className="flex-1 h-1 bg-white dark:bg-card/8 rounded-full overflow-hidden">
+                      <div className={`h-full ${w} bg-secondary/50 rounded-full`} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            {/* Top-right image */}
-            <div className="absolute top-2 right-8 w-36 h-36 rounded-2xl overflow-hidden bg-gradient-to-br from-amber-300 to-amber-500 shadow-lg flex items-center justify-center">
-              <Laptop className="w-14 h-14 text-white/90" strokeWidth={1.5} />
+
+            {/* Users card */}
+            <div className="bg-white dark:bg-card/5 border border-white/10 rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
+              <Users className="w-5 h-5 text-secondary/80" />
+              <div>
+                <p className="text-2xl font-bold text-white leading-none">{t.home.about.stat2Value}</p>
+                <p className="text-xs text-white/55 mt-1">{t.home.about.stat2Label}</p>
+              </div>
             </div>
-            {/* Bottom image */}
-            <div className="absolute bottom-0 left-20 w-64 h-56 rounded-2xl overflow-hidden bg-gradient-to-br from-sky-100 to-sky-300 shadow-lg flex items-center justify-center">
-              <Home className="w-20 h-20 text-white/90" strokeWidth={1.5} />
+
+            {/* Agents card — gold accent */}
+            <div className="bg-gradient-to-br from-secondary/15 to-secondary/5 border border-secondary/30 rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
+              <Shield className="w-5 h-5 text-secondary" />
+              <div>
+                <p className="text-2xl font-bold text-secondary leading-none">{t.home.about.stat3Value}</p>
+                <p className="text-xs text-white/55 mt-1">{t.home.about.stat3Label}</p>
+              </div>
             </div>
           </div>
 
           {/* Copy */}
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
-              À propos
+              {t.home.about.badge}
             </p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-text-dark mb-5 leading-tight">
-              Le site immobilier numéro un <br className="hidden md:block" />
-              à Kinshasa
+            <h2 className="text-3xl md:text-3xl font-semibold mb-5 leading-tight">
+              <GoldWord text={t.home.about.heading} highlight={t.home.about.headingHighlight} />
             </h2>
-            <p className="text-sm text-text-light leading-relaxed mb-4">
-              Okapi Real Estate est le plus grand portail de recherche immobilière à
-              Kinshasa et le premier endroit où commencer votre recherche !
+            <p className="text-base text-white/70 leading-relaxed mb-6 max-w-md">
+              {t.home.about.para}
             </p>
-            <p className="text-sm text-text-light leading-relaxed mb-8">
-              Okapi Real Estate recense maisons, appartements, terrains et parcelles
-              des principales agences immobilières de Kinshasa. Que vous
-              cherchiez à acheter ou à louer, vous trouverez votre bien idéal
-              sur Okapi Real Estate.
-            </p>
-            <Button variant="outline" asChild>
-              <a href="/a-propos">En savoir plus sur Okapi Real Estate</a>
+            <Button variant="outlineGold" asChild>
+              <Link href="/a-propos">{t.home.about.learnMore}</Link>
             </Button>
           </div>
         </div>
 
-        {/* Trouver un agent immobilier de confiance */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        {/* — Section 2: Notre Réseau — */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
           {/* Copy */}
           <div className="md:order-1">
             <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
-              Notre réseau
+              {t.home.about.networkBadge}
             </p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-text-dark mb-5 leading-tight">
-              Trouvez un agent immobilier de <br className="hidden md:block" />
-              confiance dans votre quartier
+            <h2 className="text-3xl md:text-4xl font-semibold mb-5 leading-tight">
+              <GoldWord text={t.home.about.networkHeading} highlight={t.home.about.networkHeadingHighlight} />
             </h2>
-            <p className="text-sm text-text-light leading-relaxed mb-8 max-w-lg">
-              Trouvez la maison de vos rêves sur Okapi Real Estate en explorant la
-              plus grande base de biens en vente par les agences immobilières à
-              travers Kinshasa et la RDC. Pour mettre votre bien sur
-              Okapi Real Estate, contactez l&apos;un de nos agents de confiance.
+            <p className="text-base text-white/70 leading-relaxed mb-8 max-w-lg">
+              {t.home.about.networkPara}
             </p>
-            <Button asChild>
-              <a href="/vendre/agents">Rechercher un agent</a>
+            <Button variant="gold" asChild>
+              <Link href="/agents">{t.home.about.findAgent}</Link>
             </Button>
           </div>
 
-          {/* Image */}
+          {/* Agent network visual */}
           <div className="md:order-2">
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-orange-100 via-rose-100 to-amber-200 shadow-lg flex items-center justify-center">
-              <Users className="w-24 h-24 text-text-dark/50" strokeWidth={1.5} />
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white dark:bg-card/5 border border-white/10">
+              {/* Subtle gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/3 via-transparent to-transparent" aria-hidden="true" />
+
+              {/* Agent avatar cluster */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative w-52 h-52">
+                  {/* Centre avatar — gold */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-secondary text-secondary-foreground font-bold text-xl flex items-center justify-center ring-4 ring-navy z-10 shadow-lg">
+                    K
+                  </div>
+                  {/* Orbit avatars — distinct tints to read as different people */}
+                  {[
+                    { init: "J", pos: "top-0 left-1/2 -translate-x-1/2",    bg: "bg-blue-500/30 border-blue-400/40"    },
+                    { init: "M", pos: "bottom-0 left-1/2 -translate-x-1/2", bg: "bg-emerald-500/30 border-emerald-400/40" },
+                    { init: "A", pos: "top-1/2 left-0 -translate-y-1/2",    bg: "bg-violet-500/30 border-violet-400/40" },
+                    { init: "S", pos: "top-1/2 right-0 -translate-y-1/2",   bg: "bg-rose-500/30 border-rose-400/40"    },
+                  ].map(({ init, pos, bg }) => (
+                    <div
+                      key={init}
+                      className={`absolute ${pos} w-11 h-11 rounded-full ${bg} border flex items-center justify-center text-white text-sm font-semibold shadow-md`}
+                    >
+                      {init}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Agent count badge */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white dark:bg-card/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-2 text-sm whitespace-nowrap">
+                <MapPin className="w-4 h-4 text-secondary shrink-0" />
+                <span className="font-semibold text-white">{t.home.about.agentCount}</span>
+              </div>
             </div>
           </div>
         </div>
+
       </div>
     </section>
   );

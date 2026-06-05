@@ -2,30 +2,37 @@
 
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-
 import { Button } from "@/shared/components/ui/button";
 import CarIcon from "@/shared/components/ui/icons/CarIcon";
 import ClockIcon from "@/shared/components/ui/icons/ClockIcon";
 import TrainIcon from "@/shared/components/ui/icons/TrainIcon";
 import WalkIcon from "@/shared/components/ui/icons/WalkIcon";
+import { useT } from "@/i18n/useT";
 
 export default function TravelTimes() {
+  const t = useT();
   const [travelTime, setTravelTime] = useState(15);
   const [mode, setMode] = useState<"car" | "train" | "walk">("car");
   const [peakHours, setPeakHours] = useState(false);
 
+  const modes = [
+    { key: "car" as const, Icon: CarIcon, label: t.travelTimes.byCar },
+    { key: "train" as const, Icon: TrainIcon, label: t.travelTimes.byTrain },
+    { key: "walk" as const, Icon: WalkIcon, label: t.travelTimes.byFoot },
+  ];
+
   return (
-    <aside className="bg-white rounded-xl border border-border shadow-sm p-5 sticky top-28">
+    <aside className="bg-white dark:bg-card rounded-xl border border-border shadow-sm p-5 sticky top-28">
       <div className="flex items-start justify-between mb-5">
         <div className="flex items-center gap-2">
           <ClockIcon className="w-5 h-5 text-foreground" />
-          <h3 className="font-semibold text-foreground">Temps de trajet</h3>
+          <h3 className="font-semibold text-foreground">{t.travelTimes.heading}</h3>
           <span className="text-[9px] font-bold uppercase bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded">
-            Nouveau
+            {t.travelTimes.newBadge}
           </span>
         </div>
         <button
-          aria-label="Réduire"
+          aria-label={t.travelTimes.collapse}
           className="text-muted-foreground hover:text-foreground"
         >
           <ChevronDown className="w-4 h-4" />
@@ -35,7 +42,7 @@ export default function TravelTimes() {
       {/* Selected location */}
       <div className="mb-5">
         <p className="text-sm font-medium text-foreground mb-2">
-          Lieu sélectionné
+          {t.travelTimes.selectedPlace}
         </p>
         <div className="flex items-center gap-2 border border-border rounded-full px-4 h-11 bg-muted/40">
           <svg
@@ -51,7 +58,7 @@ export default function TravelTimes() {
             <path d="M21 21l-4.35-4.35" />
           </svg>
           <input
-            placeholder="Rechercher un lieu"
+            placeholder={t.travelTimes.searchPlace}
             className="flex-1 bg-transparent text-sm focus:outline-none placeholder:text-muted-foreground"
           />
         </div>
@@ -60,10 +67,8 @@ export default function TravelTimes() {
       {/* Travel time slider */}
       <div className="mb-5">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-foreground">Durée maximale</p>
-          <p className="text-sm font-semibold text-foreground">
-            {travelTime} min
-          </p>
+          <p className="text-sm font-medium text-foreground">{t.travelTimes.maxDuration}</p>
+          <p className="text-sm font-semibold text-foreground">{travelTime} min</p>
         </div>
         <input
           type="range"
@@ -78,11 +83,7 @@ export default function TravelTimes() {
 
       {/* Mode toggle */}
       <div className="flex items-center gap-2 mb-5">
-        {[
-          { key: "car" as const, Icon: CarIcon, label: "Voiture" },
-          { key: "train" as const, Icon: TrainIcon, label: "Transport" },
-          { key: "walk" as const, Icon: WalkIcon, label: "À pied" },
-        ].map(({ key, Icon, label }) => (
+        {modes.map(({ key, Icon, label }) => (
           <button
             key={key}
             onClick={() => setMode(key)}
@@ -90,7 +91,7 @@ export default function TravelTimes() {
             className={`flex-1 h-11 rounded-lg border flex items-center justify-center transition-colors ${
               mode === key
                 ? "border-primary text-primary bg-accent"
-                : "border-border text-foreground/70 bg-white hover:border-primary/40"
+                : "border-border text-foreground/70 bg-white dark:bg-card hover:border-primary/40"
             }`}
           >
             <Icon className="w-5 h-5" />
@@ -100,7 +101,7 @@ export default function TravelTimes() {
 
       {/* Peak hours toggle */}
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm font-medium text-foreground">Heures de pointe</p>
+        <p className="text-sm font-medium text-foreground">{t.travelTimes.peakHours}</p>
         <button
           role="switch"
           aria-checked={peakHours}
@@ -118,7 +119,7 @@ export default function TravelTimes() {
       </div>
 
       <Button className="w-full" disabled>
-        Confirmer
+        {t.travelTimes.confirm}
       </Button>
     </aside>
   );

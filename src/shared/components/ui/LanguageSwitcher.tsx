@@ -1,0 +1,63 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { Globe } from "lucide-react";
+import { useLocaleStore, type Locale } from "@/store/useLocaleStore";
+
+const LOCALES: { code: Locale; label: string; flag: string }[] = [
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "ln", label: "Lingala", flag: "🇨🇩" },
+];
+
+export default function LanguageSwitcher() {
+  const { locale, setLocale } = useLocaleStore();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0];
+
+  function handleSelect(code: Locale) {
+    setLocale(code);
+    setOpen(false);
+  }
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-foreground dark:text-white/80 bg-primary/10 dark:bg-card/10 hover:bg-primary/20 dark:hover:bg-white/10 text-sm font-medium transition-colors duration-200 min-w-max"
+        aria-label="Changer de langue / Change language"
+      >
+        <Globe className="w-4 h-4" />
+        <span className="hidden sm:inline">{current.flag} {current.code.toUpperCase()}</span>
+        <span className="sm:hidden">{current.flag}</span>
+      </button>
+
+      {open && (
+        <div
+          className="absolute right-0 top-full mt-2 w-44 rounded-xl shadow-xl shadow-black/20 border border-border py-1.5 z-[99] bg-white dark:bg-card"
+          onMouseLeave={() => setOpen(false)}
+        >
+          {LOCALES.map(({ code, label, flag }) => (
+            <button
+              key={code}
+              onClick={() => handleSelect(code)}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors ${
+                code === locale
+                  ? "bg-primary/10 dark:bg-primary/10 text-primary font-semibold overflow-hidden"
+                  : "text-foreground hover:bg-muted overflow-hidden"
+              }`}
+            >
+              <span className="text-base">{flag}</span>
+              <span>{label}</span>
+              {code === locale && (
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

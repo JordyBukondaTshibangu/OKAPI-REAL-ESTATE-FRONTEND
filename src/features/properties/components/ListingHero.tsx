@@ -2,11 +2,12 @@
 
 import Breadcrumbs, { Crumb } from "./Breadcrumbs";
 import SearchFilterBar from "./SearchFilterBar";
+import { useT } from "@/i18n/useT";
 
 type Mode = "rent" | "sale" | "buy" | "commercial";
 
 export default function ListingHero({
-  title,
+  title: _title,
   totalListings,
   crumbs,
   mode,
@@ -18,6 +19,13 @@ export default function ListingHero({
   mode: Mode;
   showOffPlanReady?: boolean;
 }) {
+  const t = useT();
+  const title =
+    mode === "rent"
+      ? t.listingHero.rentTitle
+      : mode === "commercial"
+      ? t.listingHero.commercialTitle
+      : t.listingHero.buyTitle;
   return (
     <section className="relative z-40 bg-background-alt pt-8 pb-16 px-6">
       {/* Decorative side art — abstract Kinshasa skyline */}
@@ -82,16 +90,16 @@ export default function ListingHero({
 
       <div className="relative max-w-6xl mx-auto">
         <div className="mb-5">
-          <Breadcrumbs items={crumbs} />
+          <Breadcrumbs items={crumbs.map((c, i) => i === crumbs.length - 1 ? { ...c, label: title } : c)} />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-border p-6 md:p-7 lg:min-w-2xl">
+        <div className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border p-6 md:p-7 lg:min-w-2xl">
           <div className="mb-5">
             <h1 className="text-2xl md:text-3xl font-semibold text-foreground inline">
               {title}
             </h1>
             <span className="text-sm text-muted-foreground ml-3">
-              {new Intl.NumberFormat("fr-FR").format(totalListings)} annonces
+              {new Intl.NumberFormat("fr-FR").format(totalListings)} {t.listingHero.listings}
             </span>
           </div>
           <SearchFilterBar mode={mode} showOffPlanReady={showOffPlanReady} />

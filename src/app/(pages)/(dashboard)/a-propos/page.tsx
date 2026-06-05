@@ -1,57 +1,55 @@
+"use client";
+
+import { useT } from "@/i18n/useT";
 import { Button } from "@/shared/components/ui/button";
 import { Award, Globe, Home, Users } from "lucide-react";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "À propos — Okapi Real Estate",
-  description:
-    "Découvrez Okapi Real Estate, le portail immobilier numéro un à Kinshasa et en RDC.",
-};
-
-const stats = [
-  { label: "Biens listés", value: "250 000+" },
-  { label: "Utilisateurs actifs", value: "500 000+" },
-  { label: "Agences partenaires", value: "1 200+" },
-  { label: "Années d'expérience", value: "10+" },
-];
-
-const values = [
-  {
-    icon: Home,
-    title: "Accessibilité",
-    body: "Nous croyons que chaque Congolais mérite un toit. Nous rendons la recherche immobilière simple, rapide et gratuite.",
-  },
-  {
-    icon: Users,
-    title: "Confiance",
-    body: "Toutes les annonces sont vérifiées par notre équipe. Agents et propriétaires sont évalués par la communauté.",
-  },
-  {
-    icon: Globe,
-    title: "Innovation",
-    body: "Nous investissons en continu dans la technologie pour offrir la meilleure expérience de recherche immobilière en RDC.",
-  },
-  {
-    icon: Award,
-    title: "Excellence",
-    body: "Notre ambition est d'être le standard de référence pour l'immobilier en Afrique centrale.",
-  },
-];
 
 export default function AboutPage() {
+  const t = useT();
+  const p = t.pages.about;
+
+  const stats = [
+    { label: p.stat1Label, value: p.stat1Value },
+    { label: p.stat2Label, value: p.stat2Value },
+    { label: p.stat3Label, value: p.stat3Value },
+    { label: p.stat4Label, value: p.stat4Value },
+  ];
+
+  const values = [
+    {
+      icon: Home,
+      title: p.value1Title,
+      body: p.value1Body,
+    },
+    {
+      icon: Users,
+      title: p.value2Title,
+      body: p.value2Body,
+    },
+    {
+      icon: Globe,
+      title: p.value3Title,
+      body: p.value3Body,
+    },
+    {
+      icon: Award,
+      title: p.value4Title,
+      body: p.value4Body,
+    },
+  ];
+
   return (
     <>
       <section className="bg-navy text-white py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-4">
-            À propos de nous
+            {p.badge}
           </p>
           <h1 className="text-4xl md:text-5xl font-semibold mb-6 leading-tight">
-            Le portail immobilier numéro un à Kinshasa
+            {p.heading}
           </h1>
           <p className="text-lg text-white/75 max-w-2xl mx-auto">
-            Depuis 2014, Okapi Real Estate connecte acheteurs, locataires,
-            vendeurs et agents immobiliers à travers la RDC.
+            {p.subtitle}
           </p>
         </div>
       </section>
@@ -74,24 +72,19 @@ export default function AboutPage() {
           </div>
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
-              Notre mission
+              {p.missionBadge}
             </p>
-            <h2 className="text-3xl font-semibold text-text-dark mb-5 leading-tight">
-              Rendre l&apos;immobilier accessible à tous les Congolais
+            <h2 className="text-3xl font-semibold  mb-5 leading-tight">
+              {p.missionHeading}
             </h2>
             <p className="text-sm text-text-light leading-relaxed mb-4">
-              Okapi Real Estate est né d&apos;une conviction simple : trouver un
-              bien immobilier en RDC ne doit pas être compliqué. Notre
-              plateforme rassemble les annonces des principales agences et
-              particuliers pour vous offrir le choix le plus large.
+              {p.missionPara1}
             </p>
             <p className="text-sm text-text-light leading-relaxed mb-8">
-              Que vous cherchiez à acheter votre première maison, à louer un
-              appartement en Gombe ou à vendre un terrain à Limete, Okapi Real
-              Estate est votre partenaire de confiance à chaque étape.
+              {p.missionPara2}
             </p>
             <Button asChild>
-              <a href="/contact">Contactez-nous</a>
+              <a href="/contact">{p.contactUs}</a>
             </Button>
           </div>
         </div>
@@ -101,10 +94,10 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-3">
-              Nos valeurs
+              {p.valuesBadge}
             </p>
-            <h2 className="text-3xl font-semibold text-text-dark">
-              Ce qui nous guide
+            <h2 className="text-3xl font-semibold ">
+              {p.valuesHeading}
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -113,7 +106,7 @@ export default function AboutPage() {
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <v.icon className="w-5 h-5 text-primary" />
                 </div>
-                <h3 className="text-base font-semibold text-text-dark mb-2">
+                <h3 className="text-base font-semibold  mb-2">
                   {v.title}
                 </h3>
                 <p className="text-sm text-text-light leading-relaxed">
@@ -127,22 +120,21 @@ export default function AboutPage() {
 
       <section className="bg-primary text-primary-foreground py-16 px-6 text-center">
         <h2 className="text-2xl font-semibold mb-4">
-          Rejoignez notre communauté
+          {p.ctaHeading}
         </h2>
         <p className="text-primary-foreground/80 mb-8 max-w-lg mx-auto text-sm">
-          Que vous soyez acheteur, vendeur ou agent, Okapi Real Estate a tout ce
-          qu&apos;il vous faut.
+          {p.ctaBody}
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Button variant="gold" asChild>
-            <a href="/inscription">Créer un compte</a>
+            <a href="/inscription">{p.ctaCreate}</a>
           </Button>
           <Button
             variant="outline"
-            className="border-white text-white hover:bg-white/10"
+            className="border-white text-white hover:bg-white dark:bg-card/10"
             asChild
           >
-            <a href="/carrieres">Rejoindre l&apos;équipe</a>
+            <a href="/carrieres">{p.ctaJoin}</a>
           </Button>
         </div>
       </section>
