@@ -42,7 +42,8 @@ type PasswordData = z.infer<typeof passwordSchema>;
 
 function avatarUrl(profileImage: string | null | undefined): string | null {
   if (!profileImage) return null;
-  return `/api/proxy/${profileImage}`;
+  // Backend now returns full R2 URLs; pass through as-is
+  return profileImage;
 }
 
 export default function ProfilePage() {

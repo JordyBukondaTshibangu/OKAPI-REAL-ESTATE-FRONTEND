@@ -263,10 +263,10 @@ function ProfileMenu() {
           className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none relative"
           aria-label="Menu profil"
         >
-          {user.profileImage ? (
+          {user.profileImage?.startsWith("https://") ? (
             <span className="absolute inset-0 rounded-full overflow-hidden">
               <Image
-                src={`/api/proxy/${user.profileImage}`}
+                src={user.profileImage}
                 alt={user.firstName}
                 fill
                 className="object-cover"
