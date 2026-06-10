@@ -209,6 +209,7 @@ const ln: Messages = {
     bedsPlaceholder: "Bambeto", allBeds: "Nyonso",
     pricePlaceholder: "Ntalo", allPrices: "Ntalo nyonso",
     offPlan: "Sur plan", ready: "Ekoki", map: "Carte", clearAll: "Suka nyonso",
+    exitMap: "Bima na carte", viewProperty: "Tala ndako",
     priceFrom: "Kobanda na", priceUpTo: "Tii na",
     ariaSortBtn: "Kotia molongo", ariaAlertsBtn: "Alerte",
     bed1: "1+ mbeto", bed2: "2+ bambeto", bed3: "3+ bambeto", bed4: "4+ bambeto", bed5: "5+ bambeto",

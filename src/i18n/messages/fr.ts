@@ -230,6 +230,7 @@ const fr: Messages = {
     pricePlaceholder: "Prix",
     allPrices: "Tous les prix",
     offPlan: "Sur plan", ready: "Prêt", map: "Carte", clearAll: "Effacer tout",
+    exitMap: "Quitter la carte", viewProperty: "Voir le bien",
     priceFrom: "À partir de", priceUpTo: "Jusqu'à",
     ariaSortBtn: "Trier", ariaAlertsBtn: "Alertes",
     bed1: "1+ chambre", bed2: "2+ chambres", bed3: "3+ chambres", bed4: "4+ chambres", bed5: "5+ chambres",

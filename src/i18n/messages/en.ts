@@ -208,6 +208,7 @@ const en: Messages = {
     bedsPlaceholder: "Bedrooms", allBeds: "Any",
     pricePlaceholder: "Price", allPrices: "All prices",
     offPlan: "Off-plan", ready: "Ready", map: "Map", clearAll: "Clear all",
+    exitMap: "Exit Map", viewProperty: "View property",
     priceFrom: "From", priceUpTo: "Up to",
     ariaSortBtn: "Sort", ariaAlertsBtn: "Alerts",
     bed1: "1+ bedroom", bed2: "2+ bedrooms", bed3: "3+ bedrooms", bed4: "4+ bedrooms", bed5: "5+ bedrooms",

@@ -167,6 +167,7 @@ export type Messages = {
     bedsPlaceholder: string; allBeds: string;
     pricePlaceholder: string; allPrices: string;
     offPlan: string; ready: string; map: string; clearAll: string;
+    exitMap: string; viewProperty: string;
     priceFrom: string; priceUpTo: string;
     ariaSortBtn: string; ariaAlertsBtn: string;
     bed1: string; bed2: string; bed3: string; bed4: string; bed5: string;
