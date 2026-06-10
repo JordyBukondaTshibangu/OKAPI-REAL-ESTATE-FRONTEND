@@ -15,6 +15,7 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { formatPrice, formatListedAgo, categoryLabel } from "@/lib/properties";
+import { isValidImageUrl } from "@/shared/utils/utils";
 import { Property, PropertyDetail } from "@/features/properties/types/property";
 import { useT } from "@/i18n/useT";
 
@@ -205,6 +206,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
   const [enquiryError, setEnquiryError] = useState<string | null>(null);
   const { token, isAuthenticated } = useAuthStore();
   const router = useRouter();
+  const gallery = detail.gallery.filter(isValidImageUrl);
 
   async function handleToggleFavourite() {
     if (!isAuthenticated || !token) { router.push("/connexion"); return; }
@@ -259,12 +261,12 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
       {mapOpen && (
         <MapModal neighborhood={detail.neighborhood} suburb={detail.suburb} city={detail.city} onClose={() => setMapOpen(false)} t={t} />
       )}
-      {sliderOpen && detail.gallery.length > 0 && (
-        <ImageSlider images={detail.gallery} initialIndex={sliderIndex} onClose={() => setSliderOpen(false)} />
+      {sliderOpen && gallery.length > 0 && (
+        <ImageSlider images={gallery} initialIndex={sliderIndex} onClose={() => setSliderOpen(false)} />
       )}
 
       <div className="max-w-6xl mx-auto px-6 pt-6">
-        <Gallery images={detail.gallery} title={detail.title} active={activeImage} onActive={setActiveImage}
+        <Gallery images={gallery} title={detail.title} active={activeImage} onActive={setActiveImage}
           onOpenSlider={openSlider} verified={detail.verified} isPremium={detail.premium}
           verifiedLabel={dp.verified} premiumLabel={dp.premium} viewPhotosLabel={dp.viewPhotos} />
 
@@ -611,7 +613,7 @@ function DetailRow({ label, value }: { label: string; value: string | null | und
 
 function RecommendedCard({ property, t }: { property: Property; t: ReturnType<typeof useT> }) {
   const dp = t.detail.property;
-  const coverSrc = property.gallery?.[0];
+  const coverSrc = property.gallery?.find(isValidImageUrl);
   return (
     <Link href={`/property/${property.id}`} className="block bg-white dark:bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative aspect-[4/3] bg-muted">

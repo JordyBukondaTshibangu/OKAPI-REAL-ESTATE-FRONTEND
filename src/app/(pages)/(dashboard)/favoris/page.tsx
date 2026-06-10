@@ -8,6 +8,7 @@ import { Button } from "@/shared/components/ui/button";
 import UserSidebarLayout from "@/features/user/components/UserSidebarLayout";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getFavourites, removeFavourite, type Favourite } from "@/services/auth";
+import { isValidImageUrl } from "@/shared/utils/utils";
 
 
 
@@ -83,15 +84,17 @@ export default function FavouritesPage() {
 
         {!loading && favourites.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {favourites.map((fav ) => (
+            {favourites.map((fav ) => {
+              const cover = fav.property.gallery.find(isValidImageUrl);
+              return (
               <div
                 key={fav.id}
                 className="bg-card rounded-2xl shadow-sm overflow-hidden group"
               >
                 <div className="relative h-44 bg-muted">
-                  { fav.property.gallery[0] ? (
+                  { cover ? (
                     <Image
-                      src={fav.property.gallery[0]}
+                      src={cover}
                       alt={fav.property.title}
                       fill
                       sizes="450"
@@ -126,7 +129,8 @@ export default function FavouritesPage() {
                   </p>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

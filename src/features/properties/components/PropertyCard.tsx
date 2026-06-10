@@ -3,6 +3,7 @@
 import { useT } from "@/i18n/useT";
 import type { Property } from "@/features/properties/types/property";
 import { categoryLabel, formatListedAgo, formatPrice } from "@/lib/properties";
+import { isValidImageUrl } from "@/shared/utils/utils";
 import { addFavourite, removeFavourite } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
@@ -52,6 +53,7 @@ export default function PropertyCard({ property }: { property: Property }) {
   }
 
   const detailHref = `/property/${property.id}`;
+  const cover = property.gallery.find(isValidImageUrl);
 
   const whatsappMessage = t.cards.whatsappMsg
     .replace("{title}", property.title)
@@ -64,10 +66,10 @@ export default function PropertyCard({ property }: { property: Property }) {
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
         {/* Image */}
         <div className="relative aspect-4/3 md:aspect-auto overflow-hidden bg-muted">
-          {property.gallery.length > 0 ? (
+          {cover ? (
             <Image
               fill
-              src={property.gallery[0]}
+              src={cover}
               alt={property.title}
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 280px"
