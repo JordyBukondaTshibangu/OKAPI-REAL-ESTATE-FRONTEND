@@ -26,23 +26,22 @@ function useCountUp(target: number, duration = 900): number {
   const fromRef = useRef(0);
 
   useEffect(() => {
+    const from = fromRef.current;
+    if (from === target) {
+      return;
+    }
     const reduced =
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      fromRef.current = target;
-      setValue(target);
-      return;
-    }
-    const from = fromRef.current;
-    if (from === target) {
-      setValue(target);
-      return;
-    }
+    const effectiveDuration = reduced ? 0 : duration;
+
     let raf = 0;
     const start = performance.now();
     const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / duration);
+      const p =
+        effectiveDuration <= 0
+          ? 1
+          : Math.min(1, (now - start) / effectiveDuration);
       const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
       setValue(Math.round(from + (target - from) * eased));
       if (p < 1) {

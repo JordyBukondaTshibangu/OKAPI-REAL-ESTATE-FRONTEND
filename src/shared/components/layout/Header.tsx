@@ -4,6 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import LanguageSwitcher from "@/shared/components/ui/LanguageSwitcher";
 import ThemeToggle from "@/shared/components/ui/ThemeToggle";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useT } from "@/i18n/useT";
 import {
   Bell,
@@ -185,7 +186,7 @@ function UtilityCluster() {
 
 function ProfileMenu() {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -198,10 +199,6 @@ function ProfileMenu() {
     { label: t.auth.alerts, href: "/alertes", icon: Bell },
     { label: t.auth.reviews, href: "/avis", icon: Star },
   ];
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
