@@ -5,8 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { addFavourite, removeFavourite, createEnquiry } from "@/services/auth";
+import { recordPropertyView, recordPropertyShare } from "@/services/properties";
 import { useAuthStore } from "@/store/useAuthStore";
 import ShareButton from "@/shared/components/ui/ShareButton";
+import { PerformancePanel } from "@/features/properties/components/PerformancePulse";
 import {
   ArrowLeft, Bath, BedDouble, Building2, Calendar,
   ChevronLeft, ChevronRight, Flag, Heart, MapPin,
@@ -16,7 +18,7 @@ import { Button } from "@/shared/components/ui/button";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { formatPrice, formatListedAgo, categoryLabel } from "@/lib/properties";
 import { getR2ImageUrl } from "@/shared/utils/utils";
-import { Property, PropertyDetail } from "@/features/properties/types/property";
+import { Property, PropertyDetail, PropertyPerformance } from "@/features/properties/types/property";
 import { useT } from "@/i18n/useT";
 
 /* ─── helpers ───────────────────────────────────────────────────────────── */
@@ -206,17 +208,41 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
   const [enquiryError, setEnquiryError] = useState<string | null>(null);
   const { token, isAuthenticated } = useAuthStore();
   const router = useRouter();
+  const [perf, setPerf] = useState<PropertyPerformance>(
+    detail.performance ?? { viewed: 0, shared: 0, saved: 0 },
+  );
   const gallery = detail.gallery
     .map(getR2ImageUrl)
     .filter((url): url is string => !!url);
+
+  // Record a view once per browser session per property.
+  useEffect(() => {
+    const key = `okapi-viewed-${id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    recordPropertyView(id).then((p) => { if (p) setPerf(p); });
+  }, [id]);
+
+  function handleShared() {
+    // Optimistic tick, then sync with the real counters.
+    setPerf((p) => ({ ...p, shared: p.shared + 1 }));
+    recordPropertyShare(id).then((p) => { if (p) setPerf(p); });
+  }
 
   async function handleToggleFavourite() {
     if (!isAuthenticated || !token) { router.push("/connexion"); return; }
     if (saving) return;
     setSaving(true);
     try {
-      if (saved) { await removeFavourite(token, id); setSaved(false); }
-      else { await addFavourite(token, id); setSaved(true); }
+      if (saved) {
+        await removeFavourite(token, id);
+        setSaved(false);
+        setPerf((p) => ({ ...p, saved: Math.max(0, p.saved - 1) }));
+      } else {
+        await addFavourite(token, id);
+        setSaved(true);
+        setPerf((p) => ({ ...p, saved: p.saved + 1 }));
+      }
     } finally { setSaving(false); }
   }
 
@@ -252,7 +278,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
               <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
               {saved ? dp.saved : dp.saveBtn}
             </button>
-            <ShareButton title={detail.title} />
+            <ShareButton title={detail.title} onShare={handleShared} />
             <button className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md hover:bg-muted text-foreground/80">
               <Flag className="w-4 h-4" /> {dp.reportBtn}
             </button>
@@ -298,6 +324,9 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                 <ActionChip icon={<ThumbsUp className="w-4 h-4" />} label={dp.rentOrBuy} />
               </div>
             </header>
+
+            {/* Performance / social proof */}
+            <PerformancePanel perf={perf} />
 
             {/* Description */}
             <section>

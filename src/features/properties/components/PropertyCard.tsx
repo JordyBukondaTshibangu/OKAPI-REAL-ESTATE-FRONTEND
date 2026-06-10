@@ -22,6 +22,11 @@ import { useState } from "react";
 import NewBadge from "./badges/NewBadge";
 import PremiumBadge from "./badges/PremiumBadge";
 import VerifiedBadge from "./badges/VerifiedBadge";
+import {
+  CardPerformanceStrip,
+  HotBadge,
+  isHotProperty,
+} from "./PerformancePulse";
 
 export default function PropertyCard({ property }: { property: Property }) {
   const t = useT();
@@ -89,10 +94,13 @@ export default function PropertyCard({ property }: { property: Property }) {
             className="absolute inset-0 z-10"
           />
 
-          {/* Verified + New badges */}
-          <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5">
+          {/* Verified + New + Hot badges */}
+          <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
             {property.verified && <VerifiedBadge />}
             {property.isNew && <NewBadge />}
+            {isHotProperty(property.performance) && (
+              <HotBadge label={t.cards.hotLabel} />
+            )}
           </div>
 
           {/* Heart */}
@@ -124,11 +132,14 @@ export default function PropertyCard({ property }: { property: Property }) {
 
         {/* Body */}
         <div className="p-5 flex flex-col">
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start justify-between mb-2 gap-3">
             <p className="text-xs text-muted-foreground">
               {formatListedAgo(property.listedDaysAgo)}
             </p>
-            {property.premium && <PremiumBadge />}
+            <div className="flex items-center gap-3">
+              <CardPerformanceStrip perf={property.performance} />
+              {property.premium && <PremiumBadge />}
+            </div>
           </div>
 
           <Link href={detailHref} className="block group">

@@ -248,6 +248,7 @@ const fr: Messages = {
     whatsappMsg: "Bonjour, je suis intéressé(e) par ce bien : {title} — {neighborhood}, {suburb}. Réf : {id}",
     nationality: "Nationalité :", languages: "Langues :", forSale: "Vente :", forRent: "Location :",
     since: "Depuis {year}", agent: "agent", agents: "agents", transactions: "transactions",
+    viewsLabel: "vues", savesLabel: "favoris", sharesLabel: "partages", hotLabel: "Très demandé",
   },
   agentsPage: {
     heroHeading: "Trouvez votre agent pour trouver votre bien",
@@ -320,6 +321,12 @@ const fr: Messages = {
       callBtn: "Appeler", whatsappMsg: "Bonjour, je suis intéressé(e) par ce bien sur Okapi Real Estate : {title} (réf. {ref}).",
       recommendedHeading: "Recommandé pour vous", prevBtn: "Précédent", nextBtn: "Suivant",
       breadHome: "Accueil", breadRent: "Louer", breadBuy: "Acheter",
+      perfHeading: "Popularité de cette annonce", perfHot: "Très demandé",
+      perfViews: "Vues", perfShares: "Partages", perfSaves: "Favoris",
+      perfDemandLabel: "Niveau de demande",
+      perfDemandLow: "Demande faible", perfDemandModerate: "Demande modérée",
+      perfDemandHigh: "Demande forte", perfDemandVeryHigh: "Demande très forte",
+      perfSavedNote: "{n} personne(s) ont ce bien dans leurs favoris",
     },
     agent: {
       backToResults: "Retour aux résultats",

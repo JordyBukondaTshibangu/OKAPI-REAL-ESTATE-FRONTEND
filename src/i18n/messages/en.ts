@@ -226,6 +226,7 @@ const en: Messages = {
     whatsappMsg: "Hello, I am interested in this property: {title} — {neighborhood}, {suburb}. Ref: {id}",
     nationality: "Nationality:", languages: "Languages:", forSale: "For sale:", forRent: "For rent:",
     since: "Since {year}", agent: "agent", agents: "agents", transactions: "transactions",
+    viewsLabel: "views", savesLabel: "saves", sharesLabel: "shares", hotLabel: "In high demand",
   },
   agentsPage: {
     heroHeading: "Find your agent to find your property",
@@ -295,6 +296,12 @@ const en: Messages = {
       callBtn: "Call", whatsappMsg: "Hello, I am interested in this property on Okapi Real Estate: {title} (ref. {ref}).",
       recommendedHeading: "Recommended for you", prevBtn: "Previous", nextBtn: "Next",
       breadHome: "Home", breadRent: "Rent", breadBuy: "Buy",
+      perfHeading: "Listing popularity", perfHot: "In high demand",
+      perfViews: "Views", perfShares: "Shares", perfSaves: "Saves",
+      perfDemandLabel: "Demand level",
+      perfDemandLow: "Low demand", perfDemandModerate: "Moderate demand",
+      perfDemandHigh: "High demand", perfDemandVeryHigh: "Very high demand",
+      perfSavedNote: "{n} person(s) saved this property to their favourites",
     },
     agent: {
       backToResults: "Back to results",

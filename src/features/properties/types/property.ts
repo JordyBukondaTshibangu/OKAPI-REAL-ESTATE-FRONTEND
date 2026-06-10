@@ -35,6 +35,16 @@ export type Agency = {
   certifications: string[];
 };
 
+/** Engagement metrics returned by the backend on every property. */
+export type PropertyPerformance = {
+  /** Total page views (POST /properties/:id/view) */
+  viewed: number;
+  /** Total shares (POST /properties/:id/share) */
+  shared: number;
+  /** Live count of users who favorited the property */
+  saved: number;
+};
+
 export type Property = {
   id: string;
   listingType: ListingType;
@@ -59,6 +69,7 @@ export type Property = {
   iconType: "building" | "home" | "land" | "office" | "store" | "warehouse";
   transaction?: CommercialTransaction;
   gallery: string[];
+  performance?: PropertyPerformance;
 };
 
 export type PropertyDetail = Property & {
