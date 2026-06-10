@@ -15,7 +15,7 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { formatPrice, formatListedAgo, categoryLabel } from "@/lib/properties";
-import { isValidImageUrl } from "@/shared/utils/utils";
+import { getR2ImageUrl } from "@/shared/utils/utils";
 import { Property, PropertyDetail } from "@/features/properties/types/property";
 import { useT } from "@/i18n/useT";
 
@@ -206,7 +206,9 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
   const [enquiryError, setEnquiryError] = useState<string | null>(null);
   const { token, isAuthenticated } = useAuthStore();
   const router = useRouter();
-  const gallery = detail.gallery.filter(isValidImageUrl);
+  const gallery = detail.gallery
+    .map(getR2ImageUrl)
+    .filter((url): url is string => !!url);
 
   async function handleToggleFavourite() {
     if (!isAuthenticated || !token) { router.push("/connexion"); return; }
@@ -613,7 +615,8 @@ function DetailRow({ label, value }: { label: string; value: string | null | und
 
 function RecommendedCard({ property, t }: { property: Property; t: ReturnType<typeof useT> }) {
   const dp = t.detail.property;
-  const coverSrc = property.gallery?.find(isValidImageUrl);
+  const coverSrc = getR2ImageUrl(property.gallery?.[0]);
+  console.log(dp)
   return (
     <Link href={`/property/${property.id}`} className="block bg-white dark:bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative aspect-[4/3] bg-muted">

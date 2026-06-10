@@ -3,7 +3,7 @@
 import { useT } from "@/i18n/useT";
 import type { Property } from "@/features/properties/types/property";
 import { categoryLabel, formatListedAgo, formatPrice } from "@/lib/properties";
-import { isValidImageUrl } from "@/shared/utils/utils";
+import { getR2ImageUrl } from "@/shared/utils/utils";
 import { addFavourite, removeFavourite } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
@@ -53,7 +53,7 @@ export default function PropertyCard({ property }: { property: Property }) {
   }
 
   const detailHref = `/property/${property.id}`;
-  const cover = property.gallery.find(isValidImageUrl);
+  const cover = getR2ImageUrl(property.gallery[0]);
 
   const whatsappMessage = t.cards.whatsappMsg
     .replace("{title}", property.title)
