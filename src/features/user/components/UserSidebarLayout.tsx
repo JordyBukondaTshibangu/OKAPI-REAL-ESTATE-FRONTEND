@@ -49,7 +49,7 @@ export default function UserSidebarLayout({
                 <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-lg select-none overflow-hidden relative shrink-0">
                   {user?.profileImage ? (
                     <Image
-                      src={`/api/proxy/${user.profileImage}`}
+                      src={user.profileImage!}
                       alt={user.firstName}
                       fill
                       className="object-cover"

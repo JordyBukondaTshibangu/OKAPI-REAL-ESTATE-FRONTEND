@@ -4,6 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import LanguageSwitcher from "@/shared/components/ui/LanguageSwitcher";
 import ThemeToggle from "@/shared/components/ui/ThemeToggle";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useT } from "@/i18n/useT";
 import {
   Bell,
@@ -185,7 +186,7 @@ function UtilityCluster() {
 
 function ProfileMenu() {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -198,10 +199,6 @@ function ProfileMenu() {
     { label: t.auth.alerts, href: "/alertes", icon: Bell },
     { label: t.auth.reviews, href: "/avis", icon: Star },
   ];
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -263,10 +260,10 @@ function ProfileMenu() {
           className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none relative"
           aria-label="Menu profil"
         >
-          {user.profileImage ? (
+          {user.profileImage?.startsWith("https://") ? (
             <span className="absolute inset-0 rounded-full overflow-hidden">
               <Image
-                src={`/api/proxy/${user.profileImage}`}
+                src={user.profileImage}
                 alt={user.firstName}
                 fill
                 className="object-cover"

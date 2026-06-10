@@ -209,6 +209,7 @@ const ln: Messages = {
     bedsPlaceholder: "Bambeto", allBeds: "Nyonso",
     pricePlaceholder: "Ntalo", allPrices: "Ntalo nyonso",
     offPlan: "Sur plan", ready: "Ekoki", map: "Carte", clearAll: "Suka nyonso",
+    exitMap: "Bima na carte", viewProperty: "Tala ndako",
     priceFrom: "Kobanda na", priceUpTo: "Tii na",
     ariaSortBtn: "Kotia molongo", ariaAlertsBtn: "Alerte",
     bed1: "1+ mbeto", bed2: "2+ bambeto", bed3: "3+ bambeto", bed4: "4+ bambeto", bed5: "5+ bambeto",
@@ -226,6 +227,7 @@ const ln: Messages = {
     whatsappMsg: "Mbote, nalingi ndako oyo: {title} — {neighborhood}, {suburb}. Réf: {id}",
     nationality: "Mboka:", languages: "Minoko:", forSale: "Teka:", forRent: "Funga:",
     since: "Kobanda {year}", agent: "agent", agents: "bato ya mosala", transactions: "transactions",
+    viewsLabel: "batali", savesLabel: "favoris", sharesLabel: "bakaboli", hotLabel: "Esengami mingi",
   },
   agentsPage: {
     heroHeading: "Luka agent na yo mpo koluka ndako na yo",
@@ -295,6 +297,12 @@ const ln: Messages = {
       callBtn: "Benga", whatsappMsg: "Mbote, nalingi ndako oyo na Okapi Real Estate: {title} (réf. {ref}).",
       recommendedHeading: "Epona mpo na yo", prevBtn: "Eleki", nextBtn: "Olandeli",
       breadHome: "Ndako", breadRent: "Funga", breadBuy: "Sombola",
+      perfHeading: "Lokumu ya annonce oyo", perfHot: "Esengami mingi",
+      perfViews: "Batali", perfShares: "Bakaboli", perfSaves: "Favoris",
+      perfDemandLabel: "Niveau ya demande",
+      perfDemandLow: "Demande moke", perfDemandModerate: "Demande ya kati",
+      perfDemandHigh: "Demande makasi", perfDemandVeryHigh: "Demande makasi mingi",
+      perfSavedNote: "Bato {n} babombi ndako oyo na favoris na bango",
     },
     agent: {
       backToResults: "Zonga na résultats",

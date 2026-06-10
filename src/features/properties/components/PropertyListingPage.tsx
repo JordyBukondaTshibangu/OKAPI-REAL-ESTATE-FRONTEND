@@ -1,9 +1,11 @@
 "use client";
 
 import { useT } from "@/i18n/useT";
+import { useSearchParams } from "next/navigation";
 import { Property } from "@/features/properties/types/property";
 import { Crumb } from "./Breadcrumbs";
 import ListingHero from "./ListingHero";
+import MapOverlay from "./MapOverlay";
 import Pagination from "./Pagination";
 import PropertyCard from "./PropertyCard";
 import PropertyTypeChips, { CategoryCount } from "./PropertyTypeChips";
@@ -39,6 +41,8 @@ export default function PropertyListingPage({
   activeFilters = 0,
 }: PropertyListingPageProps) {
   const t = useT();
+  const searchParams = useSearchParams();
+  const showMap = searchParams.get("map") === "1";
 
   const pages =
     totalPages ?? Math.max(1, Math.ceil(properties.length / PER_PAGE));
@@ -95,6 +99,8 @@ export default function PropertyListingPage({
           <Pagination current={currentPage} total={pages} />
         </div>
       </section>
+
+      {showMap && <MapOverlay properties={properties} />}
     </>
   );
 }

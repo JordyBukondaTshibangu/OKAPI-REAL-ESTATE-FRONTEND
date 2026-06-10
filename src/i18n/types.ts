@@ -167,6 +167,7 @@ export type Messages = {
     bedsPlaceholder: string; allBeds: string;
     pricePlaceholder: string; allPrices: string;
     offPlan: string; ready: string; map: string; clearAll: string;
+    exitMap: string; viewProperty: string;
     priceFrom: string; priceUpTo: string;
     ariaSortBtn: string; ariaAlertsBtn: string;
     bed1: string; bed2: string; bed3: string; bed4: string; bed5: string;
@@ -183,6 +184,7 @@ export type Messages = {
     call: string; whatsapp: string; whatsappMsg: string;
     nationality: string; languages: string; forSale: string; forRent: string;
     since: string; agent: string; agents: string; transactions: string;
+    viewsLabel: string; savesLabel: string; sharesLabel: string; hotLabel: string;
   };
   agentsPage: {
     heroHeading: string; heroSubtitle: string;
@@ -231,6 +233,11 @@ export type Messages = {
       callBtn: string; whatsappMsg: string;
       recommendedHeading: string; prevBtn: string; nextBtn: string;
       breadHome: string; breadRent: string; breadBuy: string;
+      perfHeading: string; perfHot: string;
+      perfViews: string; perfShares: string; perfSaves: string;
+      perfDemandLabel: string;
+      perfDemandLow: string; perfDemandModerate: string; perfDemandHigh: string; perfDemandVeryHigh: string;
+      perfSavedNote: string;
     };
     agent: {
       backToResults: string;

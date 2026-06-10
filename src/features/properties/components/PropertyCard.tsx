@@ -3,6 +3,7 @@
 import { useT } from "@/i18n/useT";
 import type { Property } from "@/features/properties/types/property";
 import { categoryLabel, formatListedAgo, formatPrice } from "@/lib/properties";
+import { getR2ImageUrl } from "@/shared/utils/utils";
 import { addFavourite, removeFavourite } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
@@ -21,6 +22,11 @@ import { useState } from "react";
 import NewBadge from "./badges/NewBadge";
 import PremiumBadge from "./badges/PremiumBadge";
 import VerifiedBadge from "./badges/VerifiedBadge";
+import {
+  CardPerformanceStrip,
+  HotBadge,
+  isHotProperty,
+} from "./PerformancePulse";
 
 export default function PropertyCard({ property }: { property: Property }) {
   const t = useT();
@@ -52,6 +58,7 @@ export default function PropertyCard({ property }: { property: Property }) {
   }
 
   const detailHref = `/property/${property.id}`;
+  const cover = getR2ImageUrl(property.gallery[0]);
 
   const whatsappMessage = t.cards.whatsappMsg
     .replace("{title}", property.title)
@@ -64,10 +71,10 @@ export default function PropertyCard({ property }: { property: Property }) {
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
         {/* Image */}
         <div className="relative aspect-4/3 md:aspect-auto overflow-hidden bg-muted">
-          {property.gallery.length > 0 ? (
+          {cover ? (
             <Image
               fill
-              src={property.gallery[0]}
+              src={cover}
               alt={property.title}
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 280px"
@@ -87,10 +94,13 @@ export default function PropertyCard({ property }: { property: Property }) {
             className="absolute inset-0 z-10"
           />
 
-          {/* Verified + New badges */}
-          <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5">
+          {/* Verified + New + Hot badges */}
+          <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
             {property.verified && <VerifiedBadge />}
             {property.isNew && <NewBadge />}
+            {isHotProperty(property.performance) && (
+              <HotBadge label={t.cards.hotLabel} />
+            )}
           </div>
 
           {/* Heart */}
@@ -122,11 +132,14 @@ export default function PropertyCard({ property }: { property: Property }) {
 
         {/* Body */}
         <div className="p-5 flex flex-col">
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start justify-between mb-2 gap-3">
             <p className="text-xs text-muted-foreground">
               {formatListedAgo(property.listedDaysAgo)}
             </p>
-            {property.premium && <PremiumBadge />}
+            <div className="flex items-center gap-3">
+              <CardPerformanceStrip perf={property.performance} />
+              {property.premium && <PremiumBadge />}
+            </div>
           </div>
 
           <Link href={detailHref} className="block group">

@@ -403,7 +403,12 @@ export default function SearchFilterBar({
           <Bell className="w-4 h-4" />
         </button>
 
-        <Button variant="navy" size="sm" className="gap-2 ml-auto h-10">
+        <Button
+          variant="navy"
+          size="sm"
+          className="gap-2 ml-auto h-10"
+          onClick={() => setFilter("map", "1")}
+        >
           <Map className="w-4 h-4" /> {t.filters.map}
         </Button>
 
