@@ -30,7 +30,7 @@ import {
 
 export default function PropertyCard({ property }: { property: Property }) {
   const t = useT();
-  const { iconType } = property;
+  // const { iconType } = property;
   const { token, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [saved, setSaved] = useState(false);
@@ -65,6 +65,8 @@ export default function PropertyCard({ property }: { property: Property }) {
     .replace("{neighborhood}", property.neighborhood)
     .replace("{suburb}", property.suburb)
     .replace("{id}", property.id);
+
+  const WHATSAPP_NUMBER = "971523787362";
 
   return (
     <article className="bg-white dark:bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow">
@@ -109,7 +111,9 @@ export default function PropertyCard({ property }: { property: Property }) {
             aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
             disabled={saving}
             className={`absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white dark:bg-card/90 hover:bg-white dark:bg-card flex items-center justify-center transition-colors disabled:opacity-60 ${
-              saved ? "text-secondary" : "text-foreground/70 hover:text-secondary"
+              saved
+                ? "text-secondary"
+                : "text-foreground/70 hover:text-secondary"
             }`}
           >
             <HeartIcon className="w-4 h-4" filled={saved} />
@@ -198,15 +202,23 @@ export default function PropertyCard({ property }: { property: Property }) {
                   <PhoneIcon className="w-4 h-4" /> {t.cards.call}
                 </Link>
               </Button>
-              <Button variant="default" size="sm" className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53]" asChild>
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <WhatsAppIcon className="w-4 h-4" /> {t.cards.whatsapp}
-                </a>
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const link = `${window.location.origin}${detailHref}`;
+                  const message = whatsappMessage.replace("{link}", link);
+                  window.open(
+                    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
+                    "_blank",
+                    "noopener,noreferrer"
+                  );
+                }}
+              >
+                <WhatsAppIcon className="w-4 h-4" /> {t.cards.whatsapp}
               </Button>
             </div>
           </div>
