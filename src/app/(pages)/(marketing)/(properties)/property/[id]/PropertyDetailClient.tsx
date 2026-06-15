@@ -160,14 +160,23 @@ function AgentCard({ detail, t }: { detail: PropertyDetail; t: ReturnType<typeof
         <Button variant="outline" size="sm" className="gap-1.5">
           <Phone className="w-4 h-4" /> {dp.callBtn}
         </Button>
-        <Button variant="default" size="sm" className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53] text-white" asChild>
-          <a href={`https://wa.me/971523787362?text=${encodeURIComponent(dp.whatsappMsg.replace("{title}", detail.title).replace("{ref}", detail.reference ?? ""))}`}
-            target="_blank" rel="noopener noreferrer">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.1-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.075-.3-.15-1.263-.465-2.403-1.485-.888-.795-1.484-1.77-1.66-2.07-.174-.3-.019-.465.13-.615.136-.135.301-.345.451-.523.146-.181.194-.301.297-.496.1-.21.049-.375-.025-.524-.075-.15-.672-1.62-.922-2.206-.24-.584-.487-.51-.672-.51-.172-.015-.371-.015-.571-.015-.2 0-.523.074-.797.359-.273.3-1.045 1.02-1.045 2.475s1.07 2.865 1.219 3.075c.149.18 2.095 3.195 5.076 4.483.709.305 1.262.483 1.694.61.712.227 1.36.195 1.871.121.571-.085 1.758-.719 2.006-1.413.255-.704.255-1.301.18-1.426-.074-.135-.27-.21-.57-.345m-5.446 7.443h-.016a9.87 9.87 0 0 1-5.031-1.378l-.36-.214-3.742.982.999-3.648-.235-.375a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.334.101 11.893c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652a11.882 11.882 0 0 0 5.71 1.447h.006c6.585 0 11.946-5.336 11.949-11.896 0-3.176-1.24-6.165-3.495-8.411" />
-            </svg>
-            WhatsApp
-          </a>
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53] text-white"
+          onClick={() => {
+            const link = typeof window !== "undefined" ? window.location.href : "";
+            const message = dp.whatsappMsg
+              .replace("{link}", link)
+              .replace("{ref}", detail.reference ?? "");
+            window.open(`https://wa.me/971523787362?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+          }}
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+            <path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.1-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.075-.3-.15-1.263-.465-2.403-1.485-.888-.795-1.484-1.77-1.66-2.07-.174-.3-.019-.465.13-.615.136-.135.301-.345.451-.523.146-.181.194-.301.297-.496.1-.21.049-.375-.025-.524-.075-.15-.672-1.62-.922-2.206-.24-.584-.487-.51-.672-.51-.172-.015-.371-.015-.571-.015-.2 0-.523.074-.797.359-.273.3-1.045 1.02-1.045 2.475s1.07 2.865 1.219 3.075c.149.18 2.095 3.195 5.076 4.483.709.305 1.262.483 1.694.61.712.227 1.36.195 1.871.121.571-.085 1.758-.719 2.006-1.413.255-.704.255-1.301.18-1.426-.074-.135-.27-.21-.57-.345m-5.446 7.443h-.016a9.87 9.87 0 0 1-5.031-1.378l-.36-.214-3.742.982.999-3.648-.235-.375a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.334.101 11.893c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652a11.882 11.882 0 0 0 5.71 1.447h.006c6.585 0 11.946-5.336 11.949-11.896 0-3.176-1.24-6.165-3.495-8.411" />
+          </svg>
+          WhatsApp
         </Button>
       </div>
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -262,6 +271,8 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
   const hasAverages = detail.averagePriceArea != null && detail.averageSizeArea != null;
   const pricePct = hasAverages ? Math.round((detail.price / detail.averagePriceArea! - 1) * 100) : 0;
   const sizePct = hasAverages ? Math.round((detail.areaSqm / detail.averageSizeArea! - 1) * 100) : 0;
+  const areaSqmRounded = Math.round(detail.areaSqm);
+  const buildingActiveListingsCount = 3 + (areaSqmRounded % 5);
 
   return (
     <div className="bg-background-alt pb-20">
@@ -315,7 +326,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                 {detail.bathrooms > 0 && (
                   <StatPill icon={<Bath className="w-4 h-4" />}>{detail.bathrooms} {dp.bathroom}</StatPill>
                 )}
-                <StatPill icon={<Maximize2 className="w-4 h-4" />}>{detail.areaSqm} m²</StatPill>
+                <StatPill icon={<Maximize2 className="w-4 h-4" />}>{areaSqmRounded} m²</StatPill>
                 <StatPill icon={<Building2 className="w-4 h-4" />}>{categoryLabel(detail.category)}</StatPill>
               </div>
               <div className="flex flex-wrap gap-2 mt-5">
@@ -387,7 +398,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                     <p className="text-sm font-semibold text-foreground">{dp.aboutBuildingTitle.replace("{zone}", detail.zone ?? "")}</p>
                     <p className="text-xs text-muted-foreground mt-1 max-w-md">
                       Ce bâtiment offre des biens de {detail.bedrooms} à {detail.bedrooms + 3} chambres,
-                      d&apos;une surface moyenne de {detail.areaSqm} - {detail.areaSqm + 800} m². Il compte actuellement {3 + (detail.areaSqm % 5)} annonces actives.
+                      d&apos;une surface moyenne de {areaSqmRounded} - {areaSqmRounded + 800} m². Il compte actuellement {buildingActiveListingsCount} annonces actives.
                     </p>
                   </div>
                   <Link href="#" className="text-xs text-primary hover:underline whitespace-nowrap">{dp.learnMore}</Link>
@@ -395,7 +406,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                 <div className="grid grid-cols-2 gap-3 mt-4">
                   <div className="rounded-lg bg-accent/60 px-3 py-2 text-xs">
                     <p className="text-muted-foreground">{dp.buildingActiveListings}</p>
-                    <p className="text-sm font-semibold text-foreground">{3 + (detail.areaSqm % 5)}</p>
+                    <p className="text-sm font-semibold text-foreground">{buildingActiveListingsCount}</p>
                   </div>
                   <div className="rounded-lg bg-accent/60 px-3 py-2 text-xs">
                     <p className="text-muted-foreground">{dp.priceRange}</p>
@@ -417,12 +428,12 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                     headline={pricePct >= 0
                       ? dp.costMorePct.replace("{n}", String(pricePct))
                       : dp.costLessPct.replace("{n}", String(Math.abs(pricePct)))}
-                    detail={dp.avgPriceLabel.replace("{price}", `${detail.averagePriceArea!.toLocaleString("fr-FR")} ${detail.currency === "USD" ? "$" : detail.currency}`)} />
+                    detail={dp.avgPriceLabel.replace("{price}", `${Math.round(detail.averagePriceArea!).toLocaleString("fr-FR")} ${detail.currency === "USD" ? "$" : detail.currency}`)} />
                   <TrendCard positive={sizePct > 0}
                     headline={sizePct >= 0
                       ? dp.biggerPct.replace("{n}", String(sizePct))
                       : dp.smallerPct.replace("{n}", String(Math.abs(sizePct)))}
-                    detail={dp.avgSizeLabel.replace("{size}", String(detail.averageSizeArea))} />
+                    detail={dp.avgSizeLabel.replace("{size}", String(Math.round(detail.averageSizeArea!)))} />
                 </div>
                 <p className="text-xs text-muted-foreground mt-3">{dp.dataNote.replace("{suburb}", detail.suburb)}</p>
               </section>
@@ -480,7 +491,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-3">{dp.propertyDetailsHeading}</h3>
                   <DetailRow label={dp.typeLabel} value={categoryLabel(detail.category)} />
-                  <DetailRow label={dp.surfaceLabel} value={`${detail.areaSqm} m² / ${Math.round(detail.areaSqm * 10.764)} ft²`} />
+                  <DetailRow label={dp.surfaceLabel} value={`${areaSqmRounded} m² / ${Math.round(detail.areaSqm * 10.764)} ft²`} />
                   <DetailRow label={dp.bedroomsLabel} value={String(detail.bedrooms)} />
                   <DetailRow label={dp.bathroomsLabel} value={String(detail.bathrooms)} />
                   <DetailRow label={dp.availableLabel} value={detail.availableFrom} />

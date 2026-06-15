@@ -293,7 +293,7 @@ const en: Messages = {
       typeLabel: "Type", surfaceLabel: "Area", bedroomsLabel: "Bedrooms", bathroomsLabel: "Bathrooms", availableLabel: "Available from",
       referenceLabel: "Reference", listedLabel: "Listed", licenseLabel: "Agency licence", agencyLabel: "Agency", zoneLabel: "Zone", permitLabel: "Permit",
       responseTime: "Response in under 5 min", reviewsCount: "· {n} reviews", agencySection: "AGENCY", viewAgency: "View agency",
-      callBtn: "Call", whatsappMsg: "Hello, I am interested in this property on Okapi Real Estate: {title} (ref. {ref}).",
+      callBtn: "Call", whatsappMsg: "Hi, I am interested in your property on Okapi Real Estate: {link}\nRef: {ref}",
       recommendedHeading: "Recommended for you", prevBtn: "Previous", nextBtn: "Next",
       breadHome: "Home", breadRent: "Rent", breadBuy: "Buy",
       perfHeading: "Listing popularity", perfHot: "In high demand",
