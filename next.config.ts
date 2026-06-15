@@ -13,13 +13,14 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol : "https",
-        hostname : "pub-d5cad4963b964b9ba2720a29b5780d2b.r2.dev",
-        pathname : "/**"
-      }
-      
+        protocol: "https",
+        hostname: "pub-d5cad4963b964b9ba2720a29b5780d2b.r2.dev",
+        pathname: "/**",
+      },
     ],
   },
+
+  allowedDevOrigins: ["192.168.68.108"],
 };
 
 export default nextConfig;
