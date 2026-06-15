@@ -294,7 +294,7 @@ const ln: Messages = {
       typeLabel: "Motindo", surfaceLabel: "Bonene", bedroomsLabel: "Bambeto", bathroomsLabel: "Bisalle ya bain", availableLabel: "Ezo liboso ya",
       referenceLabel: "Référence", listedLabel: "Kotia", licenseLabel: "Licence ya agence", agencyLabel: "Agence", zoneLabel: "Zone", permitLabel: "Permis",
       responseTime: "Eyano na mwa ntango tii 5 miniti", reviewsCount: "· {n} makanisi", agencySection: "AGENCE", viewAgency: "Tala agence",
-      callBtn: "Benga", whatsappMsg: "Mbote, nalingi ndako oyo na Okapi Real Estate: {title} (réf. {ref}).",
+      callBtn: "Benga", whatsappMsg: "Mbote, nalingi ndako na yo na Okapi Real Estate: {link}\nRéf: {ref}",
       recommendedHeading: "Epona mpo na yo", prevBtn: "Eleki", nextBtn: "Olandeli",
       breadHome: "Ndako", breadRent: "Funga", breadBuy: "Sombola",
       perfHeading: "Lokumu ya annonce oyo", perfHot: "Esengami mingi",
