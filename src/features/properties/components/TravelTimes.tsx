@@ -1,25 +1,107 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import CarIcon from "@/shared/components/ui/icons/CarIcon";
 import ClockIcon from "@/shared/components/ui/icons/ClockIcon";
 import TrainIcon from "@/shared/components/ui/icons/TrainIcon";
 import WalkIcon from "@/shared/components/ui/icons/WalkIcon";
 import { useT } from "@/i18n/useT";
+import {
+  NAMED_LOCATIONS,
+  distanceKm,
+  getPropertyCoords,
+  normalize,
+  type NamedLocation,
+} from "@/features/properties/constants/kinshasaCoords";
+import type { Property } from "@/features/properties/types/property";
 
-export default function TravelTimes() {
+type Mode = "car" | "train" | "walk";
+
+/** Rough average speeds (km/h) used to turn distance into an estimated duration. */
+const MODE_SPEED_KMH: Record<Mode, number> = {
+  car: 32,
+  train: 22,
+  walk: 5,
+};
+
+/** Cars slow down a lot more than walking/transit during peak hours. */
+const PEAK_PENALTY: Record<Mode, number> = {
+  car: 1.7,
+  train: 1.2,
+  walk: 1,
+};
+
+function estimateMinutes(km: number, mode: Mode, peakHours: boolean): number {
+  const speed = MODE_SPEED_KMH[mode] / (peakHours ? PEAK_PENALTY[mode] : 1);
+  return (km / speed) * 60;
+}
+
+export type TravelTimesProps = {
+  /** Properties currently shown on the listing; required for filtering to do anything. */
+  properties?: Property[];
+  /** Called with the list of property ids within range, or null when no filter is active. */
+  onFilter?: (ids: string[] | null) => void;
+};
+
+export default function TravelTimes({ properties, onFilter }: TravelTimesProps) {
   const t = useT();
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<NamedLocation | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [travelTime, setTravelTime] = useState(15);
-  const [mode, setMode] = useState<"car" | "train" | "walk">("car");
+  const [mode, setMode] = useState<Mode>("car");
   const [peakHours, setPeakHours] = useState(false);
+  const [matchCount, setMatchCount] = useState<number | null>(null);
 
   const modes = [
     { key: "car" as const, Icon: CarIcon, label: t.travelTimes.byCar },
     { key: "train" as const, Icon: TrainIcon, label: t.travelTimes.byTrain },
     { key: "walk" as const, Icon: WalkIcon, label: t.travelTimes.byFoot },
   ];
+
+  const suggestions = useMemo(() => {
+    const q = normalize(query);
+    if (!q) return [];
+    return NAMED_LOCATIONS.filter((l) => normalize(l.label).includes(q)).slice(0, 6);
+  }, [query]);
+
+  function handleSelect(loc: NamedLocation) {
+    setSelected(loc);
+    setQuery(loc.label);
+    setShowSuggestions(false);
+  }
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
+    setShowSuggestions(true);
+    if (selected && normalize(value) !== normalize(selected.label)) {
+      setSelected(null);
+    }
+  }
+
+  function handleClear() {
+    setQuery("");
+    setSelected(null);
+    setMatchCount(null);
+    onFilter?.(null);
+  }
+
+  function handleConfirm() {
+    if (!selected) return;
+    if (!properties || !onFilter) {
+      // Standalone usage (no list to filter): nothing further to do.
+      setMatchCount(0);
+      return;
+    }
+    const matches = properties.filter((p) => {
+      const km = distanceKm(selected, getPropertyCoords(p));
+      return estimateMinutes(km, mode, peakHours) <= travelTime;
+    });
+    setMatchCount(matches.length);
+    onFilter(matches.map((p) => p.id));
+  }
 
   return (
     <aside className="bg-white dark:bg-card rounded-xl border border-border shadow-sm p-5 sticky top-28">
@@ -40,7 +122,7 @@ export default function TravelTimes() {
       </div>
 
       {/* Selected location */}
-      <div className="mb-5">
+      <div className="mb-5 relative">
         <p className="text-sm font-medium text-foreground mb-2">
           {t.travelTimes.selectedPlace}
         </p>
@@ -52,16 +134,51 @@ export default function TravelTimes() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-4 h-4 text-muted-foreground"
+            className="w-4 h-4 text-muted-foreground shrink-0"
           >
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
           <input
+            value={query}
+            onChange={(e) => handleQueryChange(e.target.value)}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
             placeholder={t.travelTimes.searchPlace}
             className="flex-1 bg-transparent text-sm focus:outline-none placeholder:text-muted-foreground"
           />
+          {query && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-muted-foreground hover:text-foreground shrink-0"
+              aria-label={t.travelTimes.clear}
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
+
+        {showSuggestions && query && (
+          <div className="absolute z-10 mt-1 w-full rounded-xl border border-border bg-white dark:bg-card shadow-lg overflow-hidden">
+            {suggestions.length > 0 ? (
+              suggestions.map((loc) => (
+                <button
+                  key={loc.key}
+                  type="button"
+                  onMouseDown={() => handleSelect(loc)}
+                  className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+                >
+                  {loc.label}
+                </button>
+              ))
+            ) : (
+              <p className="px-4 py-2.5 text-sm text-muted-foreground">
+                {t.travelTimes.noLocationsFound}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Travel time slider */}
@@ -118,9 +235,15 @@ export default function TravelTimes() {
         </button>
       </div>
 
-      <Button className="w-full" disabled>
+      <Button className="w-full" disabled={!selected} onClick={handleConfirm}>
         {t.travelTimes.confirm}
       </Button>
+
+      {matchCount !== null && (
+        <p className="text-xs text-muted-foreground text-center mt-3">
+          {t.travelTimes.resultsCount.replace("{n}", String(matchCount))}
+        </p>
+      )}
     </aside>
   );
 }

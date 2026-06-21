@@ -6,14 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { User, Heart, MessageSquare, Bell, Star, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
-
-const navItems = [
-  { label: "Mon Profil", href: "/profil", icon: User },
-  { label: "Favoris", href: "/favoris", icon: Heart },
-  { label: "Demandes", href: "/demandes", icon: MessageSquare },
-  { label: "Alertes", href: "/alertes", icon: Bell },
-  { label: "Avis & Notes", href: "/avis", icon: Star },
-];
+import { useT } from "@/i18n/useT";
+import { useMounted } from "@/shared/hooks/useMounted";
 
 export default function UserSidebarLayout({
   children,
@@ -23,19 +17,34 @@ export default function UserSidebarLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { logout, user, isAuthenticated } = useAuthStore();
+  const t = useT();
+  const mounted = useMounted();
 
+  const navItems = [
+    { label: t.auth.profile, href: "/profil", icon: User },
+    { label: t.auth.favorites, href: "/favoris", icon: Heart },
+    { label: t.auth.enquiries, href: "/demandes", icon: MessageSquare },
+    { label: t.auth.alerts, href: "/alertes", icon: Bell },
+    { label: t.auth.reviews, href: "/avis", icon: Star },
+  ];
+
+  // Wait until the client has mounted (and zustand's `persist` middleware
+  // has rehydrated `isAuthenticated`/`token` from localStorage) before
+  // deciding to redirect. Without this guard, the store's default
+  // (isAuthenticated: false) briefly renders on every refresh, bouncing
+  // logged-in users to /connexion before their session is restored.
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (mounted && !isAuthenticated) {
       router.replace("/connexion");
     }
-  }, [isAuthenticated, router]);
+  }, [mounted, isAuthenticated, router]);
 
   function handleLogout() {
     logout();
     router.push("/");
   }
 
-  if (!isAuthenticated) return null;
+  if (!mounted || !isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-muted">
@@ -61,7 +70,7 @@ export default function UserSidebarLayout({
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold  truncate">
-                    {user ? `${user.firstName} ${user.lastName}` : "Utilisateur"}
+                    {user ? `${user.firstName} ${user.lastName}` : t.dashboard.userFallback}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
                     {user?.email}
@@ -96,7 +105,7 @@ export default function UserSidebarLayout({
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 w-full transition-colors"
                 >
                   <LogOut className="w-4 h-4 shrink-0" />
-                  Se déconnecter
+                  {t.auth.logout}
                 </button>
               </div>
             </div>

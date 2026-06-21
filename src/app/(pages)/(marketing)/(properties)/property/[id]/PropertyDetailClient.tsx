@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
+import PropertyImage from "@/shared/components/ui/PropertyImage";
 import { formatPrice, formatListedAgo, categoryLabel } from "@/lib/properties";
 import { getR2ImageUrl } from "@/shared/utils/utils";
 import { Property, PropertyDetail, PropertyPerformance } from "@/features/properties/types/property";
@@ -38,13 +39,14 @@ function PremiumChip({ label }: { label: string }) {
   );
 }
 
-function GalleryImg({ src, alt, className = "", badge, onClick, photoCount, viewPhotosLabel }: {
+function GalleryImg({ src, alt, className = "", badge, onClick, photoCount, viewPhotosLabel, category, gradient }: {
   src: string; alt: string; className?: string; badge?: React.ReactNode;
   onClick?: () => void; photoCount?: number; viewPhotosLabel?: string;
+  category?: string; gradient?: string;
 }) {
   return (
     <div className={`relative overflow-hidden rounded-xl bg-muted ${className} ${onClick ? "cursor-pointer" : ""}`} onClick={onClick}>
-      <Image src={src} alt={alt} fill className="object-cover" sizes="(max-width:768px) 100vw, 50vw" />
+      <PropertyImage src={src} alt={alt} category={category} gradient={gradient} sizes="(max-width:768px) 100vw, 50vw" />
       {badge}
       {typeof photoCount === "number" && (
         <button onClick={onClick} className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 bg-black/60 hover:bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg transition-colors">
@@ -307,7 +309,8 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
       <div className="max-w-6xl mx-auto px-6 pt-6">
         <Gallery images={gallery} title={detail.title} active={activeImage} onActive={setActiveImage}
           onOpenSlider={openSlider} verified={detail.verified} isPremium={detail.premium}
-          verifiedLabel={dp.verified} premiumLabel={dp.premium} viewPhotosLabel={dp.viewPhotos} />
+          verifiedLabel={dp.verified} premiumLabel={dp.premium} viewPhotosLabel={dp.viewPhotos}
+          category={detail.category} gradient={detail.imageGradient} />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 mt-8">
           <div className="space-y-10">
@@ -601,18 +604,26 @@ function listingHref(detail: PropertyDetail | Property): string {
   return "/commercial";
 }
 
-function Gallery({ images, title, active, onActive, onOpenSlider, verified, isPremium, verifiedLabel, premiumLabel, viewPhotosLabel }: {
+function Gallery({ images, title, active, onActive, onOpenSlider, verified, isPremium, verifiedLabel, premiumLabel, viewPhotosLabel, category, gradient }: {
   images: string[]; title: string; active: number; onActive: (n: number) => void;
   onOpenSlider: (idx: number) => void; verified: boolean; isPremium: boolean;
   verifiedLabel: string; premiumLabel: string; viewPhotosLabel: string;
+  category?: string; gradient?: string;
 }) {
   const mainSrc = images[active] ?? images[0];
   const thumbs = images.slice(1, 3);
-  if (!mainSrc) return null;
+  if (!mainSrc) {
+    return (
+      <div className="relative aspect-[16/10] md:aspect-[16/11] rounded-xl overflow-hidden bg-muted">
+        <PropertyImage src={null} alt={title} category={category} gradient={gradient} sizes="100vw" />
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-3">
       <GalleryImg src={mainSrc} alt={title} className="aspect-[16/10] md:aspect-[16/11]"
         onClick={() => onOpenSlider(active)} photoCount={images.length} viewPhotosLabel={viewPhotosLabel}
+        category={category} gradient={gradient}
         badge={
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
             {verified && <VerifiedChip label={verifiedLabel} />}
@@ -623,6 +634,7 @@ function Gallery({ images, title, active, onActive, onOpenSlider, verified, isPr
         {thumbs.map((src, i) => (
           <GalleryImg key={i} src={src} alt={`${title} — photo ${i + 2}`}
             className={`aspect-[4/3] md:aspect-[16/11] ${active === i + 1 ? "ring-2 ring-primary" : ""}`}
+            category={category} gradient={gradient}
             onClick={() => { onActive(i + 1); onOpenSlider(i + 1); }} />
         ))}
       </div>
@@ -656,14 +668,16 @@ function DetailRow({ label, value }: { label: string; value: string | null | und
 function RecommendedCard({ property, t }: { property: Property; t: ReturnType<typeof useT> }) {
   const dp = t.detail.property;
   const coverSrc = getR2ImageUrl(property.gallery?.[0]);
-  console.log(dp)
   return (
     <Link href={`/property/${property.id}`} className="block bg-white dark:bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative aspect-[4/3] bg-muted">
-        {coverSrc
-          ? <Image src={coverSrc} alt={property.title} fill className="object-cover" sizes="280px" />
-          : <div className={`absolute inset-0 bg-gradient-to-br ${property.imageGradient} flex items-center justify-center text-white/35`}><Building2 className="w-1/3 h-1/3" /></div>
-        }
+        <PropertyImage
+          src={coverSrc}
+          alt={property.title}
+          category={property.category}
+          gradient={property.imageGradient}
+          sizes="280px"
+        />
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
           <AgentInitials name={property.agent.name} profile={property.agent.photo} />
         </div>

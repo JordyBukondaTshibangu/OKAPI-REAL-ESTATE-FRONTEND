@@ -9,7 +9,7 @@ export const KINSHASA_CENTER: LatLng = { lat: -4.325, lng: 15.322 };
  * Approximate coordinates for Kinshasa communes & well-known quartiers.
  * Keys are normalized (lowercase, no accents, no apostrophes).
  */
-const AREA_COORDS: Record<string, LatLng> = {
+export const AREA_COORDS: Record<string, LatLng> = {
   // Communes
   gombe: { lat: -4.3033, lng: 15.3003 },
   ngaliema: { lat: -4.3672, lng: 15.2497 },
@@ -58,12 +58,44 @@ const AREA_COORDS: Record<string, LatLng> = {
   "limete industriel": { lat: -4.36, lng: 15.36 },
 };
 
-function normalize(s: string): string {
+export function normalize(s: string): string {
   return s
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .trim();
+}
+
+/** A searchable list of named locations, deduplicated by coordinates. */
+export type NamedLocation = { key: string; label: string } & LatLng;
+
+export const NAMED_LOCATIONS: NamedLocation[] = Object.entries(AREA_COORDS).reduce<
+  NamedLocation[]
+>((acc, [key, coords]) => {
+  // Skip pure aliases (e.g. "kasavubu" duplicating "kasa-vubu") that share
+  // identical coordinates with an entry already added.
+  const isDuplicate = acc.some((l) => l.lat === coords.lat && l.lng === coords.lng);
+  if (isDuplicate) return acc;
+  const label = key
+    .split(" ")
+    .map((w) => (w.length ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+  acc.push({ key, label, ...coords });
+  return acc;
+}, []);
+
+/** Great-circle distance between two coordinates, in kilometres. */
+export function distanceKm(a: LatLng, b: LatLng): number {
+  const R = 6371;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const sinLat = Math.sin(dLat / 2);
+  const sinLng = Math.sin(dLng / 2);
+  const h =
+    sinLat * sinLat +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * sinLng * sinLng;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
 /** Deterministic pseudo-random in [-1, 1] from a string seed */

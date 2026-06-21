@@ -8,6 +8,7 @@ import { addFavourite, removeFavourite } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { Button } from "@/shared/components/ui/button";
+import PropertyImage from "@/shared/components/ui/PropertyImage";
 import AreaIcon from "@/shared/components/ui/icons/AreaIcon";
 import BathIcon from "@/shared/components/ui/icons/BathIcon";
 import BedIcon from "@/shared/components/ui/icons/BedIcon";
@@ -15,7 +16,6 @@ import CategoryIcon from "@/shared/components/ui/icons/CategoryIcon";
 import HeartIcon from "@/shared/components/ui/icons/HeartIcon";
 import PhoneIcon from "@/shared/components/ui/icons/PhoneIcon";
 import WhatsAppIcon from "@/shared/components/ui/icons/WhatsAppIcon";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -73,21 +73,13 @@ export default function PropertyCard({ property }: { property: Property }) {
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
         {/* Image */}
         <div className="relative aspect-4/3 md:aspect-auto overflow-hidden bg-muted">
-          {cover ? (
-            <Image
-              fill
-              src={cover}
-              alt={property.title}
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 280px"
-            />
-          ) : (
-            <div
-              className={`absolute inset-0 bg-linear-to-br ${property.imageGradient} flex items-center justify-center text-white/40`}
-            >
-              <CategoryIcon className="w-20 h-20" />
-            </div>
-          )}
+          <PropertyImage
+            src={cover}
+            alt={property.title}
+            category={property.category}
+            gradient={property.imageGradient}
+            sizes="(max-width: 768px) 100vw, 280px"
+          />
 
           {/* Click-through overlay */}
           <Link

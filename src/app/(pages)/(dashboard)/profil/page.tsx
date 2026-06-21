@@ -11,6 +11,8 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import UserSidebarLayout from "@/features/user/components/UserSidebarLayout";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useT } from "@/i18n/useT";
+import type { Messages } from "@/i18n/types";
 import {
   updateMe,
   changePassword,
@@ -19,26 +21,30 @@ import {
   deleteAccount,
 } from "@/services/auth";
 
-const profileSchema = z.object({
-  firstName: z.string().min(2, "Le prénom est requis"),
-  lastName: z.string().min(2, "Le nom est requis"),
-  email: z.string().email("Adresse e-mail invalide"),
-  phoneNumber: z.string().min(9, "Numéro invalide"),
-});
-
-const passwordSchema = z
-  .object({
-    currentPassword: z.string().min(1, "Requis"),
-    newPassword: z.string().min(6, "Au moins 6 caractères"),
-    confirmPassword: z.string(),
-  })
-  .refine((d) => d.newPassword === d.confirmPassword, {
-    message: "Les mots de passe ne correspondent pas",
-    path: ["confirmPassword"],
+function makeProfileSchema(t: Messages) {
+  return z.object({
+    firstName: z.string().min(2, t.dashboard.valFirstNameRequired),
+    lastName: z.string().min(2, t.dashboard.valLastNameRequired),
+    email: z.string().email(t.dashboard.valEmailInvalid),
+    phoneNumber: z.string().min(9, t.dashboard.valPhoneInvalid),
   });
+}
 
-type ProfileData = z.infer<typeof profileSchema>;
-type PasswordData = z.infer<typeof passwordSchema>;
+function makePasswordSchema(t: Messages) {
+  return z
+    .object({
+      currentPassword: z.string().min(1, t.dashboard.valRequired),
+      newPassword: z.string().min(6, t.dashboard.valPasswordMinLength),
+      confirmPassword: z.string(),
+    })
+    .refine((d) => d.newPassword === d.confirmPassword, {
+      message: t.dashboard.valPasswordMismatch,
+      path: ["confirmPassword"],
+    });
+}
+
+type ProfileData = z.infer<ReturnType<typeof makeProfileSchema>>;
+type PasswordData = z.infer<ReturnType<typeof makePasswordSchema>>;
 
 function avatarUrl(profileImage: string | null | undefined): string | null {
   if (!profileImage) return null;
@@ -49,6 +55,7 @@ function avatarUrl(profileImage: string | null | undefined): string | null {
 export default function ProfilePage() {
   const { user, token, setUser, logout } = useAuthStore();
   const router = useRouter();
+  const t = useT();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profileSuccess, setProfileSuccess] = useState(false);
@@ -71,7 +78,7 @@ export default function ProfilePage() {
     handleSubmit: handleProfile,
     formState: { errors: profileErrors, isSubmitting: profileSubmitting },
   } = useForm<ProfileData>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(makeProfileSchema(t)),
     defaultValues: {
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
@@ -85,7 +92,7 @@ export default function ProfilePage() {
     handleSubmit: handlePwd,
     reset: resetPwd,
     formState: { errors: pwdErrors, isSubmitting: pwdSubmitting },
-  } = useForm<PasswordData>({ resolver: zodResolver(passwordSchema) });
+  } = useForm<PasswordData>({ resolver: zodResolver(makePasswordSchema(t)) });
 
   async function onProfileSubmit(data: ProfileData) {
     setProfileSuccess(false);
@@ -95,7 +102,7 @@ export default function ProfilePage() {
       setUser(updated);
       setProfileSuccess(true);
     } catch {
-      setProfileError("Impossible de mettre à jour le profil.");
+      setProfileError(t.dashboard.errProfileUpdate);
     }
   }
 
@@ -110,7 +117,7 @@ export default function ProfilePage() {
       setPwdSuccess(true);
       resetPwd();
     } catch {
-      setPwdError("Mot de passe actuel incorrect ou erreur serveur.");
+      setPwdError(t.dashboard.errPasswordUpdate);
     }
   }
 
@@ -123,7 +130,7 @@ export default function ProfilePage() {
       const updated = await uploadAvatar(token, file);
       setUser(updated);
     } catch {
-      setAvatarError("Impossible de charger la photo. Vérifiez le format (jpg, png, webp) et la taille (max 5 Mo).");
+      setAvatarError(t.dashboard.errPhotoUpload);
     } finally {
       setAvatarLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -138,7 +145,7 @@ export default function ProfilePage() {
       const updated = await removeAvatar(token);
       setUser(updated);
     } catch {
-      setAvatarError("Impossible de supprimer la photo.");
+      setAvatarError(t.dashboard.errPhotoRemove);
     } finally {
       setAvatarLoading(false);
     }
@@ -153,7 +160,7 @@ export default function ProfilePage() {
       logout();
       router.push("/");
     } catch {
-      setDeleteError("Impossible de supprimer le compte. Réessayez.");
+      setDeleteError(t.dashboard.errAccountDelete);
       setDeleteLoading(false);
     }
   }
@@ -163,12 +170,12 @@ export default function ProfilePage() {
   return (
     <UserSidebarLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold ">Mon Profil</h1>
+        <h1 className="text-2xl font-semibold ">{t.dashboard.profileTitle}</h1>
 
         {/* Avatar card */}
         <div className="bg-card rounded-2xl shadow-sm p-8">
           <h2 className="text-base font-semibold  mb-6">
-            Photo de profil
+            {t.dashboard.photoHeading}
           </h2>
           <div className="flex items-center gap-6">
             <div className="relative shrink-0">
@@ -176,7 +183,7 @@ export default function ProfilePage() {
                 {imgSrc ? (
                   <Image
                     src={imgSrc}
-                    alt="Photo de profil"
+                    alt={t.dashboard.photoHeading}
                     fill
                     className="object-cover"
                     sizes="80px"
@@ -204,7 +211,7 @@ export default function ProfilePage() {
                   className="gap-1.5"
                 >
                   <Camera className="w-4 h-4" />
-                  {imgSrc ? "Changer la photo" : "Ajouter une photo"}
+                  {imgSrc ? t.dashboard.changePhoto : t.dashboard.addPhoto}
                 </Button>
                 {imgSrc && (
                   <Button
@@ -215,12 +222,12 @@ export default function ProfilePage() {
                     className="gap-1.5 text-muted-foreground hover:text-destructive"
                   >
                     <X className="w-4 h-4" />
-                    Supprimer
+                    {t.dashboard.removePhoto}
                   </Button>
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                JPG, PNG ou WebP · Max 5 Mo
+                {t.dashboard.photoHint}
               </p>
               {avatarError && (
                 <p className="text-xs text-destructive">{avatarError}</p>
@@ -240,13 +247,13 @@ export default function ProfilePage() {
         {/* Profile info card */}
         <div className="bg-card rounded-2xl shadow-sm p-8">
           <h2 className="text-base font-semibold  mb-6">
-            Informations personnelles
+            {t.dashboard.personalInfoHeading}
           </h2>
           <form onSubmit={handleProfile(onProfileSubmit)} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium  block mb-1.5">
-                  Prénom
+                  {t.dashboard.firstName}
                 </label>
                 <Input {...regProfile("firstName")} />
                 {profileErrors.firstName && (
@@ -257,7 +264,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <label className="text-sm font-medium  block mb-1.5">
-                  Nom
+                  {t.dashboard.lastName}
                 </label>
                 <Input {...regProfile("lastName")} />
                 {profileErrors.lastName && (
@@ -269,7 +276,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="text-sm font-medium  block mb-1.5">
-                Adresse e-mail
+                {t.dashboard.emailLabel}
               </label>
               <Input {...regProfile("email")} type="email" />
               {profileErrors.email && (
@@ -280,7 +287,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="text-sm font-medium  block mb-1.5">
-                Téléphone
+                {t.dashboard.phoneLabel}
               </label>
               <Input {...regProfile("phoneNumber")} type="tel" />
               {profileErrors.phoneNumber && (
@@ -292,7 +299,7 @@ export default function ProfilePage() {
             {profileSuccess && (
               <div className="flex items-center gap-2 text-green-600 text-sm">
                 <CheckCircle className="w-4 h-4" />
-                Profil mis à jour avec succès.
+                {t.dashboard.profileUpdated}
               </div>
             )}
             {profileError && (
@@ -300,7 +307,7 @@ export default function ProfilePage() {
             )}
             <div className="flex justify-end">
               <Button type="submit" disabled={profileSubmitting}>
-                {profileSubmitting ? "Enregistrement…" : "Enregistrer les modifications"}
+                {profileSubmitting ? t.dashboard.saving : t.dashboard.saveChanges}
               </Button>
             </div>
           </form>
@@ -309,12 +316,12 @@ export default function ProfilePage() {
         {/* Password card */}
         <div className="bg-card rounded-2xl shadow-sm p-8">
           <h2 className="text-base font-semibold  mb-6">
-            Changer le mot de passe
+            {t.dashboard.changePasswordHeading}
           </h2>
           <form onSubmit={handlePwd(onPasswordSubmit)} className="space-y-5">
             <div>
               <label className="text-sm font-medium  block mb-1.5">
-                Mot de passe actuel
+                {t.dashboard.currentPassword}
               </label>
               <div className="relative">
                 <Input
@@ -339,7 +346,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="text-sm font-medium  block mb-1.5">
-                Nouveau mot de passe
+                {t.dashboard.newPassword}
               </label>
               <div className="relative">
                 <Input
@@ -364,7 +371,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="text-sm font-medium  block mb-1.5">
-                Confirmer le nouveau mot de passe
+                {t.dashboard.confirmNewPassword}
               </label>
               <div className="relative">
                 <Input
@@ -390,7 +397,7 @@ export default function ProfilePage() {
             {pwdSuccess && (
               <div className="flex items-center gap-2 text-green-600 text-sm">
                 <CheckCircle className="w-4 h-4" />
-                Mot de passe modifié avec succès.
+                {t.dashboard.passwordUpdated}
               </div>
             )}
             {pwdError && (
@@ -398,7 +405,7 @@ export default function ProfilePage() {
             )}
             <div className="flex justify-end">
               <Button type="submit" disabled={pwdSubmitting}>
-                {pwdSubmitting ? "Modification…" : "Modifier le mot de passe"}
+                {pwdSubmitting ? t.dashboard.changingPassword : t.dashboard.changePasswordBtn}
               </Button>
             </div>
           </form>
@@ -407,11 +414,10 @@ export default function ProfilePage() {
         {/* Danger zone */}
         <div className="bg-card rounded-2xl shadow-sm p-8 border border-destructive/20">
           <h2 className="text-base font-semibold text-destructive mb-2">
-            Zone de danger
+            {t.dashboard.dangerZoneHeading}
           </h2>
           <p className="text-sm text-muted-foreground mb-5">
-            La suppression de votre compte est irréversible. Toutes vos données
-            (favoris, alertes, demandes, avis) seront définitivement effacées.
+            {t.dashboard.dangerZoneBody}
           </p>
 
           {!showDeleteConfirm ? (
@@ -421,12 +427,12 @@ export default function ProfilePage() {
               onClick={() => setShowDeleteConfirm(true)}
             >
               <Trash2 className="w-4 h-4" />
-              Supprimer mon compte
+              {t.dashboard.deleteAccountBtn}
             </Button>
           ) : (
             <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-5 space-y-4">
               <p className="text-sm font-medium text-destructive">
-                Êtes-vous sûr de vouloir supprimer définitivement votre compte ?
+                {t.dashboard.deleteAccountConfirm}
               </p>
               {deleteError && (
                 <p className="text-xs text-destructive">{deleteError}</p>
@@ -438,7 +444,7 @@ export default function ProfilePage() {
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={deleteLoading}
                 >
-                  Annuler
+                  {t.dashboard.cancel}
                 </Button>
                 <Button
                   size="sm"
@@ -447,7 +453,7 @@ export default function ProfilePage() {
                   disabled={deleteLoading}
                 >
                   <Trash2 className="w-4 h-4" />
-                  {deleteLoading ? "Suppression…" : "Oui, supprimer mon compte"}
+                  {deleteLoading ? t.dashboard.deletingAccount : t.dashboard.confirmDeleteAccount}
                 </Button>
               </div>
             </div>
