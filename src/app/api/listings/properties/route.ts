@@ -5,8 +5,6 @@ export async function GET(request: NextRequest) {
   try {
     const url = process.env.API_URL;
 
-    
-    
     const queryParameters = new URL(request.url).searchParams;
     const listingType = queryParameters.get("listingType");
     const category = queryParameters.get("category");
@@ -17,11 +15,7 @@ export async function GET(request: NextRequest) {
     const agentId = queryParameters.get("agentId");
     const agencyId = queryParameters.get("agencyId");
 
-
-    console.log("Categories", category)
-
     let apiUrl = url + "/properties?";
-
 
     if (listingType) apiUrl += `listingType=${listingType}&`;
     if (category) apiUrl += `category=${category}&`;
@@ -31,8 +25,6 @@ export async function GET(request: NextRequest) {
     if (maxPrice) apiUrl += `maxPrice=${maxPrice}&`;
     if (agentId) apiUrl += `agentId=${agentId}&`;
     if (agencyId) apiUrl += `agencyId=${agencyId}&`;
-
-    console.log("Category ***************************", category)
 
     const res = await axios.get(apiUrl);
 

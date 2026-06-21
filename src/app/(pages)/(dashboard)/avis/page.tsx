@@ -7,6 +7,7 @@ import { Button } from "@/shared/components/ui/button";
 import UserSidebarLayout from "@/features/user/components/UserSidebarLayout";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getMyReviews, deleteReview, type Review } from "@/services/auth";
+import { useT } from "@/i18n/useT";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -31,6 +32,7 @@ function reviewSubject(r: Review): string {
 
 export default function ReviewsPage() {
   const { token } = useAuthStore();
+  const t = useT();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +41,7 @@ export default function ReviewsPage() {
     if (!token) return;
     getMyReviews(token)
       .then(setReviews)
-      .catch(() => setError("Impossible de charger vos avis."))
+      .catch(() => setError(t.dashboard.errLoadReviews))
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -49,7 +51,7 @@ export default function ReviewsPage() {
       await deleteReview(token, id);
       setReviews((prev) => prev.filter((r) => r.id !== id));
     } catch {
-      setError("Impossible de supprimer cet avis.");
+      setError(t.dashboard.errDeleteReview);
     }
   }
 
@@ -62,12 +64,12 @@ export default function ReviewsPage() {
     <UserSidebarLayout>
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold ">
-          Mes Avis &amp; Notes
+          {t.dashboard.reviewsTitle}
         </h1>
 
         {loading && (
           <div className="bg-card rounded-2xl p-12 text-center text-muted-foreground text-sm">
-            Chargement…
+            {t.dashboard.loading}
           </div>
         )}
 
@@ -83,13 +85,13 @@ export default function ReviewsPage() {
               <Star className="w-8 h-8 text-muted-foreground" />
             </div>
             <h2 className="text-base font-semibold  mb-2">
-              Aucun avis publié
+              {t.dashboard.noReviewsTitle}
             </h2>
             <p className="text-sm text-muted-foreground mb-6 max-w-xs">
-              Partagez votre expérience en notant les agents ou biens avec qui vous avez travaillé.
+              {t.dashboard.noReviewsBody}
             </p>
             <Button asChild>
-              <Link href="/agents">Trouver un agent</Link>
+              <Link href="/agents">{t.dashboard.findAgent}</Link>
             </Button>
           </div>
         )}
@@ -104,7 +106,7 @@ export default function ReviewsPage() {
                 </p>
                 <StarRating rating={Math.round(avgRating)} />
                 <p className="text-xs text-muted-foreground mt-1">
-                  {reviews.length} avis
+                  {t.dashboard.reviewsCount.replace("{n}", String(reviews.length))}
                 </p>
               </div>
               <div className="flex-1 space-y-2">
@@ -143,7 +145,7 @@ export default function ReviewsPage() {
                       <div className="flex items-center gap-2 mt-1">
                         <StarRating rating={review.rating} />
                         <span className="text-xs text-muted-foreground">
-                          {review.agentId ? "Agent" : "Propriété"}
+                          {review.agentId ? t.dashboard.agentLabel : t.dashboard.propertyLabel}
                         </span>
                       </div>
                     </div>
@@ -158,7 +160,7 @@ export default function ReviewsPage() {
                       <button
                         onClick={() => handleDelete(review.id)}
                         className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                        title="Supprimer"
+                        title={t.dashboard.delete}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

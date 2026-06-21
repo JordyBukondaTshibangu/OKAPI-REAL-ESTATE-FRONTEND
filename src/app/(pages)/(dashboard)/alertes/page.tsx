@@ -15,20 +15,24 @@ import {
   deleteAlert,
   type Alert,
 } from "@/services/auth";
+import { useT } from "@/i18n/useT";
+import type { Messages } from "@/i18n/types";
 
-const alertSchema = z.object({
-  name: z.string().min(2, "Donnez un nom à votre alerte"),
-  listingType: z.string().optional(),
-  category: z.string().optional(),
-  city: z.string().optional(),
-  suburb: z.string().optional(),
-  minPrice: z.string().optional(),
-  maxPrice: z.string().optional(),
-  minBedrooms: z.string().optional(),
-  maxBedrooms: z.string().optional(),
-});
+function makeAlertSchema(t: Messages) {
+  return z.object({
+    name: z.string().min(2, t.dashboard.valAlertNameRequired),
+    listingType: z.string().optional(),
+    category: z.string().optional(),
+    city: z.string().optional(),
+    suburb: z.string().optional(),
+    minPrice: z.string().optional(),
+    maxPrice: z.string().optional(),
+    minBedrooms: z.string().optional(),
+    maxBedrooms: z.string().optional(),
+  });
+}
 
-type AlertForm = z.infer<typeof alertSchema>;
+type AlertForm = z.infer<ReturnType<typeof makeAlertSchema>>;
 
 function toNum(v: string | undefined) {
   return v && v !== "" ? Number(v) : undefined;
@@ -36,6 +40,7 @@ function toNum(v: string | undefined) {
 
 export default function AlertsPage() {
   const { token } = useAuthStore();
+  const t = useT();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,13 +51,13 @@ export default function AlertsPage() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<AlertForm>({ resolver: zodResolver(alertSchema) });
+  } = useForm<AlertForm>({ resolver: zodResolver(makeAlertSchema(t)) });
 
   useEffect(() => {
     if (!token) return;
     getAlerts(token)
       .then(setAlerts)
-      .catch(() => setError("Impossible de charger vos alertes."))
+      .catch(() => setError(t.dashboard.errLoadAlerts))
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -76,7 +81,7 @@ export default function AlertsPage() {
       reset();
       setShowForm(false);
     } catch {
-      setError("Impossible de créer l'alerte.");
+      setError(t.dashboard.errCreateAlert);
     }
   }
 
@@ -86,7 +91,7 @@ export default function AlertsPage() {
       await deleteAlert(token, id);
       setAlerts((prev) => prev.filter((a) => a.id !== id));
     } catch {
-      setError("Impossible de supprimer cette alerte.");
+      setError(t.dashboard.errDeleteAlert);
     }
   }
 
@@ -94,17 +99,17 @@ export default function AlertsPage() {
     <UserSidebarLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold ">Mes Alertes</h1>
+          <h1 className="text-2xl font-semibold ">{t.dashboard.alertsTitle}</h1>
           <Button onClick={() => setShowForm((v) => !v)} size="sm">
             {showForm ? (
               <>
                 <X className="w-4 h-4 mr-1.5" />
-                Annuler
+                {t.dashboard.cancel}
               </>
             ) : (
               <>
                 <Plus className="w-4 h-4 mr-1.5" />
-                Nouvelle alerte
+                {t.dashboard.newAlert}
               </>
             )}
           </Button>
@@ -114,14 +119,14 @@ export default function AlertsPage() {
         {showForm && (
           <div className="bg-card rounded-2xl shadow-sm p-6 border border-primary/20">
             <h2 className="text-base font-semibold  mb-5">
-              Créer une nouvelle alerte
+              {t.dashboard.createAlertHeading}
             </h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <label className="text-sm font-medium  block mb-1.5">
-                  Nom de l&apos;alerte <span className="text-destructive">*</span>
+                  {t.dashboard.alertNameLabel} <span className="text-destructive">*</span>
                 </label>
-                <Input {...register("name")} placeholder="Ex : Appartement Gombe" />
+                <Input {...register("name")} placeholder={t.dashboard.alertNamePlaceholder} />
                 {errors.name && (
                   <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
                 )}
@@ -130,32 +135,32 @@ export default function AlertsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium  block mb-1.5">
-                    Type d&apos;annonce
+                    {t.dashboard.listingTypeLabel}
                   </label>
                   <select
                     {...register("listingType")}
                     className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    <option value="">Tous</option>
-                    <option value="for-sale">À vendre</option>
-                    <option value="for-rent">À louer</option>
+                    <option value="">{t.dashboard.all}</option>
+                    <option value="for-sale">{t.dashboard.forSale}</option>
+                    <option value="for-rent">{t.dashboard.forRent}</option>
                   </select>
                 </div>
                 <div>
                   <label className="text-sm font-medium  block mb-1.5">
-                    Catégorie
+                    {t.dashboard.categoryLabel}
                   </label>
                   <select
                     {...register("category")}
                     className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    <option value="">Tous</option>
-                    <option value="Apartment">Appartement</option>
-                    <option value="Villa">Villa</option>
-                    <option value="House">Maison de ville</option>
-                    <option value="Land">Terrain</option>
-                    <option value="Studio">Studio</option>
-                    <option value="Commercial">Commercial</option>
+                    <option value="">{t.dashboard.all}</option>
+                    <option value="Apartment">{t.dashboard.categoryApartment}</option>
+                    <option value="Villa">{t.dashboard.categoryVilla}</option>
+                    <option value="House">{t.dashboard.categoryHouse}</option>
+                    <option value="Land">{t.dashboard.categoryLand}</option>
+                    <option value="Studio">{t.dashboard.categoryStudio}</option>
+                    <option value="Commercial">{t.dashboard.categoryCommercial}</option>
                   </select>
                 </div>
               </div>
@@ -163,45 +168,45 @@ export default function AlertsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium  block mb-1.5">
-                    Ville
+                    {t.dashboard.cityLabel}
                   </label>
-                  <Input {...register("city")} placeholder="Ex : Kinshasa" />
+                  <Input {...register("city")} placeholder={t.dashboard.cityPlaceholder} />
                 </div>
                 <div>
                   <label className="text-sm font-medium  block mb-1.5">
-                    Quartier
+                    {t.dashboard.suburbLabel}
                   </label>
-                  <Input {...register("suburb")} placeholder="Ex : Gombe" />
+                  <Input {...register("suburb")} placeholder={t.dashboard.suburbPlaceholder} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium  block mb-1.5">
-                    Prix min (USD)
+                    {t.dashboard.minPriceLabel}
                   </label>
                   <Input {...register("minPrice")} type="number" placeholder="0" min={0} />
                 </div>
                 <div>
                   <label className="text-sm font-medium  block mb-1.5">
-                    Prix max (USD)
+                    {t.dashboard.maxPriceLabel}
                   </label>
-                  <Input {...register("maxPrice")} type="number" placeholder="Illimité" min={0} />
+                  <Input {...register("maxPrice")} type="number" placeholder={t.dashboard.unlimited} min={0} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium  block mb-1.5">
-                    Chambres min
+                    {t.dashboard.minBedroomsLabel}
                   </label>
                   <Input {...register("minBedrooms")} type="number" placeholder="0" min={0} />
                 </div>
                 <div>
                   <label className="text-sm font-medium  block mb-1.5">
-                    Chambres max
+                    {t.dashboard.maxBedroomsLabel}
                   </label>
-                  <Input {...register("maxBedrooms")} type="number" placeholder="Illimité" min={0} />
+                  <Input {...register("maxBedrooms")} type="number" placeholder={t.dashboard.unlimited} min={0} />
                 </div>
               </div>
 
@@ -209,7 +214,7 @@ export default function AlertsPage() {
 
               <div className="flex justify-end">
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Création…" : "Créer l'alerte"}
+                  {isSubmitting ? t.dashboard.creatingAlert : t.dashboard.createAlertBtn}
                 </Button>
               </div>
             </form>
@@ -218,7 +223,7 @@ export default function AlertsPage() {
 
         {loading && (
           <div className="bg-card rounded-2xl p-12 text-center text-muted-foreground text-sm">
-            Chargement…
+            {t.dashboard.loading}
           </div>
         )}
 
@@ -234,10 +239,10 @@ export default function AlertsPage() {
               <Bell className="w-8 h-8 text-muted-foreground" />
             </div>
             <h2 className="text-base font-semibold  mb-2">
-              Aucune alerte configurée
+              {t.dashboard.noAlertsTitle}
             </h2>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Créez des alertes pour être notifié dès qu&apos;un bien correspond à vos critères.
+              {t.dashboard.noAlertsBody}
             </p>
           </div>
         )}
@@ -268,16 +273,16 @@ export default function AlertsPage() {
                       <p className="text-sm font-semibold ">{alert.name}</p>
                       {alert.active === false && (
                         <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                          Inactive
+                          {t.dashboard.inactive}
                         </span>
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {[
                         alert.listingType === "for-sale"
-                          ? "À vendre"
+                          ? t.dashboard.forSale
                           : alert.listingType === "for-rent"
-                          ? "À louer"
+                          ? t.dashboard.forRent
                           : null,
                         alert.category,
                         alert.city,
@@ -294,7 +299,7 @@ export default function AlertsPage() {
                         —{" "}
                         {alert.maxPrice
                           ? `${alert.maxPrice.toLocaleString("fr-CD")} USD`
-                          : "Illimité"}
+                          : t.dashboard.unlimited}
                       </p>
                     )}
                     {(alert.minBedrooms != null || alert.maxBedrooms != null) && (
@@ -303,11 +308,11 @@ export default function AlertsPage() {
                         {alert.maxBedrooms != null
                           ? `–${alert.maxBedrooms}`
                           : "+"}{" "}
-                        chambre{(alert.maxBedrooms ?? 99) > 1 ? "s" : ""}
+                        {t.dashboard.bedroomsSuffix}
                       </p>
                     )}
                     <p className="text-xs text-muted-foreground mt-1">
-                      Créée le{" "}
+                      {t.dashboard.createdOn}{" "}
                       {new Date(alert.createdAt).toLocaleDateString("fr-FR", {
                         day: "numeric",
                         month: "long",
@@ -319,7 +324,7 @@ export default function AlertsPage() {
                 <button
                   onClick={() => handleDelete(alert.id)}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                  title="Supprimer l'alerte"
+                  title={t.dashboard.deleteAlertTitle}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
