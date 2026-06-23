@@ -132,6 +132,14 @@ export type Messages = {
     verifiedUser: string;
   };
   home: {
+    latestListings: {
+      chipsHeading: string;
+      heading: string;
+      subheading: string;
+      tabRent: string;
+      tabSale: string;
+      viewAll: string;
+    };
     discover: {
       heading: string; headingHighlight: string;
       tabBuy: string; tabRent: string; tabSell: string;

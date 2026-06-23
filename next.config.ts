@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Gzip/Brotli compress all responses — critical for slow connections
+  compress: true,
+
   async rewrites() {
     return [
       {
@@ -11,6 +14,15 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    // Serve AVIF first (smallest), fall back to WebP — both far smaller than JPEG
+    formats: ["image/avif", "image/webp"],
+    // Allowlist the quality values used in the codebase (65 for property images)
+    qualities: [65, 75],
+    // Devices in Kinshasa are mostly mobile — focus breakpoints there
+    deviceSizes: [360, 480, 640, 750, 828, 1080, 1200],
+    imageSizes: [64, 128, 256, 384],
+    // Cache optimised images for 7 days on the CDN/browser
+    minimumCacheTTL: 60 * 60 * 24 * 7,
     remotePatterns: [
       {
         protocol: "https",

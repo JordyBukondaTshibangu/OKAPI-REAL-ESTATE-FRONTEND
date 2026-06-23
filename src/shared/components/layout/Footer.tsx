@@ -146,6 +146,7 @@ export default function Footer() {
                     <Link
                       href={`/acheter?${col.param}=${encodeURIComponent(link)}`}
                       className={linkClass}
+                      prefetch={false}
                     >
                       {link}
                     </Link>
@@ -167,6 +168,7 @@ export default function Footer() {
                     <Link
                       href={`/acheter?city=${encodeURIComponent(link)}`}
                       className={linkClass}
+                      prefetch={false}
                     >
                       {link}
                     </Link>
@@ -179,6 +181,7 @@ export default function Footer() {
                     <Link
                       href={`/acheter?city=${encodeURIComponent(link)}`}
                       className={linkClass}
+                      prefetch={false}
                     >
                       {link}
                     </Link>
@@ -258,7 +261,7 @@ export default function Footer() {
           <ul className="space-y-3">
             {companyLinks.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className={linkClass}>{link.label}</Link>
+                <Link href={link.href} className={linkClass} prefetch={false}>{link.label}</Link>
               </li>
             ))}
           </ul>
@@ -266,7 +269,7 @@ export default function Footer() {
           <ul className="space-y-3">
             {legalLinks.map((link, i) => (
               <li key={i}>
-                <Link href={link.href} className={linkClass}>{link.label}</Link>
+                <Link href={link.href} className={linkClass} prefetch={false}>{link.label}</Link>
               </li>
             ))}
           </ul>
@@ -274,7 +277,7 @@ export default function Footer() {
           <ul className="space-y-3">
             {partnerLinks.map((link, i) => (
               <li key={i}>
-                <Link href={link.href} className={linkClass}>{link.label}</Link>
+                <Link href={link.href} className={linkClass} prefetch={false}>{link.label}</Link>
               </li>
             ))}
           </ul>

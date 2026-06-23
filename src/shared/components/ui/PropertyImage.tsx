@@ -4,12 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { Building2, Home, LandPlot, Store, Warehouse } from "lucide-react";
 
-/**
- * Picks a representative icon for a property type. Accepts the strict
- * `PropertyCategory` union as well as the looser free-text `type` strings
- * some API responses use (e.g. Favourite.property.type), matched
- * case-insensitively by keyword.
- */
 function iconForCategory(category?: string | null) {
   const c = (category ?? "").toLowerCase();
   if (c.includes("land")) return LandPlot;
@@ -44,9 +38,10 @@ export function PropertyCategoryFallback({
 
 /**
  * Drop-in replacement for next/image `fill` usage on property photos.
- * Falls back to a category icon both when the src is missing AND when the
- * image actually fails to load (broken URL, 404, etc.) — next/image alone
- * doesn't catch the latter case.
+ * - Shows an animated shimmer skeleton while the image is loading
+ * - Falls back to a category icon when src is missing or the URL errors
+ * - Passes `priority` / `loading="eager"` to the first above-fold image
+ *   to avoid the LCP warning
  */
 export default function PropertyImage({
   src,
@@ -65,6 +60,7 @@ export default function PropertyImage({
   className?: string;
   priority?: boolean;
 }) {
+  const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
 
   if (!src || errored) {
@@ -72,14 +68,26 @@ export default function PropertyImage({
   }
 
   return (
-    <Image
-      fill
-      src={src}
-      alt={alt}
-      sizes={sizes}
-      priority={priority}
-      className={className}
-      onError={() => setErrored(true)}
-    />
+    <>
+      {/* Shimmer skeleton — visible until the image finishes loading */}
+      {!loaded && (
+        <div className="absolute inset-0 overflow-hidden bg-muted">
+          <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        </div>
+      )}
+
+      <Image
+        fill
+        src={src}
+        alt={alt}
+        sizes={sizes}
+        quality={65}
+        priority={priority}
+        loading={priority ? "eager" : undefined}
+        className={`${className} transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => setErrored(true)}
+      />
+    </>
   );
 }

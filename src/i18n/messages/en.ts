@@ -142,6 +142,14 @@ const en: Messages = {
     verifiedUser: "Verified user",
   },
   home: {
+    latestListings: {
+      chipsHeading: "What type of property are you looking for?",
+      heading: "Latest listings",
+      subheading: "Fresh properties added today — browse and contact directly.",
+      tabRent: "For Rent",
+      tabSale: "For Sale",
+      viewAll: "View all properties",
+    },
     discover: {
       heading: "Discover everything about real estate",
       headingHighlight: "everything",

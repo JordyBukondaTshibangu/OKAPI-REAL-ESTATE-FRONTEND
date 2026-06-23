@@ -5,7 +5,7 @@ const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getAgencyById(id: string): Promise<Agency | null> {
   try {
-    const res = await fetch(`${API_URL}/agencies/${id}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/agencies/${id}`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -15,7 +15,7 @@ export async function getAgencyById(id: string): Promise<Agency | null> {
 
 export async function getAgentsByAgency(agencyName: string): Promise<Agent[]> {
   try {
-    const res = await fetch(`${API_URL}/agents?limit=100`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/agents?limit=100`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
     const json = await res.json();
     const data = (json.data ?? json) as Record<string, unknown>[];

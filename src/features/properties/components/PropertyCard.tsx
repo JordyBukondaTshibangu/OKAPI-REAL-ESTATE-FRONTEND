@@ -28,7 +28,7 @@ import {
   isHotProperty,
 } from "./PerformancePulse";
 
-export default function PropertyCard({ property }: { property: Property }) {
+export default function PropertyCard({ property, priority }: { property: Property; priority?: boolean }) {
   const t = useT();
   // const { iconType } = property;
   const { token, isAuthenticated } = useAuthStore();
@@ -79,6 +79,7 @@ export default function PropertyCard({ property }: { property: Property }) {
             category={property.category}
             gradient={property.imageGradient}
             sizes="(max-width: 768px) 100vw, 280px"
+            priority={priority}
           />
 
           {/* Click-through overlay */}

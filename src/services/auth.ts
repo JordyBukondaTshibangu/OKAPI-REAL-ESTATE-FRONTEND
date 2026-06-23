@@ -243,7 +243,7 @@ export type Review = {
   propertyId?: string;
   agentId?: string;
   property?: { id: string; title: string };
-  agent?: { id: string; firstName: string; lastName: string };
+  agent?: { id: string; name: string };
   rating: number;
   comment?: string;
   createdAt: string;
