@@ -24,7 +24,7 @@ export async function getPropertiesByListingType(
     const res = await fetch(
       `${API_URL}/properties?listingType=${listingType}`,
       {
-        cache: "no-store",
+        next: { revalidate: 60 },
       },
     );
     if (!res.ok) return [];
@@ -103,6 +103,13 @@ export function formatPrice(
   const curr = currency === "USD" ? "$" : currency;
   const per = period === "monthly" ? "/mois" : period === "yearly" ? "/an" : "";
   return `${formatted} ${curr}${per}`;
+}
+
+/** 1 234 → "1,2k", 1 200 000 → "1,2M" — compact display for engagement counters. */
+export function formatCompactCount(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".", ",").replace(",0", "")}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(".", ",").replace(",0", "")}k`;
+  return String(n);
 }
 
 export function formatListedAgo(days: number): string {

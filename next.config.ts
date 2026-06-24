@@ -1,95 +1,38 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Gzip/Brotli compress all responses — critical for slow connections
+  compress: true,
+
   async rewrites() {
     return [
       {
         source: "/api/proxy/:path*",
-        destination: `${process.env.API_URL ?? "http://localhost:3000"}/:path*`,
+        destination: `${process.env.API_URL ?? "http://localhost:8080"}/:path*`,
       },
     ];
   },
 
   images: {
+    // Serve AVIF first (smallest), fall back to WebP — both far smaller than JPEG
+    formats: ["image/avif", "image/webp"],
+    // Allowlist the quality values used in the codebase (65 for property images)
+    qualities: [65, 75],
+    // Devices in Kinshasa are mostly mobile — focus breakpoints there
+    deviceSizes: [360, 480, 640, 750, 828, 1080, 1200],
+    imageSizes: [64, 128, 256, 384],
+    // Cache optimised images for 7 days on the CDN/browser
+    minimumCacheTTL: 60 * 60 * 24 * 7,
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "example.com",
+        hostname: "pub-d5cad4963b964b9ba2720a29b5780d2b.r2.dev",
         pathname: "/**",
       },
-      {
-        protocol: "https",
-        hostname: "another-domain.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "randomuser.me",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "thumbs.dreamstime.com",
-        pathname: "/**",
-      },
-      {
-        protocol : "https",
-        hostname : "plus.unsplash.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "static.wixstatic.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "pbs.twimg.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "www.thehousedesigners.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "cdn.sanity.io",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "images.pexels.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "i.pinimg.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "www.housegyan.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "www.executivecentre.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "www.tcccanada.com",
-        pathname : "/**"
-      },
-      {
-        protocol : "https",
-        hostname : "images.unsplash.com",
-        pathname : "/**"
-      }
-      
     ],
   },
+
+  allowedDevOrigins: ["192.168.68.108"],
 };
 
 export default nextConfig;

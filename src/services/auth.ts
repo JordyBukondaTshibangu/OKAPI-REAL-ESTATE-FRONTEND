@@ -65,11 +65,24 @@ export async function changePassword(
 }
 
 export async function uploadAvatar(token: string, file: File) {
-  const formData = new FormData();
-  formData.append("file", file);
+  // Step 1: get presigned URL from backend
+  const { data: { key, url } } = await axios.post<{ key: string; url: string }>(
+    `/api/proxy/uploads/presign-avatar`,
+    { filename: file.name, contentType: file.type },
+    { headers: authHeader(token) }
+  );
+
+  // Step 2: PUT file binary directly to R2
+  await fetch(url, {
+    method: "PUT",
+    body: file,
+    headers: { "Content-Type": file.type },
+  });
+
+  // Step 3: promote tmp key → users/{userId}/ and update user record
   const res = await axios.patch<import("@/features/properties/types/user").User>(
     `/api/proxy/users/me/avatar`,
-    formData,
+    { key },
     { headers: authHeader(token) }
   );
   return res.data;
@@ -230,7 +243,7 @@ export type Review = {
   propertyId?: string;
   agentId?: string;
   property?: { id: string; title: string };
-  agent?: { id: string; firstName: string; lastName: string };
+  agent?: { id: string; name: string };
   rating: number;
   comment?: string;
   createdAt: string;

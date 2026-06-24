@@ -7,12 +7,7 @@ import { Button } from "@/shared/components/ui/button";
 import UserSidebarLayout from "@/features/user/components/UserSidebarLayout";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getEnquiries, deleteEnquiry, type Enquiry } from "@/services/auth";
-
-const STATUS_LABEL: Record<Enquiry["status"], string> = {
-  pending: "En attente",
-  replied: "Répondu",
-  closed: "Clôturé",
-};
+import { useT } from "@/i18n/useT";
 
 const STATUS_CLASS: Record<Enquiry["status"], string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -22,15 +17,22 @@ const STATUS_CLASS: Record<Enquiry["status"], string> = {
 
 export default function EnquiriesPage() {
   const { token } = useAuthStore();
+  const t = useT();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const STATUS_LABEL: Record<Enquiry["status"], string> = {
+    pending: t.dashboard.statusPending,
+    replied: t.dashboard.statusReplied,
+    closed: t.dashboard.statusClosed,
+  };
 
   useEffect(() => {
     if (!token) return;
     getEnquiries(token)
       .then(setEnquiries)
-      .catch(() => setError("Impossible de charger vos demandes."))
+      .catch(() => setError(t.dashboard.errLoadEnquiries))
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -40,18 +42,18 @@ export default function EnquiriesPage() {
       await deleteEnquiry(token, id);
       setEnquiries((prev) => prev.filter((e) => e.id !== id));
     } catch {
-      setError("Impossible de supprimer cette demande.");
+      setError(t.dashboard.errDeleteEnquiry);
     }
   }
 
   return (
     <UserSidebarLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold ">Mes Demandes</h1>
+        <h1 className="text-2xl font-semibold ">{t.dashboard.enquiriesTitle}</h1>
 
         {loading && (
           <div className="bg-card rounded-2xl p-12 text-center text-muted-foreground text-sm">
-            Chargement…
+            {t.dashboard.loading}
           </div>
         )}
 
@@ -67,13 +69,13 @@ export default function EnquiriesPage() {
               <MessageSquare className="w-8 h-8 text-muted-foreground" />
             </div>
             <h2 className="text-base font-semibold  mb-2">
-              Aucune demande envoyée
+              {t.dashboard.noEnquiriesTitle}
             </h2>
             <p className="text-sm text-muted-foreground mb-6 max-w-xs">
-              Contactez un agent depuis une fiche propriété pour soumettre une demande.
+              {t.dashboard.noEnquiriesBody}
             </p>
             <Button asChild>
-              <Link href="/acheter">Trouver un bien</Link>
+              <Link href="/acheter">{t.dashboard.findProperty}</Link>
             </Button>
           </div>
         )}
@@ -85,10 +87,10 @@ export default function EnquiriesPage() {
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div>
                     <p className="text-sm font-semibold ">
-                      {enq.property?.title ?? "Propriété inconnue"}
+                      {enq.property?.title ?? t.dashboard.unknownProperty}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Réf. propriété : {enq.propertyId}
+                      {t.dashboard.propertyRef} {enq.propertyId}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -100,7 +102,7 @@ export default function EnquiriesPage() {
                     <button
                       onClick={() => handleDelete(enq.id)}
                       className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                      title="Supprimer"
+                      title={t.dashboard.delete}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -108,7 +110,7 @@ export default function EnquiriesPage() {
                 </div>
                 <p className="text-sm text-text-light line-clamp-2">{enq.message}</p>
                 <p className="text-xs text-muted-foreground mt-3">
-                  Envoyée le{" "}
+                  {t.dashboard.sentOn}{" "}
                   {new Date(enq.createdAt).toLocaleDateString("fr-FR", {
                     day: "numeric",
                     month: "long",

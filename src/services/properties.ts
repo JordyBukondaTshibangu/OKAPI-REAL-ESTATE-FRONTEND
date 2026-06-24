@@ -1,4 +1,8 @@
-import type { Property, PropertyDetail } from "@/features/properties/types/property";
+import type {
+  Property,
+  PropertyDetail,
+  PropertyPerformance,
+} from "@/features/properties/types/property";
 
 export type PropertyParams = {
   listingType?: string;
@@ -27,4 +31,40 @@ export async function fetchPropertyById(id: string): Promise<PropertyDetail> {
   const res = await fetch(`/api/listings/properties/${id}`);
   if (!res.ok) throw new Error(`Failed to fetch property ${id}`);
   return res.json();
+}
+
+/**
+ * Records a page view for a property. Fire-and-forget friendly:
+ * returns the fresh performance counters, or null on failure.
+ */
+export async function recordPropertyView(
+  id: string,
+): Promise<PropertyPerformance | null> {
+  try {
+    const res = await fetch(`/api/listings/properties/${id}/view`, {
+      method: "POST",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Records a share for a property. Returns the fresh performance
+ * counters, or null on failure.
+ */
+export async function recordPropertyShare(
+  id: string,
+): Promise<PropertyPerformance | null> {
+  try {
+    const res = await fetch(`/api/listings/properties/${id}/share`, {
+      method: "POST",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }

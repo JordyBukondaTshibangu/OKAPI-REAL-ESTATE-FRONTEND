@@ -3,10 +3,12 @@
 import { useT } from "@/i18n/useT";
 import type { Property } from "@/features/properties/types/property";
 import { categoryLabel, formatListedAgo, formatPrice } from "@/lib/properties";
+import { getR2ImageUrl } from "@/shared/utils/utils";
 import { addFavourite, removeFavourite } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { Button } from "@/shared/components/ui/button";
+import PropertyImage from "@/shared/components/ui/PropertyImage";
 import AreaIcon from "@/shared/components/ui/icons/AreaIcon";
 import BathIcon from "@/shared/components/ui/icons/BathIcon";
 import BedIcon from "@/shared/components/ui/icons/BedIcon";
@@ -14,17 +16,21 @@ import CategoryIcon from "@/shared/components/ui/icons/CategoryIcon";
 import HeartIcon from "@/shared/components/ui/icons/HeartIcon";
 import PhoneIcon from "@/shared/components/ui/icons/PhoneIcon";
 import WhatsAppIcon from "@/shared/components/ui/icons/WhatsAppIcon";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import NewBadge from "./badges/NewBadge";
 import PremiumBadge from "./badges/PremiumBadge";
 import VerifiedBadge from "./badges/VerifiedBadge";
+import {
+  CardPerformanceStrip,
+  HotBadge,
+  isHotProperty,
+} from "./PerformancePulse";
 
-export default function PropertyCard({ property }: { property: Property }) {
+export default function PropertyCard({ property, priority }: { property: Property; priority?: boolean }) {
   const t = useT();
-  const { iconType } = property;
+  // const { iconType } = property;
   const { token, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [saved, setSaved] = useState(false);
@@ -52,6 +58,7 @@ export default function PropertyCard({ property }: { property: Property }) {
   }
 
   const detailHref = `/property/${property.id}`;
+  const cover = getR2ImageUrl(property.gallery[0]);
 
   const whatsappMessage = t.cards.whatsappMsg
     .replace("{title}", property.title)
@@ -59,26 +66,21 @@ export default function PropertyCard({ property }: { property: Property }) {
     .replace("{suburb}", property.suburb)
     .replace("{id}", property.id);
 
+  const WHATSAPP_NUMBER = "971523787362";
+
   return (
     <article className="bg-white dark:bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
         {/* Image */}
         <div className="relative aspect-4/3 md:aspect-auto overflow-hidden bg-muted">
-          {property.gallery.length > 0 ? (
-            <Image
-              fill
-              src={property.gallery[0]}
-              alt={property.title}
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 280px"
-            />
-          ) : (
-            <div
-              className={`absolute inset-0 bg-linear-to-br ${property.imageGradient} flex items-center justify-center text-white/40`}
-            >
-              <CategoryIcon className="w-20 h-20" />
-            </div>
-          )}
+          <PropertyImage
+            src={cover}
+            alt={property.title}
+            category={property.category}
+            gradient={property.imageGradient}
+            sizes="(max-width: 768px) 100vw, 280px"
+            priority={priority}
+          />
 
           {/* Click-through overlay */}
           <Link
@@ -87,10 +89,13 @@ export default function PropertyCard({ property }: { property: Property }) {
             className="absolute inset-0 z-10"
           />
 
-          {/* Verified + New badges */}
-          <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5">
+          {/* Verified + New + Hot badges */}
+          <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
             {property.verified && <VerifiedBadge />}
             {property.isNew && <NewBadge />}
+            {isHotProperty(property.performance) && (
+              <HotBadge label={t.cards.hotLabel} />
+            )}
           </div>
 
           {/* Heart */}
@@ -99,7 +104,9 @@ export default function PropertyCard({ property }: { property: Property }) {
             aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
             disabled={saving}
             className={`absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white dark:bg-card/90 hover:bg-white dark:bg-card flex items-center justify-center transition-colors disabled:opacity-60 ${
-              saved ? "text-secondary" : "text-foreground/70 hover:text-secondary"
+              saved
+                ? "text-secondary"
+                : "text-foreground/70 hover:text-secondary"
             }`}
           >
             <HeartIcon className="w-4 h-4" filled={saved} />
@@ -122,11 +129,14 @@ export default function PropertyCard({ property }: { property: Property }) {
 
         {/* Body */}
         <div className="p-5 flex flex-col">
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start justify-between mb-2 gap-3">
             <p className="text-xs text-muted-foreground">
               {formatListedAgo(property.listedDaysAgo)}
             </p>
-            {property.premium && <PremiumBadge />}
+            <div className="flex items-center gap-3">
+              <CardPerformanceStrip perf={property.performance} />
+              {property.premium && <PremiumBadge />}
+            </div>
           </div>
 
           <Link href={detailHref} className="block group">
@@ -185,15 +195,23 @@ export default function PropertyCard({ property }: { property: Property }) {
                   <PhoneIcon className="w-4 h-4" /> {t.cards.call}
                 </Link>
               </Button>
-              <Button variant="default" size="sm" className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53]" asChild>
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <WhatsAppIcon className="w-4 h-4" /> {t.cards.whatsapp}
-                </a>
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const link = `${window.location.origin}${detailHref}`;
+                  const message = whatsappMessage.replace("{link}", link);
+                  window.open(
+                    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
+                    "_blank",
+                    "noopener,noreferrer"
+                  );
+                }}
+              >
+                <WhatsAppIcon className="w-4 h-4" /> {t.cards.whatsapp}
               </Button>
             </div>
           </div>

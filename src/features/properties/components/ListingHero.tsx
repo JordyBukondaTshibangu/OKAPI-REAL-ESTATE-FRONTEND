@@ -12,12 +12,14 @@ export default function ListingHero({
   crumbs,
   mode,
   showOffPlanReady,
+  typeRoutes,
 }: {
   title: string;
   totalListings: number;
   crumbs: Crumb[];
   mode: Mode;
   showOffPlanReady?: boolean;
+  typeRoutes?: Record<string, string>;
 }) {
   const t = useT();
   const title =
@@ -102,7 +104,7 @@ export default function ListingHero({
               {new Intl.NumberFormat("fr-FR").format(totalListings)} {t.listingHero.listings}
             </span>
           </div>
-          <SearchFilterBar mode={mode} showOffPlanReady={showOffPlanReady} />
+          <SearchFilterBar mode={mode} showOffPlanReady={showOffPlanReady} typeRoutes={typeRoutes} />
         </div>
       </div>
     </section>

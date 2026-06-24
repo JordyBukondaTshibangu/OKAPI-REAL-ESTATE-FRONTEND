@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@keyframes shimmer {
+  100% { transform: translateX(200%); }
+}
+
 /* Safelist dynamic accent classes used in ACCENT_CLASSES (agency cards) */
 @source inline("bg-blue-600 bg-green-600 bg-purple-600 bg-red-600 bg-orange-600 bg-indigo-600 bg-teal-600 bg-pink-600 bg-yellow-600 bg-gray-700");
 
@@ -144,4 +148,96 @@ body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: var(--font-sans);
+}
+
+/* ---------- Property map (Leaflet) ---------- */
+
+/* Price-tag pin */
+.okapi-price-pin-wrap {
+  background: transparent;
+  border: none;
+}
+
+.okapi-price-pin {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+  background: hsl(var(--navy));
+  color: hsl(var(--navy-foreground));
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  border: 2px solid #fff;
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.okapi-price-pin::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid hsl(var(--navy));
+}
+
+.okapi-price-pin:hover {
+  transform: translateX(-50%) scale(1.08);
+  background: hsl(var(--primary));
+  z-index: 50;
+}
+
+.okapi-price-pin:hover::after {
+  border-top-color: hsl(var(--primary));
+}
+
+/* Popup card */
+.okapi-map-popup .leaflet-popup-content-wrapper {
+  background: hsl(var(--card, var(--background)));
+  color: hsl(var(--foreground));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 0;
+  overflow: hidden;
+}
+
+.okapi-map-popup .leaflet-popup-content {
+  margin: 0;
+  width: auto !important;
+}
+
+.okapi-map-popup .leaflet-popup-tip {
+  background: hsl(var(--card, var(--background)));
+}
+
+.okapi-map-popup .leaflet-popup-close-button {
+  z-index: 10;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 4px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Darken OSM tiles in dark mode */
+.dark .okapi-map-tiles {
+  filter: brightness(0.7) invert(1) hue-rotate(180deg) saturate(0.5)
+    brightness(0.85) contrast(0.95);
+}
+
+.dark .okapi-price-pin {
+  border-color: hsl(var(--border));
 }
