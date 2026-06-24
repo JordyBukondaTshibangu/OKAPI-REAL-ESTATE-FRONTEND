@@ -25,7 +25,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 function reviewSubject(r: Review): string {
-  if (r.agent) return `${r.agent.firstName} ${r.agent.lastName}`;
+  if (r.agent) return r.agent.name;
   if (r.property) return r.property.title;
   return "—";
 }

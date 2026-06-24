@@ -142,6 +142,14 @@ const fr: Messages = {
     verifiedUser: "Utilisateur vérifié",
   },
   home: {
+    latestListings: {
+      chipsHeading: "Quel type de bien recherchez-vous ?",
+      heading: "Dernières annonces",
+      subheading: "Nouveaux biens ajoutés aujourd'hui — parcourez et contactez directement.",
+      tabRent: "À louer",
+      tabSale: "À vendre",
+      viewAll: "Voir toutes les annonces",
+    },
     discover: {
       heading: "Découvrez tout sur l'immobilier",
       headingHighlight: "tout",

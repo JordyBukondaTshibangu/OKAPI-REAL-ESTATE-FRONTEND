@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getPropertyById, getAllProperties } from "@/lib/api";
+import { getPropertyById, getRecommendedProperties } from "@/lib/api";
 import PropertyDetailClient from "./PropertyDetailClient";
 
 export async function generateMetadata({
@@ -22,15 +22,11 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [detail, allProperties] = await Promise.all([
-    getPropertyById(id),
-    getAllProperties(),
-  ]);
+  const detail = await getPropertyById(id);
   if (!detail) notFound();
 
-  const recommended = allProperties
-    .filter((p) => p.id !== id && p.category === detail.category)
-    .slice(0, 4);
+  // Fetch only a small same-category slice instead of the entire catalogue
+  const recommended = await getRecommendedProperties(detail.category, id);
 
   return <PropertyDetailClient id={id} detail={detail} recommended={recommended} />;
 }

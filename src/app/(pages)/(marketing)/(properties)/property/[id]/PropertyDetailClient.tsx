@@ -46,7 +46,7 @@ function GalleryImg({ src, alt, className = "", badge, onClick, photoCount, view
 }) {
   return (
     <div className={`relative overflow-hidden rounded-xl bg-muted ${className} ${onClick ? "cursor-pointer" : ""}`} onClick={onClick}>
-      <PropertyImage src={src} alt={alt} category={category} gradient={gradient} sizes="(max-width:768px) 100vw, 50vw" />
+      <PropertyImage src={src} alt={alt} category={category} gradient={gradient} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 800px" />
       {badge}
       {typeof photoCount === "number" && (
         <button onClick={onClick} className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 bg-black/60 hover:bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg transition-colors">
@@ -84,7 +84,7 @@ function ImageSlider({ images, initialIndex, onClose }: { images: string[]; init
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div className="relative w-full h-full max-w-4xl max-h-[75vh]">
-          <Image key={current} src={images[current]} alt={`Photo ${current + 1}`} fill className="object-contain" sizes="100vw" priority />
+          <Image key={current} src={images[current]} alt={`Photo ${current + 1}`} fill className="object-contain" sizes="(max-width: 1024px) calc(100vw - 128px), 896px" priority />
         </div>
         <button onClick={next} className="absolute right-4 w-10 h-10 rounded-full bg-white dark:bg-card/10 hover:bg-white dark:bg-card/25 flex items-center justify-center text-white transition-colors z-10">
           <ChevronRight className="w-5 h-5" />
@@ -280,21 +280,36 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
     <div className="bg-background-alt pb-20">
       {/* Top sub-nav */}
       <div className="bg-white dark:bg-card border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-          <Link href={listingHref(detail)} className="inline-flex items-center gap-2 text-sm text-foreground/80 hover:text-primary">
-            <ArrowLeft className="w-4 h-4" /> {dp.backToResults}
-          </Link>
-          <Breadcrumb detail={detail} t={t} />
-          <div className="flex items-center gap-1.5 text-sm">
-            <button onClick={handleToggleFavourite} disabled={saving}
-              className={`inline-flex items-center gap-1.5 px-3 h-9 rounded-md hover:bg-muted transition-colors disabled:opacity-60 ${saved ? "text-secondary" : "text-foreground/80"}`}>
-              <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
-              {saved ? dp.saved : dp.saveBtn}
-            </button>
-            <ShareButton title={detail.title} onShare={handleShared} />
-            <button className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md hover:bg-muted text-foreground/80">
-              <Flag className="w-4 h-4" /> {dp.reportBtn}
-            </button>
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          {/* Row 1 — back + actions */}
+          <div className="flex items-center justify-between gap-3 py-3">
+            <Link href={listingHref(detail)} className="inline-flex items-center gap-2 text-sm text-foreground/80 hover:text-primary shrink-0">
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">{dp.backToResults}</span>
+            </Link>
+
+            {/* Breadcrumb sits in the middle on desktop only */}
+            <div className="hidden lg:block flex-1 min-w-0">
+              <Breadcrumb detail={detail} t={t} />
+            </div>
+
+            <div className="flex items-center gap-0.5 text-sm shrink-0">
+              <button onClick={handleToggleFavourite} disabled={saving}
+                className={`inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted transition-colors disabled:opacity-60 ${saved ? "text-secondary" : "text-foreground/80"}`}>
+                <Heart className={`w-4 h-4 shrink-0 ${saved ? "fill-current" : ""}`} />
+                <span className="hidden md:inline">{saved ? dp.saved : dp.saveBtn}</span>
+              </button>
+              <ShareButton title={detail.title} onShare={handleShared} iconOnly />
+              <button className="inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted text-foreground/80">
+                <Flag className="w-4 h-4 shrink-0" />
+                <span className="hidden md:inline">{dp.reportBtn}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Row 2 — breadcrumb on tablet (lg hides this) */}
+          <div className="lg:hidden pb-2">
+            <Breadcrumb detail={detail} t={t} fullWidth />
           </div>
         </div>
       </div>
@@ -576,7 +591,15 @@ function MapModal({ neighborhood, suburb, city, onClose, t }: {
   );
 }
 
-function Breadcrumb({ detail, t }: { detail: PropertyDetail; t: ReturnType<typeof useT> }) {
+function Breadcrumb({
+  detail,
+  t,
+  fullWidth = false,
+}: {
+  detail: PropertyDetail;
+  t: ReturnType<typeof useT>;
+  fullWidth?: boolean;
+}) {
   const dp = t.detail.property;
   const trail = [
     { label: dp.breadHome, href: "/" },
@@ -586,12 +609,13 @@ function Breadcrumb({ detail, t }: { detail: PropertyDetail; t: ReturnType<typeo
     { label: detail.title, truncate: true },
   ];
   return (
-    <nav className="hidden md:flex items-center text-xs text-muted-foreground gap-1.5 max-w-[40%] truncate">
+    <nav className={`flex items-center flex-wrap text-xs text-muted-foreground gap-x-1.5 gap-y-1 ${fullWidth ? "w-full" : "min-w-0"}`}>
       {trail.map((c, i) => (
-        <span key={i} className="inline-flex items-center gap-1.5">
-          {i > 0 && <span className="text-foreground/30">/</span>}
-          {c.href ? <Link href={c.href} className="hover:text-primary">{c.label}</Link>
-            : <span className={c.truncate ? "truncate max-w-[180px]" : ""}>{c.label}</span>}
+        <span key={i} className="inline-flex items-center gap-1.5 min-w-0">
+          {i > 0 && <span className="text-foreground/30 shrink-0">/</span>}
+          {c.href
+            ? <Link href={c.href} className="hover:text-primary shrink-0">{c.label}</Link>
+            : <span className={`${c.truncate ? "truncate max-w-[200px]" : ""} shrink-0`}>{c.label}</span>}
         </span>
       ))}
     </nav>
@@ -615,7 +639,7 @@ function Gallery({ images, title, active, onActive, onOpenSlider, verified, isPr
   if (!mainSrc) {
     return (
       <div className="relative aspect-[16/10] md:aspect-[16/11] rounded-xl overflow-hidden bg-muted">
-        <PropertyImage src={null} alt={title} category={category} gradient={gradient} sizes="100vw" />
+        <PropertyImage src={null} alt={title} category={category} gradient={gradient} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 800px" />
       </div>
     );
   }

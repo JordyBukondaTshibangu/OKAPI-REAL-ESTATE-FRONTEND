@@ -6,11 +6,13 @@ import { Check, Share2 } from "lucide-react";
 export default function ShareButton({
   title,
   onShare,
-  className = "inline-flex items-center gap-1.5 px-3 h-9 rounded-md hover:bg-muted text-foreground/80 transition-colors",
+  iconOnly = false,
+  className = "inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted text-foreground/80 transition-colors",
 }: {
   title?: string;
-  /** Called once a share actually happened (native share or link copied). */
   onShare?: () => void;
+  /** Hides the text label entirely — used on tablet where space is tight. */
+  iconOnly?: boolean;
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -42,11 +44,15 @@ export default function ShareButton({
   return (
     <button onClick={handleShare} className={className}>
       {copied ? (
-        <Check className="w-4 h-4 text-green-600" />
+        <Check className="w-4 h-4 shrink-0 text-green-600" />
       ) : (
-        <Share2 className="w-4 h-4" />
+        <Share2 className="w-4 h-4 shrink-0" />
       )}
-      {copied ? "Lien copié !" : "Partager"}
+      {!iconOnly && (
+        <span className="hidden md:inline">
+          {copied ? "Lien copié !" : "Partager"}
+        </span>
+      )}
     </button>
   );
 }

@@ -24,7 +24,7 @@ export async function getPropertiesByListingType(
     const res = await fetch(
       `${API_URL}/properties?listingType=${listingType}`,
       {
-        cache: "no-store",
+        next: { revalidate: 60 },
       },
     );
     if (!res.ok) return [];

@@ -25,6 +25,7 @@ export type PropertyListingPageProps = {
   currentPage?: number;
   totalPages?: number;
   activeFilters?: number;
+  typeRoutes?: Record<string, string>;
 };
 
 const PER_PAGE = 6;
@@ -40,6 +41,7 @@ export default function PropertyListingPage({
   currentPage = 1,
   totalPages,
   activeFilters = 0,
+  typeRoutes,
 }: PropertyListingPageProps) {
   const t = useT();
   const searchParams = useSearchParams();
@@ -72,6 +74,7 @@ export default function PropertyListingPage({
         crumbs={crumbs}
         mode={mode}
         showOffPlanReady={showOffPlanReady}
+        typeRoutes={typeRoutes}
       />
 
       <section className="bg-background-alt pb-16 px-6">
@@ -92,7 +95,7 @@ export default function PropertyListingPage({
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
             <div className="space-y-5">
               {visible.length > 0 ? (
-                visible.map((p) => <PropertyCard key={p.id} property={p} />)
+                visible.map((p, i) => <PropertyCard key={p.id} property={p} priority={i === 0} />)
               ) : (
                 <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-12 text-center">
                   <p className="text-muted-foreground text-sm mb-2">

@@ -143,6 +143,14 @@ const ln: Messages = {
     verifiedUser: "Mopesi makanisi ya solo",
   },
   home: {
+    latestListings: {
+      chipsHeading: "Ndako ya ndenge nini ozali koluka?",
+      heading: "Bandako ya sika",
+      subheading: "Bandako ya sika lelo — tala mpe samba mbala moko.",
+      tabRent: "Ya funga",
+      tabSale: "Ya koteka",
+      viewAll: "Tala bandako nyonso",
+    },
     discover: {
       heading: "Yeba makambo nyonso ya ndako",
       headingHighlight: "nyonso",

@@ -93,11 +93,15 @@ function DropdownPill({
 export type SearchFilterBarProps = {
   mode: Mode;
   showOffPlanReady?: boolean;
+  /** Maps a type value (e.g. "villa") to a base route (e.g. "/louer/villas").
+   *  When set, selecting a type navigates to that route instead of appending ?type=. */
+  typeRoutes?: Record<string, string>;
 };
 
 export default function SearchFilterBar({
   mode,
   showOffPlanReady,
+  typeRoutes,
 }: SearchFilterBarProps) {
   const t = useT();
   const router = useRouter();
@@ -205,6 +209,19 @@ export default function SearchFilterBar({
     setLocalQ("");
   }
 
+  function setTypeFilter(value: string | null) {
+    if (value && typeRoutes && typeRoutes[value]) {
+      // Navigate to the dedicated route, preserving non-type filters
+      const p = new URLSearchParams(searchParams.toString());
+      p.delete("page");
+      p.delete("type");
+      const qs = p.toString();
+      router.push(typeRoutes[value] + (qs ? `?${qs}` : ""));
+    } else {
+      setFilter("type", value);
+    }
+  }
+
   const hasFilters =
     currentType ||
     currentMinPrice ||
@@ -291,7 +308,7 @@ export default function SearchFilterBar({
                   ? "bg-accent text-primary font-semibold"
                   : ""
               }`}
-              onClick={() => setFilter("type", item.value)}
+              onClick={() => setTypeFilter(item.value)}
             >
               {item.label}
             </button>
