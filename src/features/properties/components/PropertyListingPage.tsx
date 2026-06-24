@@ -25,6 +25,7 @@ export type PropertyListingPageProps = {
   currentPage?: number;
   totalPages?: number;
   activeFilters?: number;
+  typeRoutes?: Record<string, string>;
 };
 
 const PER_PAGE = 6;
@@ -40,6 +41,7 @@ export default function PropertyListingPage({
   currentPage = 1,
   totalPages,
   activeFilters = 0,
+  typeRoutes,
 }: PropertyListingPageProps) {
   const t = useT();
   const searchParams = useSearchParams();
@@ -72,6 +74,7 @@ export default function PropertyListingPage({
         crumbs={crumbs}
         mode={mode}
         showOffPlanReady={showOffPlanReady}
+        typeRoutes={typeRoutes}
       />
 
       <section className="bg-background-alt pb-16 px-6">

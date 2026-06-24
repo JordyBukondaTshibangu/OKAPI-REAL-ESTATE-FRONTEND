@@ -84,7 +84,7 @@ function ImageSlider({ images, initialIndex, onClose }: { images: string[]; init
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div className="relative w-full h-full max-w-4xl max-h-[75vh]">
-          <Image key={current} src={images[current]} alt={`Photo ${current + 1}`} fill className="object-contain" sizes="100vw" priority />
+          <Image key={current} src={images[current]} alt={`Photo ${current + 1}`} fill className="object-contain" sizes="(max-width: 1024px) calc(100vw - 128px), 896px" priority />
         </div>
         <button onClick={next} className="absolute right-4 w-10 h-10 rounded-full bg-white dark:bg-card/10 hover:bg-white dark:bg-card/25 flex items-center justify-center text-white transition-colors z-10">
           <ChevronRight className="w-5 h-5" />

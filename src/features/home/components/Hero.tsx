@@ -10,12 +10,19 @@ import { ChevronDown, TrendingUp } from "lucide-react";
 import { useT } from "@/i18n/useT";
 
 const TAB_ROUTES: Record<string, string> = {
-  buy:  "/acheter",
+  buy: "/acheter",
   rent: "/louer",
   sell: "/vendre",
 };
 
-const POPULAR_AREAS = ["Gombe", "Ngaliema", "Limete", "Kintambo", "Lingwala", "Masina"];
+const POPULAR_AREAS = [
+  "Gombe",
+  "Ngaliema",
+  "Limete",
+  "Kintambo",
+  "Lingwala",
+  "Masina",
+];
 
 export default function Hero() {
   const router = useRouter();
@@ -24,10 +31,10 @@ export default function Hero() {
   const [query, setQuery] = useState("");
 
   const FILTER_PILLS = [
-    { label: t.hero.filterType,      param: "type"     },
-    { label: t.hero.filterMinPrice,  param: "minPrice" },
-    { label: t.hero.filterMaxPrice,  param: "maxPrice" },
-    { label: t.hero.filterBedrooms,  param: "beds"     },
+    { label: t.hero.filterType, param: "type" },
+    { label: t.hero.filterMinPrice, param: "minPrice" },
+    { label: t.hero.filterMaxPrice, param: "maxPrice" },
+    { label: t.hero.filterBedrooms, param: "beds" },
   ];
 
   function handleSearch() {
@@ -38,15 +45,15 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative bg-navy text-white py-48 pb-48 px-8 overflow-hidden">
+    <section className="relative bg-navy text-white py-32 pb-32 px-8 overflow-hidden">
       {/* Background gradient */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-navy via-navy to-primary/30 pointer-events-none"
+        className="absolute inset-0 bg-linear-to-br from-navy via-navy to-primary/30 pointer-events-none"
         aria-hidden="true"
       />
       {/* Top gold line */}
       <div
-        className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent"
+        className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-secondary/60 to-transparent"
         aria-hidden="true"
       />
 
@@ -64,7 +71,7 @@ export default function Hero() {
         <Tabs value={tab} onValueChange={setTab} className="mb-6">
           <TabsList className="bg-transparent gap-6 border-b border-white/15 rounded-none">
             {[
-              { value: "buy",  label: t.hero.buyTab  },
+              { value: "buy", label: t.hero.buyTab },
               { value: "rent", label: t.hero.rentTab },
               { value: "sell", label: t.hero.sellTab },
             ].map(({ value, label }) => (
@@ -82,7 +89,10 @@ export default function Hero() {
         {/* Search bar */}
         <form
           className="bg-white dark:bg-card/95 rounded-xl flex overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
-          onSubmit={(e) => { e.preventDefault(); handleSearch(); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch();
+          }}
         >
           <Input
             value={query}

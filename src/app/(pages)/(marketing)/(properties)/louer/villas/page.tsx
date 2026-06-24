@@ -36,10 +36,17 @@ export default async function Page({
         { label: "Villas", count: all.length, href: "/louer/villas" },
         { label: "Maisons de ville", count: 0, href: "/louer/maisons-ville" },
       ]}
+      typeRoutes={{
+        apartment: "/louer/appartements",
+        villa: "/louer/villas",
+        studio: "/louer/studios",
+        townhouse: "/louer/maisons-ville",
+        penthouse: "/louer",
+      }}
       properties={items}
       currentPage={currentPage}
       totalPages={totalPages}
-    activeFilters={activeFilters}
+      activeFilters={activeFilters}
     />
   );
 }
