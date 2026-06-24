@@ -37,6 +37,14 @@ export async function forgotPassword(email: string) {
   return res.data;
 }
 
+export async function resetPassword(token: string, newPassword: string) {
+  const res = await axios.post(`/api/auth/reset-password`, {
+    token,
+    newPassword,
+  });
+  return res.data;
+}
+
 export async function getMe(token: string): Promise<User> {
   const res = await axios.get<User>(`/api/proxy/users/me`, {
     headers: authHeader(token),
