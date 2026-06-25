@@ -461,6 +461,7 @@ const fr: Messages = {
       placeholderName: "Jean Makiese", placeholderEmail: "jean@exemple.cd", placeholderSubject: "Demande d'information", placeholderMessage: "Décrivez votre demande...",
       validationName: "Le nom est requis", validationEmail: "Adresse e-mail invalide", validationSubject: "Le sujet est requis", validationMessage: "Le message doit contenir au moins 10 caractères",
       successTitle: "Message envoyé !", successBody: "Nous vous répondrons dans les plus brefs délais.",
+      errorTitle: "Échec de l'envoi", errorBody: "Une erreur est survenue. Veuillez réessayer ou nous contacter directement par e-mail.",
       sendAnother: "Envoyer un autre message", sending: "Envoi en cours…", send: "Envoyer le message",
     },
     carrieres: {

@@ -230,7 +230,7 @@ function ProfileMenu() {
         <Button
           variant="outline"
           size="sm"
-          className="border-white/40 text-white hover:bg-white dark:bg-card/10 hover:text-white"
+          className="border-white/40 text-white hover:bg-white hover:text-navy dark:bg-card/10"
           asChild
         >
           <Link href="/connexion" className="min-w-fit">{t.auth.login}</Link>
