@@ -436,6 +436,7 @@ const en: Messages = {
       placeholderName: "Jean Makiese", placeholderEmail: "jean@example.cd", placeholderSubject: "Information request", placeholderMessage: "Describe your request...",
       validationName: "Name is required", validationEmail: "Invalid email address", validationSubject: "Subject is required", validationMessage: "Message must be at least 10 characters",
       successTitle: "Message sent!", successBody: "We will get back to you as soon as possible.",
+      errorTitle: "Failed to send", errorBody: "Something went wrong. Please try again or contact us directly by email.",
       sendAnother: "Send another message", sending: "Sending…", send: "Send message",
     },
     carrieres: {

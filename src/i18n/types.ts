@@ -333,7 +333,7 @@ export type Messages = {
       fieldName: string; fieldEmail: string; fieldSubject: string; fieldMessage: string;
       placeholderName: string; placeholderEmail: string; placeholderSubject: string; placeholderMessage: string;
       validationName: string; validationEmail: string; validationSubject: string; validationMessage: string;
-      successTitle: string; successBody: string; sendAnother: string; sending: string; send: string;
+      successTitle: string; successBody: string; errorTitle: string; errorBody: string; sendAnother: string; sending: string; send: string;
     };
     carrieres: {
       heroBadge: string; heroHeading: string; heroSubtitle: string; heroBtn: string;

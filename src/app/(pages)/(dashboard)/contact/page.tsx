@@ -28,7 +28,12 @@ export default function ContactPage() {
         subject: z.string().min(3, p.validationSubject),
         message: z.string().min(10, p.validationMessage),
       }),
-    [p.validationName, p.validationEmail, p.validationSubject, p.validationMessage],
+    [
+      p.validationName,
+      p.validationEmail,
+      p.validationSubject,
+      p.validationMessage,
+    ],
   );
 
   const contactDetails = [
@@ -38,11 +43,12 @@ export default function ContactPage() {
       value: "123, Avenue du Commerce, Gombe, Kinshasa, RDC",
     },
     { icon: Phone, label: p.labelPhone, value: "+243 999 000 111" },
-    { icon: Mail, label: p.labelEmail, value: "contact@okapiimmobilier.cd" },
+    { icon: Mail, label: p.labelEmail, value: "contact@okapi-real-estate.com" },
     { icon: Clock, label: p.labelHours, value: "Lun – Ven : 8h00 – 17h00" },
   ];
 
   const [sent, setSent] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   const {
     register,
@@ -51,10 +57,20 @@ export default function ContactPage() {
     reset,
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  async function onSubmit(_data: FormData) {
-    await new Promise((r) => setTimeout(r, 800));
-    setSent(true);
-    reset();
+  async function onSubmit(data: FormData) {
+    setSubmitError(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to send");
+      setSent(true);
+      reset();
+    } catch {
+      setSubmitError(true);
+    }
   }
 
   return (
@@ -64,12 +80,8 @@ export default function ContactPage() {
         <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-4">
           {p.badge}
         </p>
-        <h1 className="text-4xl md:text-5xl font-semibold mb-4">
-          {p.heading}
-        </h1>
-        <p className="text-white/75 max-w-xl mx-auto text-base">
-          {p.subtitle}
-        </p>
+        <h1 className="text-4xl md:text-5xl font-semibold mb-4">{p.heading}</h1>
+        <p className="text-white/75 max-w-xl mx-auto text-base">{p.subtitle}</p>
       </section>
 
       {/* Content */}
@@ -77,9 +89,7 @@ export default function ContactPage() {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
           {/* Contact details */}
           <div>
-            <h2 className="text-xl font-semibold  mb-8">
-              {p.infoHeading}
-            </h2>
+            <h2 className="text-xl font-semibold  mb-8">{p.infoHeading}</h2>
             <ul className="space-y-6">
               {contactDetails.map(({ icon: Icon, label, value }) => (
                 <li key={label} className="flex items-start gap-4">
@@ -90,9 +100,7 @@ export default function ContactPage() {
                     <p className="text-xs text-muted-foreground mb-0.5">
                       {label}
                     </p>
-                    <p className="text-sm  font-medium">
-                      {value}
-                    </p>
+                    <p className="text-sm  font-medium">{value}</p>
                   </div>
                 </li>
               ))}
@@ -105,17 +113,13 @@ export default function ContactPage() {
 
           {/* Form */}
           <div>
-            <h2 className="text-xl font-semibold  mb-8">
-              {p.formHeading}
-            </h2>
+            <h2 className="text-xl font-semibold  mb-8">{p.formHeading}</h2>
             {sent ? (
               <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
                 <p className="text-green-700 font-medium text-base mb-1">
                   {p.successTitle}
                 </p>
-                <p className="text-green-600 text-sm">
-                  {p.successBody}
-                </p>
+                <p className="text-green-600 text-sm">{p.successBody}</p>
                 <Button className="mt-6" onClick={() => setSent(false)}>
                   {p.sendAnother}
                 </Button>
@@ -126,7 +130,10 @@ export default function ContactPage() {
                   <label className="text-sm font-medium  block mb-1.5">
                     {p.fieldName}
                   </label>
-                  <Input {...register("name")} placeholder={p.placeholderName} />
+                  <Input
+                    {...register("name")}
+                    placeholder={p.placeholderName}
+                  />
                   {errors.name && (
                     <p className="text-xs text-destructive mt-1">
                       {errors.name.message}
@@ -178,6 +185,12 @@ export default function ContactPage() {
                     </p>
                   )}
                 </div>
+                {submitError && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                    <p className="text-red-700 font-medium text-sm">{p.errorTitle}</p>
+                    <p className="text-red-600 text-xs mt-1">{p.errorBody}</p>
+                  </div>
+                )}
                 <Button
                   type="submit"
                   className="w-full"
