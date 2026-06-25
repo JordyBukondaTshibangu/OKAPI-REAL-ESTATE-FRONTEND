@@ -437,6 +437,7 @@ const ln: Messages = {
       placeholderName: "Jean Makiese", placeholderEmail: "jean@exemple.cd", placeholderSubject: "Demande ya makambo", placeholderMessage: "Limbolisa demande na yo...",
       validationName: "Nkombo esengeli", validationEmail: "Adresse ya e-mail ezali malamu te", validationSubject: "Sujet esengeli", validationMessage: "Mokanda esengeli kozala na bacaractère 10 to lisusu",
       successTitle: "Mokanda etindamaki!", successBody: "Tozongisela yo na mbangu koleka.",
+      errorTitle: "Kotinda elongi te", errorBody: "Likambo moko ekweyi. Meka lisusu to benga biso na e-mail.",
       sendAnother: "Tinda mokanda mosusu", sending: "Kozela kotinda…", send: "Tinda mokanda",
     },
     carrieres: {
