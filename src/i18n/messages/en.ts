@@ -230,7 +230,7 @@ const en: Messages = {
   },
   cards: {
     addFavourite: "Add to favourites", removeFavourite: "Remove from favourites",
-    call: "Call", whatsapp: "WhatsApp",
+    call: "Call", whatsapp: "WhatsApp", viewProperty: "View property",
     whatsappMsg: "Hi, I am interested in your property on Okapi Real Estate: {link}\nRef: {id}",
     nationality: "Nationality:", languages: "Languages:", forSale: "For sale:", forRent: "For rent:",
     since: "Since {year}", agent: "agent", agents: "agents", transactions: "transactions",

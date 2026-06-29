@@ -37,8 +37,8 @@ const SKELETON_COUNT = 3;
 function CardSkeleton() {
   return (
     <div className="bg-white dark:bg-card rounded-xl border border-border shadow-sm overflow-hidden animate-pulse">
-      <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
-        <div className="aspect-4/3 md:aspect-auto md:h-48 bg-muted" />
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]">
+        <div className="aspect-4/3 lg:aspect-auto lg:h-48 bg-muted" />
         <div className="p-5 space-y-3">
           <div className="h-3 bg-muted rounded w-1/3" />
           <div className="h-6 bg-muted rounded w-1/2" />

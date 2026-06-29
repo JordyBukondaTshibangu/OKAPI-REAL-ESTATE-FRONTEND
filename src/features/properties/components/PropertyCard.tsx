@@ -14,8 +14,6 @@ import BathIcon from "@/shared/components/ui/icons/BathIcon";
 import BedIcon from "@/shared/components/ui/icons/BedIcon";
 import CategoryIcon from "@/shared/components/ui/icons/CategoryIcon";
 import HeartIcon from "@/shared/components/ui/icons/HeartIcon";
-import PhoneIcon from "@/shared/components/ui/icons/PhoneIcon";
-import WhatsAppIcon from "@/shared/components/ui/icons/WhatsAppIcon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -60,17 +58,9 @@ export default function PropertyCard({ property, priority }: { property: Propert
   const detailHref = `/property/${property.id}`;
   const cover = getR2ImageUrl(property.gallery[0]);
 
-  const whatsappMessage = t.cards.whatsappMsg
-    .replace("{title}", property.title)
-    .replace("{neighborhood}", property.neighborhood)
-    .replace("{suburb}", property.suburb)
-    .replace("{id}", property.id);
-
-  const WHATSAPP_NUMBER = "971523787362";
-
   return (
     <article className="bg-white dark:bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-      <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]">
         {/* Image */}
         <div className="relative aspect-4/3 md:aspect-auto overflow-hidden bg-muted">
           <PropertyImage
@@ -173,7 +163,7 @@ export default function PropertyCard({ property, priority }: { property: Propert
           </p>
 
           {/* Agent + actions */}
-          <div className="mt-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="mt-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="flex items-center gap-3">
               <AgentAvatar
                 name={property.agent.name}
@@ -189,31 +179,12 @@ export default function PropertyCard({ property, priority }: { property: Propert
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-1.5" asChild>
-                <Link href={detailHref}>
-                  <PhoneIcon className="w-4 h-4" /> {t.cards.call}
-                </Link>
-              </Button>
-              <Button
-                type="button"
-                variant="default"
-                size="sm"
-                className="gap-1.5 bg-[#25D366] hover:bg-[#1faa53]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const link = `${window.location.origin}${detailHref}`;
-                  const message = whatsappMessage.replace("{link}", link);
-                  window.open(
-                    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
-                    "_blank",
-                    "noopener,noreferrer"
-                  );
-                }}
-              >
-                <WhatsAppIcon className="w-4 h-4" /> {t.cards.whatsapp}
-              </Button>
-            </div>
+            <Button variant="default" size="sm" className="gap-1.5" asChild>
+              <Link href={detailHref}>
+                {t.cards.viewProperty}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 ml-0.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
