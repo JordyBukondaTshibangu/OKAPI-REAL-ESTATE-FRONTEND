@@ -9,12 +9,15 @@ import { useT } from "@/i18n/useT";
 import {
   Bell,
   ChevronDown,
+  ChevronRight,
   Heart,
+  Home,
   LogOut,
+  Menu,
   MessageSquare,
   Star,
   User,
-  UserPlus,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -312,8 +315,248 @@ function ProfileMenu() {
   );
 }
 
+/* ─── Mobile Drawer ──────────────────────────────────────────────────────── */
+
+function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const t = useT();
+  const navItems = useNavItems();
+  const pathname = usePathname();
+  const router = useRouter();
+  const mounted = useMounted();
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Close on route change
+  useEffect(() => { onClose(); }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Lock body scroll
+  useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  function handleLogout() {
+    logout();
+    onClose();
+    router.push("/");
+  }
+
+  const profileLinks = [
+    { label: t.auth.profile, href: "/profil", icon: User },
+    { label: t.auth.favorites, href: "/favoris", icon: Heart },
+    { label: t.auth.enquiries, href: "/demandes", icon: MessageSquare },
+    { label: t.auth.alerts, href: "/alertes", icon: Bell },
+    { label: t.auth.reviews, href: "/avis", icon: Star },
+  ];
+
+  if (!mounted) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-[80] bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        onClick={onClose}
+        aria-hidden
+      />
+
+      {/* Drawer panel */}
+      <div
+        className={`fixed top-0 right-0 bottom-0 z-[90] w-[85vw] max-w-sm bg-background shadow-2xl flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${open ? "translate-x-0" : "translate-x-full"}`}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0 bg-navy">
+          <Link href="/" onClick={onClose}>
+            <Image
+              src="/assets/images/company-logo.png"
+              alt="Okapi Real Estate"
+              width={100}
+              height={46}
+              className="h-12 w-auto"
+            />
+          </Link>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label="Fermer le menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto">
+
+          {/* Auth strip */}
+          {isAuthenticated && user ? (
+            <div className="flex items-center gap-3 px-5 py-4 bg-primary/5 border-b border-border">
+              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground font-semibold text-sm select-none overflow-hidden relative shrink-0">
+                {user.profileImage?.startsWith("https://") ? (
+                  <Image src={user.profileImage} alt={user.firstName} fill className="object-cover" sizes="40px" />
+                ) : (
+                  user.firstName[0].toUpperCase()
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">{user.firstName} {user.lastName}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-2 px-5 py-4 border-b border-border">
+              <Button variant="outline" size="sm" className="flex-1" asChild>
+                <Link href="/connexion" onClick={onClose}>{t.auth.login}</Link>
+              </Button>
+              <Button variant="gold" size="sm" className="flex-1 font-semibold" asChild>
+                <Link href="/inscription" onClick={onClose}>{t.auth.register}</Link>
+              </Button>
+            </div>
+          )}
+
+          {/* Quick account links (authenticated only) */}
+          {isAuthenticated && (
+            <div className="grid grid-cols-3 gap-0 border-b border-border">
+              {profileLinks.slice(0, 3).map(({ label, href, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={onClose}
+                  className={`flex flex-col items-center gap-1.5 py-4 text-center text-xs font-medium transition-colors ${pathname === href ? "text-primary bg-primary/5" : "text-muted-foreground hover:text-primary hover:bg-muted"}`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {label}
+                </Link>
+              ))}
+              {profileLinks.slice(3).map(({ label, href, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={onClose}
+                  className={`flex flex-col items-center gap-1.5 py-4 text-center text-xs font-medium transition-colors ${pathname === href ? "text-primary bg-primary/5" : "text-muted-foreground hover:text-primary hover:bg-muted"}`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {label}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Home quick link */}
+          <Link
+            href="/"
+            onClick={onClose}
+            className={`flex items-center gap-3 px-5 py-3.5 text-sm font-medium border-b border-border transition-colors ${pathname === "/" ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-muted"}`}
+          >
+            <Home className="w-4 h-4 shrink-0 text-muted-foreground" />
+            Accueil
+          </Link>
+
+          {/* Main nav accordion */}
+          {navItems.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            const isOpen = expanded === item.label;
+
+            return (
+              <div key={item.label} className="border-b border-border">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!item.columns) { router.push(item.href); onClose(); return; }
+                    setExpanded(isOpen ? null : item.label);
+                  }}
+                  className={`w-full flex items-center justify-between px-5 py-3.5 text-sm font-medium transition-colors ${isActive ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-muted"}`}
+                >
+                  <span>{item.label}</span>
+                  {item.columns ? (
+                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </button>
+
+                {item.columns && isOpen && (
+                  <div className="bg-muted/40 pb-2">
+                    {item.columns.map((col, idx) => (
+                      <div key={idx} className="px-5 pt-3">
+                        {col.title && (
+                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
+                            {col.title}
+                          </p>
+                        )}
+                        <ul className="space-y-0">
+                          {col.links.map((link) => (
+                            <li key={link.label}>
+                              <Link
+                                href={link.href}
+                                onClick={onClose}
+                                className={`flex items-center gap-2 py-2 text-sm transition-colors ${pathname === link.href ? "text-primary font-medium" : "text-foreground/70 hover:text-primary"}`}
+                              >
+                                <span className="w-1 h-1 rounded-full bg-muted-foreground/50 shrink-0" />
+                                {link.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+
+                    {/* Direct link to section */}
+                    <Link
+                      href={item.href}
+                      onClick={onClose}
+                      className="flex items-center gap-1.5 mx-5 mt-3 text-xs font-semibold text-primary hover:underline"
+                    >
+                      Voir tout <ChevronRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* List your property CTA */}
+          <div className="px-5 py-4 border-b border-border">
+            <Link
+              href="/vendre"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 w-full rounded-full bg-secondary text-secondary-foreground px-5 py-3 text-sm font-semibold hover:bg-secondary/90 transition-colors"
+            >
+              {t.nav.list}
+            </Link>
+          </div>
+
+          {/* Logout (authenticated) */}
+          {isAuthenticated && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 w-full px-5 py-4 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors border-b border-border"
+            >
+              <LogOut className="w-4 h-4" />
+              {t.auth.logout}
+            </button>
+          )}
+
+          {/* Language + theme — inside scroll area so the chat button never covers it */}
+          <div className="flex items-center justify-between px-5 py-5">
+            <span className="text-xs text-muted-foreground font-medium">Langue & thème</span>
+            <div className="flex items-center gap-1 rounded-lg border border-border bg-card px-1 py-0.5">
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
+          </div>
+
+          {/* Bottom spacer so last item isn't flush against the edge */}
+          <div className="h-6 shrink-0" />
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navItems = useNavItems();
   const pathname = usePathname();
@@ -348,7 +591,7 @@ export default function Header() {
             />
           </Link>
 
-          <nav className="hidden md:flex items-center">
+          <nav className="hidden lg:flex items-center">
             {navItems.map((item) => {
               const isMenuOpen = openMenu === item.label;
               const isCurrentPage = pathname.startsWith(item.href);
@@ -382,9 +625,22 @@ export default function Header() {
             <NavListButton navItems={navItems} setOpenMenu={setOpenMenu} />
           </nav>
 
-          <ProfileMenu />
+          <div className="flex items-center gap-2">
+            <ProfileMenu />
+            {/* Hamburger — mobile/tablet only */}
+            <button
+              onClick={() => setMobileOpen(true)}
+              aria-label="Ouvrir le menu"
+              className="lg:hidden w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors ml-1"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile drawer */}
+      <MobileDrawer open={mobileOpen} onClose={() => setMobileOpen(false)} />
 
       {/* Mega Menu Dropdown */}
       {openMenu && (
@@ -398,7 +654,7 @@ export default function Header() {
               .map((item) => (
                 <div
                   key={item.label}
-                  className="grid grid-cols-1 md:grid-cols-3 gap-10"
+                  className="grid grid-cols-1 lg:grid-cols-3 gap-10"
                 >
                   {item.columns!.map((column, idx) => (
                     <div key={idx}>

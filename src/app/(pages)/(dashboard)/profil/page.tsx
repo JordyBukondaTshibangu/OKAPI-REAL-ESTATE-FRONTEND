@@ -173,11 +173,11 @@ export default function ProfilePage() {
         <h1 className="text-2xl font-semibold ">{t.dashboard.profileTitle}</h1>
 
         {/* Avatar card */}
-        <div className="bg-card rounded-2xl shadow-sm p-8">
-          <h2 className="text-base font-semibold  mb-6">
+        <div className="bg-card rounded-2xl shadow-sm p-4 sm:p-8">
+          <h2 className="text-base font-semibold mb-4 sm:mb-6">
             {t.dashboard.photoHeading}
           </h2>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <div className="relative shrink-0">
               <div className="relative w-20 h-20 rounded-full overflow-hidden bg-primary flex items-center justify-center">
                 {imgSrc ? (
@@ -245,12 +245,12 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile info card */}
-        <div className="bg-card rounded-2xl shadow-sm p-8">
-          <h2 className="text-base font-semibold  mb-6">
+        <div className="bg-card rounded-2xl shadow-sm p-4 sm:p-8">
+          <h2 className="text-base font-semibold mb-4 sm:mb-6">
             {t.dashboard.personalInfoHeading}
           </h2>
           <form onSubmit={handleProfile(onProfileSubmit)} className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium  block mb-1.5">
                   {t.dashboard.firstName}
@@ -314,8 +314,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Password card */}
-        <div className="bg-card rounded-2xl shadow-sm p-8">
-          <h2 className="text-base font-semibold  mb-6">
+        <div className="bg-card rounded-2xl shadow-sm p-4 sm:p-8">
+          <h2 className="text-base font-semibold mb-4 sm:mb-6">
             {t.dashboard.changePasswordHeading}
           </h2>
           <form onSubmit={handlePwd(onPasswordSubmit)} className="space-y-5">
@@ -412,7 +412,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Danger zone */}
-        <div className="bg-card rounded-2xl shadow-sm p-8 border border-destructive/20">
+        <div className="bg-card rounded-2xl shadow-sm p-4 sm:p-8 border border-destructive/20">
           <h2 className="text-base font-semibold text-destructive mb-2">
             {t.dashboard.dangerZoneHeading}
           </h2>

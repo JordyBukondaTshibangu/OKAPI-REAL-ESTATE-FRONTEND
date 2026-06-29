@@ -231,7 +231,7 @@ const ln: Messages = {
   },
   cards: {
     addFavourite: "Kotia na bolingo", removeFavourite: "Kolongola na bolingo",
-    call: "Benga", whatsapp: "WhatsApp",
+    call: "Benga", whatsapp: "WhatsApp", viewProperty: "Tala ndako",
     whatsappMsg: "Mbote, nalingi ndako na yo na Okapi Real Estate: {link}\nRéf: {id}",
     nationality: "Mboka:", languages: "Minoko:", forSale: "Teka:", forRent: "Funga:",
     since: "Kobanda {year}", agent: "agent", agents: "bato ya mosala", transactions: "transactions",
