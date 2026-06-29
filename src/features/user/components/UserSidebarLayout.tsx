@@ -45,7 +45,7 @@ export default function UserSidebarLayout({
     <div className="min-h-screen bg-muted">
 
       {/* ── Tablet tab-strip (md only, hidden on mobile & desktop) ── */}
-      <div className="md:block lg:hidden border-b border-border bg-card shadow-sm">
+      <div className="hidden md:block lg:hidden border-b border-border bg-card shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
           {/* User row */}
