@@ -252,7 +252,7 @@ const fr: Messages = {
   },
   cards: {
     addFavourite: "Ajouter aux favoris", removeFavourite: "Retirer des favoris",
-    call: "Appeler", whatsapp: "WhatsApp",
+    call: "Appeler", whatsapp: "WhatsApp", viewProperty: "Voir le bien",
     whatsappMsg: "Bonjour, je suis intéressé(e) par votre bien sur Okapi Real Estate : {link}\nRéf : {id}",
     nationality: "Nationalité :", languages: "Langues :", forSale: "Vente :", forRent: "Location :",
     since: "Depuis {year}", agent: "agent", agents: "agents", transactions: "transactions",

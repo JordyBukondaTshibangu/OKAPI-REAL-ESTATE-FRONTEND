@@ -45,7 +45,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative bg-navy text-white py-32 pb-32 px-8 overflow-hidden">
+    <section className="relative bg-navy text-white py-14 md:py-20 lg:py-32 px-5 md:px-8 overflow-hidden">
       {/* Background gradient */}
       <div
         className="absolute inset-0 bg-linear-to-br from-navy via-navy to-primary/30 pointer-events-none"
@@ -62,7 +62,7 @@ export default function Hero() {
         <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-4">
           {t.hero.tagline}
         </p>
-        <h1 className="text-4xl md:text-5xl font-semibold mb-8 leading-tight">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold mb-6 md:mb-8 leading-tight">
           {t.hero.title}{" "}
           <span className="text-secondary">{t.hero.highlight}</span>
         </h1>

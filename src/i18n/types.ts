@@ -189,7 +189,7 @@ export type Messages = {
   };
   cards: {
     addFavourite: string; removeFavourite: string;
-    call: string; whatsapp: string; whatsappMsg: string;
+    call: string; whatsapp: string; whatsappMsg: string; viewProperty: string;
     nationality: string; languages: string; forSale: string; forRent: string;
     since: string; agent: string; agents: string; transactions: string;
     viewsLabel: string; savesLabel: string; sharesLabel: string; hotLabel: string;
