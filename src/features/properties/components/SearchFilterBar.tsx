@@ -306,6 +306,196 @@ function BedsDropdown({
   );
 }
 
+/* ─── DuréeDropdown ─────────────────────────────────────────────────────── */
+
+function DuréeDropdown({
+  currentDuration,
+  currentMinNightPrice,
+  currentMaxNightPrice,
+  currentMinStay,
+  currentMaxStay,
+  onApply,
+  onClear,
+  t,
+}: {
+  currentDuration: string;
+  currentMinNightPrice: string;
+  currentMaxNightPrice: string;
+  currentMinStay: string;
+  currentMaxStay: string;
+  onApply: (params: {
+    rentalDuration: string;
+    minNightPrice: string;
+    maxNightPrice: string;
+    minStay: string;
+    maxStay: string;
+  }) => void;
+  onClear: () => void;
+  t: ReturnType<typeof useT>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [localDuration, setLocalDuration] = useState(currentDuration);
+  const [localMinNight, setLocalMinNight] = useState(currentMinNightPrice);
+  const [localMaxNight, setLocalMaxNight] = useState(currentMaxNightPrice);
+  const [localMinStay, setLocalMinStay] = useState(currentMinStay);
+  const [localMaxStay, setLocalMaxStay] = useState(currentMaxStay);
+  const ref = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useOutsideClick(ref, close);
+
+  // Sync local state when URL params change
+  useEffect(() => {
+    setLocalDuration(currentDuration);
+    setLocalMinNight(currentMinNightPrice);
+    setLocalMaxNight(currentMaxNightPrice);
+    setLocalMinStay(currentMinStay);
+    setLocalMaxStay(currentMaxStay);
+  }, [currentDuration, currentMinNightPrice, currentMaxNightPrice, currentMinStay, currentMaxStay]);
+
+  const isActive = !!(currentDuration || currentMinNightPrice || currentMaxNightPrice || currentMinStay || currentMaxStay);
+  const showShortTermFields = localDuration === "short" || localDuration === "both";
+
+  const pillLabel =
+    currentDuration === "long" ? t.filters.durationLongPill :
+    currentDuration === "short" ? t.filters.durationShortPill :
+    currentDuration === "both" ? t.filters.durationBothPill :
+    t.filters.durationPlaceholder;
+
+  function handleApply() {
+    onApply({
+      rentalDuration: localDuration,
+      minNightPrice: localMinNight,
+      maxNightPrice: localMaxNight,
+      minStay: localMinStay,
+      maxStay: localMaxStay,
+    });
+    setOpen(false);
+  }
+
+  return (
+    <div ref={ref} className={`relative ${open ? "z-100" : ""}`}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${
+          isActive
+            ? "border-primary text-primary bg-accent font-medium"
+            : "border-border text-foreground/80 hover:border-primary/50 bg-white dark:bg-card"
+        }`}
+      >
+        {pillLabel}
+        {isActive ? (
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={(e) => { e.stopPropagation(); onClear(); }}
+            onKeyDown={(e) => e.key === "Enter" && (e.stopPropagation(), onClear())}
+            className="ml-0.5 hover:text-destructive"
+          >
+            <X className="w-3 h-3" />
+          </span>
+        ) : (
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute left-0 mt-1.5 w-72 bg-white dark:bg-card rounded-xl border border-border shadow-lg z-100 overflow-hidden">
+          {/* Duration type */}
+          <div className="px-4 py-3">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t.filters.durationTypeSection}</p>
+            <div className="space-y-0.5">
+              {(
+                [
+                  { value: "", label: t.filters.durationAll },
+                  { value: "long", label: t.filters.durationLongOnly },
+                  { value: "short", label: t.filters.durationShortOnly },
+                  { value: "both", label: t.filters.durationBoth },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setLocalDuration(opt.value)}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                    localDuration === opt.value
+                      ? "bg-accent text-primary font-medium"
+                      : "hover:bg-accent/50"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Short-term fields — shown only when court terme or both */}
+          {showShortTermFields && (
+            <>
+              <div className="border-t border-border px-4 py-3 space-y-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t.filters.nightPriceLabel}</p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Min"
+                    value={localMinNight}
+                    onChange={(e) => setLocalMinNight(e.target.value)}
+                    className="w-full rounded-lg border border-border px-3 py-1.5 text-sm bg-transparent focus:outline-none focus:border-primary"
+                  />
+                  <span className="text-muted-foreground text-xs shrink-0">–</span>
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Max"
+                    value={localMaxNight}
+                    onChange={(e) => setLocalMaxNight(e.target.value)}
+                    className="w-full rounded-lg border border-border px-3 py-1.5 text-sm bg-transparent focus:outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-border px-4 py-3 space-y-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t.filters.stayDurationLabel}</p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    placeholder="Min"
+                    value={localMinStay}
+                    onChange={(e) => setLocalMinStay(e.target.value)}
+                    className="w-full rounded-lg border border-border px-3 py-1.5 text-sm bg-transparent focus:outline-none focus:border-primary"
+                  />
+                  <span className="text-muted-foreground text-xs shrink-0">–</span>
+                  <input
+                    type="number"
+                    min={1}
+                    placeholder="Max"
+                    value={localMaxStay}
+                    onChange={(e) => setLocalMaxStay(e.target.value)}
+                    className="w-full rounded-lg border border-border px-3 py-1.5 text-sm bg-transparent focus:outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Apply */}
+          <div className="border-t border-border px-4 py-3">
+            <button
+              type="button"
+              onClick={handleApply}
+              className="w-full rounded-lg bg-primary text-white text-xs font-medium py-1.5 hover:bg-primary/90 transition-colors"
+            >
+              {t.filters.filterApply}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── main component ────────────────────────────────────────────────────── */
 
 export type SearchFilterBarProps = {
@@ -405,6 +595,7 @@ export default function SearchFilterBar({
   const currentMinPrice = searchParams.get("minPrice") ?? "";
   const currentMaxPrice = searchParams.get("maxPrice") ?? "";
   const currentBeds = searchParams.get("beds") ?? "";
+  const currentIsShortTerm = searchParams.get("isShortTerm") === "true"; // legacy
 
   const [localQ, setLocalQ] = useState(currentQ);
 
@@ -445,7 +636,13 @@ export default function SearchFilterBar({
     currentMinPrice ||
     currentMaxPrice ||
     currentBeds ||
-    currentQ;
+    currentQ ||
+    currentIsShortTerm ||
+    searchParams.get("rentalDuration") ||
+    searchParams.get("minNightPrice") ||
+    searchParams.get("maxNightPrice") ||
+    searchParams.get("minStay") ||
+    searchParams.get("maxStay");
 
   // Price label
   const priceLabel = (() => {
@@ -572,6 +769,42 @@ export default function SearchFilterBar({
             )
           }
         />
+
+        {/* Durée dropdown */}
+        {(mode === "rent" || mode === "commercial") && (
+          <DuréeDropdown
+            t={t}
+            currentDuration={searchParams.get("rentalDuration") ?? ""}
+            currentMinNightPrice={searchParams.get("minNightPrice") ?? ""}
+            currentMaxNightPrice={searchParams.get("maxNightPrice") ?? ""}
+            currentMinStay={searchParams.get("minStay") ?? ""}
+            currentMaxStay={searchParams.get("maxStay") ?? ""}
+            onApply={({ rentalDuration, minNightPrice, maxNightPrice, minStay, maxStay }) =>
+              router.push(
+                buildUrl({
+                  rentalDuration: rentalDuration || null,
+                  minNightPrice: minNightPrice || null,
+                  maxNightPrice: maxNightPrice || null,
+                  minStay: minStay || null,
+                  maxStay: maxStay || null,
+                  isShortTerm: null, // clear legacy param
+                }),
+              )
+            }
+            onClear={() =>
+              router.push(
+                buildUrl({
+                  rentalDuration: null,
+                  minNightPrice: null,
+                  maxNightPrice: null,
+                  minStay: null,
+                  maxStay: null,
+                  isShortTerm: null,
+                }),
+              )
+            }
+          />
+        )}
 
         {showOffPlanReady && (
           <>
