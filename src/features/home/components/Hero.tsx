@@ -118,7 +118,7 @@ export default function Hero() {
               variant="outline"
               size="sm"
               onClick={() => router.push(TAB_ROUTES[tab] ?? "/acheter")}
-              className="border-white/25 text-white/80 bg-white dark:bg-card/8 hover:bg-secondary hover:border-secondary hover:text-secondary-foreground rounded-full transition-all duration-200"
+              className="border-white/25 text-white/80 bg-white/15 hover:bg-secondary hover:border-secondary hover:text-secondary-foreground rounded-full transition-all duration-200"
             >
               {label}
               <ChevronDown className="w-3 h-3 ml-1 opacity-60" />
@@ -147,7 +147,7 @@ export default function Hero() {
           </div>
 
           {/* Live Trends card */}
-          <div className="bg-white dark:bg-card/10 backdrop-blur-sm border border-secondary/20 rounded-lg p-4 space-y-3">
+          <div className="bg-white/10 backdrop-blur-sm border border-secondary/20 rounded-lg p-4 space-y-3">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-secondary animate-pulse shrink-0" />
               <span className="text-xs font-semibold text-secondary uppercase tracking-wider">

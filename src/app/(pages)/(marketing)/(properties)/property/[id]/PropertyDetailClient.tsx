@@ -12,7 +12,7 @@ import { PerformancePanel } from "@/features/properties/components/PerformancePu
 import {
   ArrowLeft, Bath, BedDouble, Building2, Calendar,
   ChevronLeft, ChevronRight, Flag, Heart, MapPin,
-  Maximize2, Phone, Sparkles, ThumbsUp, ThumbsDown, X, Grid2x2,
+  Maximize2, Moon, Phone, Sparkles, ThumbsUp, ThumbsDown, X, Grid2x2,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
@@ -75,18 +75,18 @@ function ImageSlider({ images, initialIndex, onClose }: { images: string[]; init
     <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col">
       <div className="flex items-center justify-between px-6 py-4 shrink-0">
         <span className="text-white/70 text-sm">{current + 1} / {images.length}</span>
-        <button onClick={onClose} className="w-10 h-10 rounded-full bg-white dark:bg-card/10 hover:bg-white dark:bg-card/20 flex items-center justify-center text-white transition-colors">
+        <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors">
           <X className="w-5 h-5" />
         </button>
       </div>
       <div className="flex-1 relative flex items-center justify-center px-16 min-h-0">
-        <button onClick={prev} className="absolute left-4 w-10 h-10 rounded-full bg-white dark:bg-card/10 hover:bg-white dark:bg-card/25 flex items-center justify-center text-white transition-colors z-10">
+        <button onClick={prev} className="absolute left-4 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors z-10">
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div className="relative w-full h-full max-w-4xl max-h-[75vh]">
           <Image key={current} src={images[current]} alt={`Photo ${current + 1}`} fill className="object-contain" sizes="(max-width: 1024px) calc(100vw - 128px), 896px" priority />
         </div>
-        <button onClick={next} className="absolute right-4 w-10 h-10 rounded-full bg-white dark:bg-card/10 hover:bg-white dark:bg-card/25 flex items-center justify-center text-white transition-colors z-10">
+        <button onClick={next} className="absolute right-4 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors z-10">
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
@@ -373,6 +373,47 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                 </span>
               </p>
             </section>
+
+            {/* Short-term rental info */}
+            {detail.isShortTerm && (
+              <section className="pt-2 border-t border-border">
+                <div className="flex items-center gap-2 mb-3">
+                  <Moon className="w-4 h-4 text-primary" />
+                  <SectionHeading>Location courte durée</SectionHeading>
+                  <span className="inline-flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-semibold px-2 py-0.5 rounded-md">
+                    Short-term
+                  </span>
+                  {detail.isLongTerm && (
+                    <span className="inline-flex items-center gap-1 bg-muted text-muted-foreground text-[10px] font-semibold px-2 py-0.5 rounded-md">
+                      Long-term aussi
+                    </span>
+                  )}
+                </div>
+                <div className="rounded-xl border border-border bg-white dark:bg-card p-5 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                  {detail.pricePerNight != null && (
+                    <div className="flex flex-col gap-1">
+                      <span className="text-muted-foreground text-xs">Prix / nuit</span>
+                      <span className="font-semibold text-foreground">{detail.pricePerNight.toLocaleString("fr-FR")} {detail.currency}</span>
+                    </div>
+                  )}
+                  {detail.minStayNights != null && (
+                    <div className="flex flex-col gap-1">
+                      <span className="text-muted-foreground text-xs">Séjour minimum</span>
+                      <span className="font-semibold text-foreground">{detail.minStayNights} nuit{detail.minStayNights > 1 ? "s" : ""}</span>
+                    </div>
+                  )}
+                  {detail.maxStayNights != null && (
+                    <div className="flex flex-col gap-1">
+                      <span className="text-muted-foreground text-xs">Séjour maximum</span>
+                      <span className="font-semibold text-foreground">{detail.maxStayNights} nuit{detail.maxStayNights > 1 ? "s" : ""}</span>
+                    </div>
+                  )}
+                </div>
+                {detail.shortTermNotes && (
+                  <p className="mt-3 text-sm text-foreground/80 leading-relaxed">{detail.shortTermNotes}</p>
+                )}
+              </section>
+            )}
 
             {/* Amenities */}
             <section className="pt-2 border-t border-border">

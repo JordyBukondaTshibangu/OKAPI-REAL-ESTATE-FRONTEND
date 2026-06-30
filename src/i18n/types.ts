@@ -186,6 +186,18 @@ export type Messages = {
     salePrice1: string; salePrice2: string; salePrice3: string; salePrice4: string;
     rentPrice1: string; rentPrice2: string; rentPrice3: string; rentPrice4: string;
     commPrice1: string; commPrice2: string; commPrice3: string; commPrice4: string; commPrice5: string;
+    filterApply: string;
+    durationPlaceholder: string;
+    durationTypeSection: string;
+    durationAll: string;
+    durationLongOnly: string;
+    durationShortOnly: string;
+    durationBoth: string;
+    durationLongPill: string;
+    durationShortPill: string;
+    durationBothPill: string;
+    nightPriceLabel: string;
+    stayDurationLabel: string;
   };
   cards: {
     addFavourite: string; removeFavourite: string;

@@ -22,9 +22,15 @@ export default async function CommercialPage({
     minPrice?: string;
     maxPrice?: string;
     beds?: string;
+    isShortTerm?: string;
+    rentalDuration?: string;
+    minNightPrice?: string;
+    maxNightPrice?: string;
+    minStay?: string;
+    maxStay?: string;
   }>;
 }) {
-  const { page, q, type, minPrice, maxPrice, beds } = await searchParams;
+  const { page, q, type, minPrice, maxPrice, beds, isShortTerm, rentalDuration, minNightPrice, maxNightPrice, minStay, maxStay } = await searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10));
 
   const allCommercial = await getPropertiesByListingType("commercial");
@@ -35,9 +41,15 @@ export default async function CommercialPage({
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     beds: beds ? Number(beds) : undefined,
+    isShortTerm: isShortTerm === "true" ? true : undefined,
+    rentalDuration: (rentalDuration as PropertyFilters["rentalDuration"]) || undefined,
+    minNightPrice: minNightPrice ? Number(minNightPrice) : undefined,
+    maxNightPrice: maxNightPrice ? Number(maxNightPrice) : undefined,
+    minStay: minStay ? Number(minStay) : undefined,
+    maxStay: maxStay ? Number(maxStay) : undefined,
   };
   const filtered = filterProperties(allCommercial, filters);
-  const activeFilters = [q, type, minPrice, maxPrice, beds].filter(
+  const activeFilters = [q, type, minPrice, maxPrice, beds, isShortTerm, rentalDuration, minNightPrice, maxNightPrice, minStay, maxStay].filter(
     Boolean,
   ).length;
   const { items, totalPages } = paginateProperties(filtered, currentPage);
