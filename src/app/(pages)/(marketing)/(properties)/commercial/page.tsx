@@ -22,9 +22,10 @@ export default async function CommercialPage({
     minPrice?: string;
     maxPrice?: string;
     beds?: string;
+    isShortTerm?: string;
   }>;
 }) {
-  const { page, q, type, minPrice, maxPrice, beds } = await searchParams;
+  const { page, q, type, minPrice, maxPrice, beds, isShortTerm } = await searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10));
 
   const allCommercial = await getPropertiesByListingType("commercial");
@@ -35,9 +36,10 @@ export default async function CommercialPage({
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     beds: beds ? Number(beds) : undefined,
+    isShortTerm: isShortTerm === "true" ? true : undefined,
   };
   const filtered = filterProperties(allCommercial, filters);
-  const activeFilters = [q, type, minPrice, maxPrice, beds].filter(
+  const activeFilters = [q, type, minPrice, maxPrice, beds, isShortTerm].filter(
     Boolean,
   ).length;
   const { items, totalPages } = paginateProperties(filtered, currentPage);

@@ -405,6 +405,7 @@ export default function SearchFilterBar({
   const currentMinPrice = searchParams.get("minPrice") ?? "";
   const currentMaxPrice = searchParams.get("maxPrice") ?? "";
   const currentBeds = searchParams.get("beds") ?? "";
+  const currentIsShortTerm = searchParams.get("isShortTerm") === "true";
 
   const [localQ, setLocalQ] = useState(currentQ);
 
@@ -445,7 +446,8 @@ export default function SearchFilterBar({
     currentMinPrice ||
     currentMaxPrice ||
     currentBeds ||
-    currentQ;
+    currentQ ||
+    currentIsShortTerm;
 
   // Price label
   const priceLabel = (() => {
@@ -572,6 +574,32 @@ export default function SearchFilterBar({
             )
           }
         />
+
+        {/* Courte durée toggle */}
+        {(mode === "rent" || mode === "commercial") && (
+          <button
+            type="button"
+            onClick={() => setFilter("isShortTerm", currentIsShortTerm ? null : "true")}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${
+              currentIsShortTerm
+                ? "border-primary text-primary bg-accent font-medium"
+                : "border-border text-foreground/80 hover:border-primary/50 bg-white dark:bg-card"
+            }`}
+          >
+            Courte durée
+            {currentIsShortTerm && (
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => { e.stopPropagation(); setFilter("isShortTerm", null); }}
+                onKeyDown={(e) => e.key === "Enter" && (e.stopPropagation(), setFilter("isShortTerm", null))}
+                className="ml-0.5 hover:text-destructive"
+              >
+                <X className="w-3 h-3" />
+              </span>
+            )}
+          </button>
+        )}
 
         {showOffPlanReady && (
           <>

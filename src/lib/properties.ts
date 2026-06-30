@@ -15,6 +15,7 @@ export type PropertyFilters = {
   beds?: number;
   suburb?: string;
   city?: string;
+  isShortTerm?: boolean;
 };
 
 export async function getPropertiesByListingType(
@@ -78,6 +79,8 @@ export function filterProperties(
     if (filters.maxPrice !== undefined && item.price > filters.maxPrice)
       return false;
     if (filters.beds !== undefined && item.bedrooms !== filters.beds)
+      return false;
+    if (filters.isShortTerm && !item.isShortTerm)
       return false;
     return true;
   });
