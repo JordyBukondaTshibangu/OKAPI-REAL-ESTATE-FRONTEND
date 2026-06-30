@@ -15,7 +15,16 @@ export type PropertyFilters = {
   beds?: number;
   suburb?: string;
   city?: string;
+  /** Legacy toggle — prefer rentalDuration */
   isShortTerm?: boolean;
+  /** "short" | "long" | "both" — replaces isShortTerm */
+  rentalDuration?: "short" | "long" | "both";
+  minNightPrice?: number;
+  maxNightPrice?: number;
+  /** User wants to stay at least minStay nights — hides properties whose minStayNights > minStay */
+  minStay?: number;
+  /** User wants to stay at most maxStay nights — hides properties whose maxStayNights < maxStay */
+  maxStay?: number;
 };
 
 export async function getPropertiesByListingType(
@@ -80,8 +89,19 @@ export function filterProperties(
       return false;
     if (filters.beds !== undefined && item.bedrooms !== filters.beds)
       return false;
-    if (filters.isShortTerm && !item.isShortTerm)
-      return false;
+    // Rental duration filter (new)
+    if (filters.rentalDuration === "short" && !item.isShortTerm) return false;
+    if (filters.rentalDuration === "long" && item.isLongTerm === false) return false;
+    if (filters.rentalDuration === "both" && (!item.isShortTerm || item.isLongTerm === false)) return false;
+    // Legacy toggle
+    if (!filters.rentalDuration && filters.isShortTerm && !item.isShortTerm) return false;
+    // Price per night
+    if (filters.minNightPrice !== undefined && (item.pricePerNight == null || item.pricePerNight < filters.minNightPrice)) return false;
+    if (filters.maxNightPrice !== undefined && (item.pricePerNight == null || item.pricePerNight > filters.maxNightPrice)) return false;
+    // Stay nights: minStay = user wants to stay at least X nights; hide if property minStayNights > X
+    if (filters.minStay !== undefined && item.minStayNights != null && item.minStayNights > filters.minStay) return false;
+    // maxStay = user wants to stay at most X nights; hide if property maxStayNights < X
+    if (filters.maxStay !== undefined && item.maxStayNights != null && item.maxStayNights < filters.maxStay) return false;
     return true;
   });
 }
