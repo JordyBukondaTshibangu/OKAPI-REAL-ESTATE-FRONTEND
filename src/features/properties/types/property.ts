@@ -72,6 +72,7 @@ export type Property = {
   performance?: PropertyPerformance;
   // Rental duration type — optional so pre-migration data doesn't break.
   // Absence means long-term only (matches the schema default).
+  updatedAt?: string; // ISO date — used for freshness indicator
   isShortTerm?: boolean;
   isLongTerm?: boolean;
   // Short-term optional details

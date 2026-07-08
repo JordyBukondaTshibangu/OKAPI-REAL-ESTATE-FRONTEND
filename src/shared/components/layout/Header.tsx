@@ -4,6 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import LanguageSwitcher from "@/shared/components/ui/LanguageSwitcher";
 import ThemeToggle from "@/shared/components/ui/ThemeToggle";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useMounted } from "@/shared/hooks/useMounted";
 import { useT } from "@/i18n/useT";
 import {
@@ -140,6 +141,7 @@ function useNavItems(): NavItem[] {
           links: [
             { label: t.nav.findAgent, href: "/agents" },
             { label: t.nav.findAgency, href: "/agences" },
+            { label: t.footer.becomeAgent, href: "/devenir-agent" },
           ],
         },
       ],
@@ -193,6 +195,7 @@ function ProfileMenu() {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { agent: agentSession, isAuthenticated: isAgentAuth, logout: agentLogout } = useAgentSessionStore();
   const t = useT();
 
   const profileMenuItems = [
@@ -213,6 +216,18 @@ function ProfileMenu() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  function handleLogout() {
+    logout();
+    setOpen(false);
+    router.push("/");
+  }
+
+  function handleAgentLogout() {
+    agentLogout();
+    setOpen(false);
+    router.push("/");
+  }
+
   if (!mounted) {
     return (
       <div className="flex items-center gap-2">
@@ -225,18 +240,66 @@ function ProfileMenu() {
     );
   }
 
+  // ── Agent session pill (checked before user auth so it doesn't fall through) ─
+  if (isAgentAuth && agentSession) {
+    const initials = agentSession.name
+      .split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+    const isAgencyOwner = agentSession.agentType === "AGENCY_OWNER" && !!agentSession.agencyId;
+    const portalHref = isAgencyOwner ? "/espace-agence" : "/espace-agent";
+    const portalLabel = isAgencyOwner ? "Espace agence" : "Espace agent";
+    const portalLinkLabel = isAgencyOwner ? "Mon espace agence" : "Mon espace agent";
+    return (
+      <div className="flex items-center gap-2">
+        <UtilityCluster />
+        <div className="w-px h-5 bg-white dark:bg-card/20" />
+        <div className="relative" ref={ref}>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            style={{ boxShadow: "0 0 0 2px hsl(var(--navy)), 0 0 0 4px hsl(var(--secondary))" }}
+            className="w-9 h-9 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none"
+            aria-label="Menu agent"
+          >
+            {initials}
+          </button>
+          {open && (
+            <div className="absolute right-0 top-full mt-2 w-56 bg-card rounded-xl shadow-lg border border-border py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="px-4 py-3 border-b border-border mb-1">
+                <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-0.5">{portalLabel}</p>
+                <p className="text-sm font-semibold text-foreground">{agentSession.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{agentSession.email}</p>
+              </div>
+              <Link
+                href={portalHref}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors duration-150"
+              >
+                <User className="w-4 h-4 text-muted-foreground" />
+                {portalLinkLabel}
+              </Link>
+              <div className="border-t border-border mt-1 pt-1">
+                <button
+                  onClick={handleAgentLogout}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 w-full transition-colors duration-150"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Déconnexion
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Guest (no session at all) ────────────────────────────────────────────────
   if (!isAuthenticated || !user) {
     return (
       <div className="flex items-center gap-2">
         <UtilityCluster />
         <div className="w-px h-5 bg-white dark:bg-card/20" />
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-white/40 text-white hover:bg-white hover:text-navy dark:bg-card/10"
-          asChild
-        >
-          <Link href="/connexion" className="min-w-fit">{t.auth.login}</Link>
+        <Button variant="ghost" size="sm" asChild className="hidden xl:flex text-white/80 hover:text-white hover:bg-white/10">
+          <Link href="/connexion">{t.auth.login}</Link>
         </Button>
         <Button variant="gold" size="sm" asChild className="hidden xl:flex font-semibold">
           <Link href="/inscription">{t.auth.register}</Link>
@@ -245,12 +308,7 @@ function ProfileMenu() {
     );
   }
 
-  function handleLogout() {
-    logout();
-    setOpen(false);
-    router.push("/");
-  }
-
+  // ── Authenticated regular user ────────────────────────────────────────────────
   return (
     <div className="flex items-center gap-3">
       <UtilityCluster />
@@ -267,14 +325,14 @@ function ProfileMenu() {
             <span className="absolute inset-0 rounded-full overflow-hidden">
               <Image
                 src={user.profileImage}
-                alt={user.firstName}
+                alt={user.firstName ?? ""}
                 fill
                 className="object-cover"
                 sizes="36px"
               />
             </span>
           ) : (
-            user.firstName[0].toUpperCase()
+            (user.firstName?.[0] ?? "U").toUpperCase()
           )}
         </button>
 
@@ -324,6 +382,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
   const router = useRouter();
   const mounted = useMounted();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { agent: agentSession, isAuthenticated: isAgentAuth, logout: agentLogout } = useAgentSessionStore();
   const [expanded, setExpanded] = useState<string | null>(null);
 
   // Close on route change
@@ -338,6 +397,12 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
 
   function handleLogout() {
     logout();
+    onClose();
+    router.push("/");
+  }
+
+  function handleAgentLogout() {
+    agentLogout();
     onClose();
     router.push("/");
   }
@@ -389,7 +454,26 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
         <div className="flex-1 overflow-y-auto">
 
           {/* Auth strip */}
-          {isAuthenticated && user ? (
+          {isAgentAuth && agentSession ? (
+            <div className="flex items-center gap-3 px-5 py-4 bg-primary/5 border-b border-border">
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-sm select-none shrink-0">
+                {agentSession.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-primary uppercase tracking-wide">
+                  {agentSession.agentType === "AGENCY_OWNER" && agentSession.agencyId ? "Espace agence" : "Espace agent"}
+                </p>
+                <p className="text-sm font-semibold text-foreground truncate">{agentSession.name}</p>
+              </div>
+              <Link
+                href={agentSession.agentType === "AGENCY_OWNER" && agentSession.agencyId ? "/espace-agence" : "/espace-agent"}
+                onClick={onClose}
+                className="text-xs text-primary hover:underline shrink-0"
+              >
+                Mon espace
+              </Link>
+            </div>
+          ) : isAuthenticated && user ? (
             <div className="flex items-center gap-3 px-5 py-4 bg-primary/5 border-b border-border">
               <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground font-semibold text-sm select-none overflow-hidden relative shrink-0">
                 {user.profileImage?.startsWith("https://") ? (
@@ -527,9 +611,9 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
           </div>
 
           {/* Logout (authenticated) */}
-          {isAuthenticated && (
+          {(isAuthenticated || isAgentAuth) && (
             <button
-              onClick={handleLogout}
+              onClick={isAgentAuth ? handleAgentLogout : handleLogout}
               className="flex items-center gap-3 w-full px-5 py-4 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors border-b border-border"
             >
               <LogOut className="w-4 h-4" />

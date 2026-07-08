@@ -8,6 +8,7 @@ import { Crumb } from "./Breadcrumbs";
 import ListingHero from "./ListingHero";
 import MapOverlay from "./MapOverlay";
 import Pagination from "./Pagination";
+import AlertSubscriptionBanner from "./AlertSubscriptionBanner";
 import PropertyCard from "./PropertyCard";
 import PropertyTypeChips, { CategoryCount } from "./PropertyTypeChips";
 import TravelTimes from "./TravelTimes";
@@ -104,6 +105,7 @@ export default function PropertyListingPage({
                   <p className="text-xs text-muted-foreground">
                     {t.listing.noResultsHint}
                   </p>
+                  <AlertSubscriptionBanner mode={mode} />
                 </div>
               )}
             </div>

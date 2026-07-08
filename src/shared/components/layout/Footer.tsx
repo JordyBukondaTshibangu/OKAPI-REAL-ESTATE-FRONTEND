@@ -113,6 +113,7 @@ export default function Footer() {
   ];
   const partnerLinks = [
     { label: t.footer.joinTeam, href: "/carrieres" },
+    { label: t.footer.becomeAgent, href: "/devenir-agent" },
     { label: t.footer.agentSpace, href: "/agents" },
     { label: t.footer.agencyProducts, href: "/agences" },
   ];
@@ -293,11 +294,11 @@ export default function Footer() {
                 <a
                   key={name}
                   href="#"
-                  className="inline-flex items-center gap-2.5 bg-white dark:bg-card/8 hover:bg-white dark:bg-card/12 border border-white/20 hover:border-secondary/40 hover:shadow-[0_0_12px_hsl(var(--secondary)/0.15)] transition-all duration-200 text-white rounded-lg px-3.5 py-2.5"
+                  className="inline-flex items-center gap-2.5 bg-white dark:bg-card/8 hover:bg-white/90 dark:hover:bg-card/12 border border-border dark:border-white/20 hover:border-secondary/40 hover:shadow-[0_0_12px_hsl(var(--secondary)/0.15)] transition-all duration-200 text-foreground dark:text-white rounded-lg px-3.5 py-2.5"
                 >
                   <Icon className="w-5 h-5 shrink-0" />
                   <div className="leading-tight">
-                    <p className="text-[9px] text-white/60 uppercase tracking-wide">{top}</p>
+                    <p className="text-[9px] text-muted-foreground dark:text-white/60 uppercase tracking-wide">{top}</p>
                     <p className="text-xs font-semibold">{name}</p>
                   </div>
                 </a>

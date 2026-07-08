@@ -42,18 +42,18 @@ export default function AgencyCard({ agency }: { agency: Agency }) {
           <div className="mt-auto flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground border-t border-border pt-3">
             <span className="inline-flex items-center gap-1">
               <Users className="w-3.5 h-3.5 text-primary" />
-              {agency.agentCount}{" "}
-              {agency.agentCount > 1 ? t.cards.agents : t.cards.agent}
+              {agency.agentCount ?? 0}{" "}
+              {(agency.agentCount ?? 0) > 1 ? t.cards.agents : t.cards.agent}
             </span>
             <span className="inline-flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5 text-primary" />
-              {agency.closedDeals} {t.cards.transactions}
+              {agency.closedDeals ?? 0} {t.cards.transactions}
             </span>
             <span className="inline-flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-primary" />
-              {agency.areasServed[0]}
-              {agency.areasServed.length > 1 &&
-                ` +${agency.areasServed.length - 1}`}
+              {agency.areasServed?.[0]}
+              {(agency.areasServed?.length ?? 0) > 1 &&
+                ` +${(agency.areasServed?.length ?? 0) - 1}`}
             </span>
           </div>
         </div>

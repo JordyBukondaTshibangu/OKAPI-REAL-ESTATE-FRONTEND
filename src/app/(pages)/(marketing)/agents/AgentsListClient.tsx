@@ -123,7 +123,7 @@ export default function AgentsListClient() {
 
   const agencyLanguageOptions = useMemo(() => {
     const set = new Set<string>();
-    agencies.forEach((a) => a.languages.forEach((l) => set.add(l)));
+    agencies.forEach((a) => a.languages?.forEach((l) => set.add(l)));
     return Array.from(set).sort();
   }, [agencies]);
 

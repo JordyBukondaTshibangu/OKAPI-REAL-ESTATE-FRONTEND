@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { getR2ImageUrl } from "@/shared/utils/utils";
 
 function initials(name: string): string {
@@ -19,11 +20,12 @@ type Props = {
 };
 
 export default function AgentAvatar({ name, photo, size = 40, className = "" }: Props) {
+  const [imgError, setImgError] = useState(false);
   const base = `rounded-full overflow-hidden shrink-0 ${className}`;
   const style = { width: size, height: size, minWidth: size };
   const src = getR2ImageUrl(photo);
 
-  if (src) {
+  if (src && !imgError) {
     return (
       // Using <img> intentionally — photo URLs come from the backend and may be
       // from any hostname, so Next.js <Image> (which requires configured remotePatterns) would crash.
@@ -35,6 +37,7 @@ export default function AgentAvatar({ name, photo, size = 40, className = "" }: 
         height={size}
         className={`${base} object-cover bg-muted`}
         style={style}
+        onError={() => setImgError(true)}
       />
     );
   }

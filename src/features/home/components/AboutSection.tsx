@@ -39,8 +39,8 @@ export default function AboutSection() {
               <div className="w-9 h-9 rounded-xl bg-secondary/15 border border-secondary/25 flex items-center justify-center mb-4">
                 <Home className="w-4 h-4 text-secondary" />
               </div>
-              <p className="text-4xl font-bold text-white leading-none">{t.home.about.stat1Value}</p>
-              <p className="text-sm text-white/55 mt-1.5">{t.home.about.stat1Label}</p>
+              <p className="text-4xl font-bold text-foreground dark:text-white leading-none">{t.home.about.stat1Value}</p>
+              <p className="text-sm text-muted-foreground dark:text-white/55 mt-1.5">{t.home.about.stat1Label}</p>
 
               {/* Mini neighbourhood activity bars */}
               <div className="mt-auto pt-5 space-y-2.5">
@@ -50,8 +50,8 @@ export default function AboutSection() {
                   { name: "Limete",   w: "w-[60%]" },
                 ].map(({ name, w }) => (
                   <div key={name} className="flex items-center gap-2">
-                    <span className="text-[10px] text-white/45 w-14 shrink-0">{name}</span>
-                    <div className="flex-1 h-1 bg-white dark:bg-card/8 rounded-full overflow-hidden">
+                    <span className="text-[10px] text-muted-foreground/70 dark:text-white/45 w-14 shrink-0">{name}</span>
+                    <div className="flex-1 h-1 bg-muted dark:bg-white/8 rounded-full overflow-hidden">
                       <div className={`h-full ${w} bg-secondary/50 rounded-full`} />
                     </div>
                   </div>
@@ -63,8 +63,8 @@ export default function AboutSection() {
             <div className="bg-white dark:bg-card/5 border border-white/10 rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
               <Users className="w-5 h-5 text-secondary/80" />
               <div>
-                <p className="text-2xl font-bold text-white leading-none">{t.home.about.stat2Value}</p>
-                <p className="text-xs text-white/55 mt-1">{t.home.about.stat2Label}</p>
+                <p className="text-2xl font-bold text-foreground dark:text-white leading-none">{t.home.about.stat2Value}</p>
+                <p className="text-xs text-muted-foreground dark:text-white/55 mt-1">{t.home.about.stat2Label}</p>
               </div>
             </div>
 
@@ -73,7 +73,7 @@ export default function AboutSection() {
               <Shield className="w-5 h-5 text-secondary" />
               <div>
                 <p className="text-2xl font-bold text-secondary leading-none">{t.home.about.stat3Value}</p>
-                <p className="text-xs text-white/55 mt-1">{t.home.about.stat3Label}</p>
+                <p className="text-xs text-muted-foreground dark:text-white/55 mt-1">{t.home.about.stat3Label}</p>
               </div>
             </div>
           </div>
@@ -144,9 +144,9 @@ export default function AboutSection() {
               </div>
 
               {/* Agent count badge */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white dark:bg-card/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-2 text-sm whitespace-nowrap">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white dark:bg-card/10 backdrop-blur-sm border border-border dark:border-white/15 rounded-full px-4 py-2 text-sm whitespace-nowrap shadow-sm">
                 <MapPin className="w-4 h-4 text-secondary shrink-0" />
-                <span className="font-semibold text-white">{t.home.about.agentCount}</span>
+                <span className="font-semibold text-foreground dark:text-white">{t.home.about.agentCount}</span>
               </div>
             </div>
           </div>

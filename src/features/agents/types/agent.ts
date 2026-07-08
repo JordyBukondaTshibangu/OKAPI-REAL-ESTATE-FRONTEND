@@ -45,4 +45,7 @@ export type Agent = {
   photoGradient: string;
   areasOfExpertise: AreaOfExpertise[];
   trackRecord: TrackRecordRow[];
+  verificationTier?: "NON_VERIFIE" | "VERIFIE";
+  verifiedAt?: string; // ISO date — used for "Membre depuis"
+  createdAt?: string;
 };

@@ -30,7 +30,7 @@ export default async function AgencyDetailPage({
   if (!agency) notFound();
 
   const [agencyAgents, agencyProperties] = await Promise.all([
-    getAgentsByAgency(agency.name),
+    getAgentsByAgency(agency.id),
     getPropertiesByAgency(id),
   ]);
 

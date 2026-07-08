@@ -17,6 +17,7 @@ import HeartIcon from "@/shared/components/ui/icons/HeartIcon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import FreshnessIndicator from "./badges/FreshnessIndicator";
 import NewBadge from "./badges/NewBadge";
 import PremiumBadge from "./badges/PremiumBadge";
 import VerifiedBadge from "./badges/VerifiedBadge";
@@ -120,9 +121,12 @@ export default function PropertyCard({ property, priority }: { property: Propert
         {/* Body */}
         <div className="p-5 flex flex-col">
           <div className="flex items-start justify-between mb-2 gap-3">
-            <p className="text-xs text-muted-foreground">
-              {formatListedAgo(property.listedDaysAgo)}
-            </p>
+            <div className="flex flex-col gap-0.5">
+              <p className="text-xs text-muted-foreground">
+                {formatListedAgo(property.listedDaysAgo)}
+              </p>
+              <FreshnessIndicator updatedAt={property.updatedAt} />
+            </div>
             <div className="flex items-center gap-3">
               <CardPerformanceStrip perf={property.performance} />
               {property.premium && <PremiumBadge />}

@@ -2,14 +2,23 @@
 
 import { useT } from "@/i18n/useT";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
-import { Star } from "lucide-react";
+import { BadgeCheck, Star } from "lucide-react";
 import Link from "next/link";
 import TitleBadge from "./TitleBadge";
 
 import { Agent } from "@/features/agents/types/agent";
 
+function membreSince(dateStr?: string): string | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+}
+
 export default function AgentCard({ agent }: { agent: Agent }) {
   const t = useT();
+  const isVerified = agent.verificationTier === "VERIFIE";
+  const since = membreSince(agent.verifiedAt ?? agent.createdAt);
 
   return (
     <Link
@@ -17,26 +26,14 @@ export default function AgentCard({ agent }: { agent: Agent }) {
       className="group block bg-white dark:bg-card rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden"
     >
       <div className="grid grid-cols-[160px_1fr]">
-        {/* Photo */}
+        {/* Photo — AgentAvatar handles missing/broken photos with a gradient+initials fallback */}
         <div className="relative aspect-square bg-muted flex items-center justify-center overflow-hidden">
-          {agent?.photo ? (
-            <AgentAvatar
-              name={agent.name}
-              photo={agent.photo}
-              size={160}
-              className="rounded-none! w-full h-full"
-            />
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center text-white/40">
-              <span className="text-4xl font-bold">
-                {agent.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()}
-              </span>
-            </div>
-          )}
+          <AgentAvatar
+            name={agent.name}
+            photo={agent.photo}
+            size={160}
+            className="rounded-none! w-full h-full"
+          />
         </div>
 
         {/* Body */}
@@ -60,7 +57,22 @@ export default function AgentCard({ agent }: { agent: Agent }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 mt-3">
+          {/* Verified badge — prominent, first thing seen */}
+          {isVerified && (
+            <div className="flex items-center gap-1.5 mt-2 mb-0.5">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-[11px] font-semibold">
+                <BadgeCheck className="w-3.5 h-3.5" />
+                Agent Vérifié
+              </span>
+              {since && (
+                <span className="text-[11px] text-muted-foreground">
+                  · Membre depuis {since}
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3 mt-2">
             <TitleBadge title={agent.title} />
             <span className="inline-flex items-center gap-1 text-xs text-foreground/85">
               <Star className="w-3.5 h-3.5 fill-secondary text-secondary" />

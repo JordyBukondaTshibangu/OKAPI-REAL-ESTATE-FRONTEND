@@ -36,7 +36,7 @@ export default function AgencesPage() {
 
   const languageOptions = useMemo(() => {
     const set = new Set<string>();
-    agencies.forEach((a) => a.languages.forEach((l) => set.add(l)));
+    agencies.forEach((a) => a.languages?.forEach((l) => set.add(l)));
     return Array.from(set).sort();
   }, [agencies]);
 
@@ -81,10 +81,10 @@ export default function AgencesPage() {
         <div className="max-w-6xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
           {[
             { label: t.agenciesPage.statPartners, value: meta.total },
-            { label: t.agenciesPage.statAgents, value: agencies.reduce((s, a) => s + a.agentCount, 0) },
+            { label: t.agenciesPage.statAgents, value: agencies.reduce((s, a) => s + (a.agentCount ?? 0), 0) },
             {
               label: t.agenciesPage.statTransactions,
-              value: `${agencies.reduce((s, a) => s + a.closedDeals, 0).toLocaleString("fr-FR")}+`,
+              value: `${agencies.reduce((s, a) => s + (a.closedDeals ?? 0), 0).toLocaleString("fr-FR")}+`,
             },
           ].map((stat) => (
             <div key={stat.label}>
