@@ -5,6 +5,45 @@ import { Agency } from "@/features/agency/types/agency";
 import { MapPin, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
 
+// Literal class names so Tailwind's build-time content scan can find and
+// compile them — a class name coming only from API data (e.g. agency.accentClass)
+// would never be generated, since Tailwind can't see runtime strings.
+const ACCENT_CLASSES = [
+  "bg-rose-700",
+  "bg-purple-700",
+  "bg-emerald-700",
+  "bg-blue-700",
+  "bg-amber-600",
+  "bg-yellow-600",
+  "bg-teal-700",
+  "bg-indigo-700",
+  "bg-pink-700",
+  "bg-orange-600",
+] as const;
+
+function hashString(value: string): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash * 31 + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function getAccentClass(agencyId: string): string {
+  return ACCENT_CLASSES[hashString(agencyId) % ACCENT_CLASSES.length];
+}
+
+function getMonogram(agency: Pick<Agency, "monogram" | "name">): string {
+  if (agency.monogram) return agency.monogram;
+  return agency.name
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export default function AgencyCard({ agency }: { agency: Agency }) {
   const t = useT();
 
@@ -16,10 +55,10 @@ export default function AgencyCard({ agency }: { agency: Agency }) {
       <div className="grid grid-cols-[140px_1fr]">
         {/* Logo panel */}
         <div
-          className={`${agency?.accentClass? agency?.accentClass : 'bg-yellow-600'} flex flex-col items-center justify-center gap-2 p-6`}
+          className={`${getAccentClass(agency.id)} flex flex-col items-center justify-center gap-2 p-6`}
         >
-          <div className="w-16 h-16 rounded-xl bg-white dark:bg-card/15 flex items-center justify-center text-white text-2xl font-bold tracking-tight">
-            {agency.monogram}
+          <div className="w-16 h-16 rounded-xl bg-white/20 dark:bg-card/15 flex items-center justify-center text-white text-2xl font-bold tracking-tight">
+            {getMonogram(agency)}
           </div>
           <p className="text-white/80 text-[10px] font-semibold tracking-wider text-center leading-tight">
             {t.cards.since.replace("{year}", String(agency.founded))}

@@ -194,27 +194,28 @@ export default function AgencyDetailClient({
             </div>
           </div>
         </div>
-
-        {/* Stats strip — overlaps bottom of hero */}
-        <div className="relative max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white dark:bg-[#112240] rounded-2xl shadow-xl border border-border p-6 translate-y-1/2">
-            {stats.map(({ label, value, icon: Icon, color, bg }) => (
-              <div key={label} className="flex items-center gap-3">
-                <div className={`${bg} p-2.5 rounded-xl shrink-0`}>
-                  <Icon className={`size-5 ${color}`} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground leading-none">{value}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
-      {/* Spacer for the overlapping stats strip */}
-      <div className="h-20" />
+      {/* Stats strip — overlaps bottom of hero. Rendered as a sibling after
+          the hero section (instead of inside it) and pulled up with a
+          negative margin rather than a transform, so it isn't clipped by
+          the hero's overflow-hidden (used to contain its background blurs)
+          and doesn't need a compensating spacer below. */}
+      <div className="relative max-w-6xl mx-auto px-6 -mt-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white dark:bg-[#112240] rounded-2xl shadow-xl border border-border p-6">
+          {stats.map(({ label, value, icon: Icon, color, bg }) => (
+            <div key={label} className="flex items-center gap-3">
+              <div className={`${bg} p-2.5 rounded-xl shrink-0`}>
+                <Icon className={`size-5 ${color}`} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground leading-none">{value}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ── Body ─────────────────────────────────────────────────────── */}
       <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10">
