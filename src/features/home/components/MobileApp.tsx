@@ -160,7 +160,7 @@ export default function MobileApp() {
               <a
                 key={name}
                 href="#"
-                className="inline-flex items-center gap-2.5 bg-white dark:bg-card/8 hover:bg-white dark:bg-card/12 border border-white/20 hover:border-secondary/40 hover:shadow-[0_0_12px_hsl(var(--secondary)/0.15)] transition-all duration-200 text-white rounded-lg px-3.5 py-2.5"
+                className="inline-flex items-center gap-2.5 bg-white/8 hover:bg-white/12 border border-white/20 hover:border-secondary/40 hover:shadow-[0_0_12px_hsl(var(--secondary)/0.15)] transition-all duration-200 text-white rounded-lg px-3.5 py-2.5"
               >
                 <Icon className="w-5 h-5 shrink-0" />
                 <div className="leading-tight">
