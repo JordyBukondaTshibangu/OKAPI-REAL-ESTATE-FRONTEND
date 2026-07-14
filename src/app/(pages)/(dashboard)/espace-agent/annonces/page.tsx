@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
@@ -13,16 +13,22 @@ import {
   Loader2,
   Home,
   Zap,
+  SendHorizontal,
+  EyeOff,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
+type ListingStatus = "DRAFT" | "PENDING" | "LIVE" | "HIDDEN" | "REJECTED" | "EXPIRED";
+
 type Property = {
   id: string;
   title: string;
   subtitle?: string;
-  status: string;
+  status: ListingStatus;
   listingType?: string;
   category?: string;
   price?: number;
@@ -32,8 +38,11 @@ type Property = {
   city?: string;
   viewCount?: number;
   boostedUntil?: string | null;
+  rejectionReason?: string;
   createdAt?: string;
 };
+
+type Tab = "ALL" | "LIVE" | "PENDING" | "DRAFT" | "HIDDEN";
 
 function formatPrice(price?: number, currency?: string) {
   if (!price) return null;
@@ -47,43 +56,65 @@ export default function MesAnnoncesPage() {
   const { token, agent } = useAgentSessionStore();
   const tAll = useT();
   const t = tAll.espaceAgent;
-  const tCommon = tAll.common;
 
   const STATUS: Record<string, { label: string; color: string }> = {
-    open: {
-      label: t.statusActive,
+    LIVE: {
+      label: t.statusLive,
       color: "text-emerald-700 bg-emerald-50 border-emerald-200",
     },
-    published: {
-      label: t.statusActive,
-      color: "text-emerald-700 bg-emerald-50 border-emerald-200",
-    },
-    active: {
-      label: t.statusActive,
-      color: "text-emerald-700 bg-emerald-50 border-emerald-200",
-    },
-    draft: {
+    DRAFT: {
       label: t.statusDraft,
       color: "text-amber-700 bg-amber-50 border-amber-200",
     },
-    pending: {
+    PENDING: {
       label: t.statusPending,
       color: "text-blue-700 bg-blue-50 border-blue-200",
     },
-    closed: {
-      label: t.statusClosed,
+    HIDDEN: {
+      label: t.statusHidden,
+      color: "text-muted-foreground bg-muted border-border",
+    },
+    REJECTED: {
+      label: t.statusRejected,
+      color: "text-destructive bg-destructive/10 border-destructive/30",
+    },
+    EXPIRED: {
+      label: t.statusExpired,
       color: "text-muted-foreground bg-muted border-border",
     },
   };
+
+  const TABS: { key: Tab; label: string }[] = [
+    { key: "ALL", label: t.tabAll },
+    { key: "LIVE", label: t.tabLive },
+    { key: "PENDING", label: t.tabPending },
+    { key: "DRAFT", label: t.tabDraft },
+    { key: "HIDDEN", label: t.tabHidden },
+  ];
 
   const [hydrated, setHydrated] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [actioning, setActioning] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>("ALL");
 
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
+  useEffect(() => { setHydrated(true); }, []);
+
+  const fetchListings = useCallback(() => {
+    if (!token) return;
+    setLoading(true);
+    axios
+      .get("/api/proxy/properties/mine/list", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((r) => {
+        const data = r.data;
+        setProperties(Array.isArray(data) ? data : (data.data ?? []));
+      })
+      .catch(() => setProperties([]))
+      .finally(() => setLoading(false));
+  }, [token]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -91,22 +122,15 @@ export default function MesAnnoncesPage() {
       router.replace("/connexion-agent");
       return;
     }
-    axios
-      .get(`/api/listings/properties?agentId=${agent.id}&limit=100`)
-      .then((r) => {
-        const data = r.data;
-        setProperties(Array.isArray(data) ? data : (data.data ?? []));
-      })
-      .catch(() => setProperties([]))
-      .finally(() => setLoading(false));
-  }, [hydrated, token, agent, router]);
+    fetchListings();
+  }, [hydrated, token, agent, router, fetchListings]);
 
   async function handleDelete(id: string) {
     if (!token) return;
     if (!confirm(t.deleteConfirm)) return;
     setDeleting(id);
     try {
-      await axios.delete(`/api/proxy/properties/${id}`, {
+      await axios.delete(`/api/proxy/properties/mine/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProperties((p) => p.filter((x) => x.id !== id));
@@ -116,6 +140,47 @@ export default function MesAnnoncesPage() {
       setDeleting(null);
     }
   }
+
+  async function handlePublish(id: string) {
+    if (!token) return;
+    setActioning(id);
+    try {
+      await axios.post(
+        `/api/proxy/properties/mine/${id}/publish`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchListings();
+    } catch {
+      alert(t.errPublish);
+    } finally {
+      setActioning(null);
+    }
+  }
+
+  async function handleUnpublish(id: string) {
+    if (!token) return;
+    setActioning(id);
+    try {
+      await axios.post(
+        `/api/proxy/properties/mine/${id}/unpublish`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchListings();
+    } catch {
+      alert(t.errPublish);
+    } finally {
+      setActioning(null);
+    }
+  }
+
+  const filtered =
+    activeTab === "ALL"
+      ? properties
+      : properties.filter((p) => p.status === activeTab);
+
+  const pendingCount = properties.filter((p) => p.status === "PENDING").length;
 
   if (!hydrated || !token) return null;
 
@@ -142,6 +207,16 @@ export default function MesAnnoncesPage() {
           </Button>
         </div>
 
+        {/* Pending info banner */}
+        {pendingCount > 0 && (
+          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-start gap-2.5 text-sm text-blue-800">
+            <Clock className="w-4 h-4 mt-0.5 shrink-0" />
+            <span>
+              <strong>{pendingCount}</strong> annonce{pendingCount > 1 ? "s" : ""} en cours de vérification.
+            </span>
+          </div>
+        )}
+
         {loading ? (
           <div className="bg-card rounded-2xl shadow-sm flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -164,102 +239,268 @@ export default function MesAnnoncesPage() {
           </div>
         ) : (
           <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-4 py-4 border-b border-border flex items-center justify-between">
-              <h1 className="font-semibold text-sm">
-                {t.annoncesTitle} ({properties.length})
-              </h1>
+            {/* Status tabs */}
+            <div className="px-4 pt-4 border-b border-border">
+              <div className="flex items-center gap-1 overflow-x-auto">
+                {TABS.map(({ key, label }) => {
+                  const count =
+                    key === "ALL"
+                      ? properties.length
+                      : properties.filter((p) => p.status === key).length;
+                  const isActive = activeTab === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setActiveTab(key)}
+                      className={`flex items-center gap-1.5 whitespace-nowrap px-3 py-2 text-xs font-medium border-b-2 transition -mb-px ${
+                        isActive
+                          ? "border-primary text-primary"
+                          : "border-transparent text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {label}
+                      {count > 0 && (
+                        <span
+                          className={`text-[10px] rounded-full px-1.5 py-0.5 font-semibold ${
+                            isActive
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="divide-y divide-border">
-              {properties.map((p) => {
-                const st = STATUS[p.status] ?? {
-                  label: p.status,
-                  color: "text-muted-foreground bg-muted border-border",
-                };
-                const location = [p.suburb ?? p.neighborhood, p.city]
-                  .filter(Boolean)
-                  .join(" · ");
-                const price = formatPrice(p.price, p.currency);
-                const isBoosted =
-                  p.boostedUntil && new Date(p.boostedUntil) > new Date();
 
-                return (
-                  <div key={p.id} className="px-6 py-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <p className="text-sm font-medium truncate">
-                            {p.title}
-                          </p>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${st.color}`}
-                          >
-                            {st.label}
-                          </span>
-                          {isBoosted && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded border font-medium text-amber-700 bg-amber-50 border-amber-200 flex items-center gap-0.5">
-                              <Zap className="w-2.5 h-2.5" /> {t.statusBoosted}
+            {filtered.length === 0 ? (
+              <div className="px-6 py-10 text-center text-sm text-muted-foreground">
+                Aucune annonce dans cette catégorie.
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {filtered.map((p) => {
+                  const st = STATUS[p.status] ?? {
+                    label: p.status,
+                    color: "text-muted-foreground bg-muted border-border",
+                  };
+                  const location = [p.suburb ?? p.neighborhood, p.city]
+                    .filter(Boolean)
+                    .join(" · ");
+                  const price = formatPrice(p.price, p.currency);
+                  const isBoosted =
+                    p.boostedUntil && new Date(p.boostedUntil) > new Date();
+                  const isActioning = actioning === p.id;
+                  const isDeleting = deleting === p.id;
+
+                  return (
+                    <div key={p.id} className="px-6 py-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <p className="text-sm font-medium truncate">
+                              {p.title}
+                            </p>
+                            <span
+                              className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${st.color}`}
+                            >
+                              {st.label}
                             </span>
+                            {isBoosted && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded border font-medium text-amber-700 bg-amber-50 border-amber-200 flex items-center gap-0.5">
+                                <Zap className="w-2.5 h-2.5" /> {t.statusBoosted}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                            {location && <span>{location}</span>}
+                            {price && (
+                              <span className="font-medium text-foreground">
+                                {price}
+                              </span>
+                            )}
+                            {p.viewCount !== undefined && (
+                              <span className="flex items-center gap-1">
+                                <Eye className="w-3 h-3" /> {p.viewCount}{" "}
+                                {t.views}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Rejected reason */}
+                          {p.status === "REJECTED" && p.rejectionReason && (
+                            <div className="mt-2 flex items-start gap-1.5 text-xs text-destructive bg-destructive/5 rounded-lg px-2.5 py-1.5">
+                              <AlertCircle className="w-3 h-3 mt-0.5 shrink-0" />
+                              <span>{p.rejectionReason}</span>
+                            </div>
                           )}
-                        </div>
-                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-                          {location && <span>{location}</span>}
-                          {price && (
-                            <span className="font-medium text-foreground">
-                              {price}
-                            </span>
-                          )}
-                          {p.viewCount !== undefined && (
-                            <span className="flex items-center gap-1">
-                              <Eye className="w-3 h-3" /> {p.viewCount}{" "}
-                              {t.views}
-                            </span>
+
+                          {/* Pending note */}
+                          {p.status === "PENDING" && (
+                            <div className="mt-2 flex items-center gap-1.5 text-xs text-blue-700">
+                              <Clock className="w-3 h-3 shrink-0" />
+                              <span>{t.pendingNote}</span>
+                            </div>
                           )}
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex gap-2 mt-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-7 px-2.5"
-                        asChild
-                      >
-                        <Link href={`/espace-agent/annonces/${p.id}/modifier`}>
-                          <Pencil className="w-3 h-3 mr-1" /> {t.editBtn}
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs h-7 px-2.5"
-                        asChild
-                      >
-                        <Link href={`/annonces/${p.id}`} target="_blank">
-                          <Eye className="w-3 h-3 mr-1" />{" "}
-                          {t.viewAll.split(" ")[0]}
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs h-7 px-2.5 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDelete(p.id)}
-                        disabled={deleting === p.id}
-                      >
-                        {deleting === p.id ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
+                      {/* Context-aware action buttons */}
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {/* Edit — all statuses except PENDING */}
+                        {p.status !== "PENDING" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-7 px-2.5"
+                            asChild
+                          >
+                            <Link
+                              href={`/espace-agent/annonces/${p.id}/modifier`}
+                            >
+                              <Pencil className="w-3 h-3 mr-1" /> {t.editBtn}
+                            </Link>
+                          </Button>
+                        )}
+
+                        {/* LIVE: view publicly + unpublish */}
+                        {p.status === "LIVE" && (
                           <>
-                            <Trash2 className="w-3 h-3 mr-1" /> {tCommon.delete}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs h-7 px-2.5"
+                              asChild
+                            >
+                              <Link href={`/annonces/${p.id}`} target="_blank">
+                                <Eye className="w-3 h-3 mr-1" /> Voir
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs h-7 px-2.5 text-muted-foreground hover:text-foreground"
+                              onClick={() => handleUnpublish(p.id)}
+                              disabled={isActioning}
+                            >
+                              {isActioning ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <EyeOff className="w-3 h-3 mr-1" />{" "}
+                                  {t.unpublishBtn}
+                                </>
+                              )}
+                            </Button>
                           </>
                         )}
-                      </Button>
+
+                        {/* DRAFT or REJECTED: submit for review + delete */}
+                        {(p.status === "DRAFT" || p.status === "REJECTED") && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs h-7 px-2.5 text-primary hover:text-primary hover:bg-primary/10"
+                              onClick={() => handlePublish(p.id)}
+                              disabled={isActioning}
+                            >
+                              {isActioning ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <SendHorizontal className="w-3 h-3 mr-1" />
+                                  {p.status === "REJECTED"
+                                    ? t.republishBtn
+                                    : t.submitBtn}
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs h-7 px-2.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDelete(p.id)}
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <Trash2 className="w-3 h-3 mr-1" />{" "}
+                                  {t.deleteBtn}
+                                </>
+                              )}
+                            </Button>
+                          </>
+                        )}
+
+                        {/* HIDDEN: resubmit + delete */}
+                        {p.status === "HIDDEN" && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs h-7 px-2.5 text-primary hover:text-primary hover:bg-primary/10"
+                              onClick={() => handlePublish(p.id)}
+                              disabled={isActioning}
+                            >
+                              {isActioning ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <SendHorizontal className="w-3 h-3 mr-1" />{" "}
+                                  {t.republishBtn}
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs h-7 px-2.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDelete(p.id)}
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <Trash2 className="w-3 h-3 mr-1" />{" "}
+                                  {t.deleteBtn}
+                                </>
+                              )}
+                            </Button>
+                          </>
+                        )}
+
+                        {/* EXPIRED: resubmit */}
+                        {p.status === "EXPIRED" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-7 px-2.5 text-primary hover:text-primary hover:bg-primary/10"
+                            onClick={() => handlePublish(p.id)}
+                            disabled={isActioning}
+                          >
+                            {isActioning ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <>
+                                <SendHorizontal className="w-3 h-3 mr-1" />{" "}
+                                {t.republishBtn}
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </main>

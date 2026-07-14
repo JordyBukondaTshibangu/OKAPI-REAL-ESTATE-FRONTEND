@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   Loader2,
   Save,
-  SendHorizontal,
   Trash2,
   Upload,
   X,
@@ -22,6 +21,8 @@ import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
+
+const R2_BASE = "https://pub-d5cad4963b964b9ba2720a29b5780d2b.r2.dev/";
 
 const CATEGORIES = [
   { value: "apartment",  label: "Appartement" },
@@ -76,7 +77,25 @@ type FormState = {
   amenities: string[];
 };
 
-type StagedPhoto = { file: File; preview: string };
+// Existing photo already on R2 (URL + the underlying key for the PATCH payload)
+type ExistingPhoto = { url: string; key: string };
+// New photo staged for upload
+type NewPhoto = { file: File; preview: string };
+
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+
+function urlToKey(url: string): string {
+  return url.startsWith(R2_BASE) ? url.slice(R2_BASE.length) : url;
+}
+
+function deriveDurationType(
+  isShortTerm?: boolean,
+  isLongTerm?: boolean
+): FormState["durationType"] {
+  if (isShortTerm && isLongTerm) return "both";
+  if (isShortTerm) return "shortterm";
+  return "longterm";
+}
 
 // ─── Small components ───────────────────────────────────────────────────────────
 
@@ -88,9 +107,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Field({
-  label, required, hint, children,
-}: {
+function Field({ label, required, hint, children }: {
   label: string; required?: boolean; hint?: string; children: React.ReactNode;
 }) {
   return (
@@ -104,9 +121,7 @@ function Field({
   );
 }
 
-function TextInput({
-  value, onChange, placeholder, type = "text", disabled,
-}: {
+function TextInput({ value, onChange, placeholder, type = "text", disabled }: {
   value: string; onChange: (v: string) => void;
   placeholder?: string; type?: string; disabled?: boolean;
 }) {
@@ -122,27 +137,21 @@ function TextInput({
   );
 }
 
-function SelectInput({
-  value, onChange, children, disabled,
-}: {
-  value: string; onChange: (v: string) => void;
-  children: React.ReactNode; disabled?: boolean;
+function SelectInput({ value, onChange, children }: {
+  value: string; onChange: (v: string) => void; children: React.ReactNode;
 }) {
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition disabled:opacity-50"
+      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
     >
       {children}
     </select>
   );
 }
 
-function Toggle({
-  label, value, onChange,
-}: {
+function Toggle({ label, value, onChange }: {
   label: string; value: boolean; onChange: (v: boolean) => void;
 }) {
   return (
@@ -155,19 +164,15 @@ function Toggle({
           : "border-border bg-background hover:border-primary/40 text-foreground"
       }`}
     >
-      <span
-        className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${
-          value ? "border-primary-foreground bg-primary-foreground/20" : "border-current"
-        }`}
-      >
+      <span className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${
+        value ? "border-primary-foreground bg-primary-foreground/20" : "border-current"
+      }`}>
         {value && <CheckCircle2 className="w-3 h-3" />}
       </span>
       {label}
     </button>
   );
 }
-
-// ─── Step indicator ─────────────────────────────────────────────────────────────
 
 function StepBar({ step, total }: { step: number; total: number }) {
   const labels = ["Informations", "Localisation", "Prix", "Photos"];
@@ -180,15 +185,11 @@ function StepBar({ step, total }: { step: number; total: number }) {
         return (
           <div key={n} className="flex items-center gap-1">
             <div className="flex flex-col items-center">
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition ${
-                  done
-                    ? "bg-primary text-primary-foreground"
-                    : active
-                    ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition ${
+                done ? "bg-primary text-primary-foreground"
+                  : active ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                  : "bg-muted text-muted-foreground"
+              }`}>
                 {done ? <CheckCircle2 className="w-4 h-4" /> : n}
               </div>
               <span className={`text-[9px] mt-0.5 font-medium whitespace-nowrap ${active ? "text-primary" : "text-muted-foreground"}`}>
@@ -209,19 +210,23 @@ function StepBar({ step, total }: { step: number; total: number }) {
 
 const TOTAL_STEPS = 4;
 
-export default function NouvelleAnnoncePage() {
+export default function ModifierAnnoncePage() {
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { token, agent } = useAgentSessionStore();
   const t = useT().espaceAgent;
 
   const [hydrated, setHydrated] = useState(false);
+  const [loadingProperty, setLoadingProperty] = useState(true);
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
-  const [savingDraft, setSavingDraft] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const [photos, setPhotos] = useState<StagedPhoto[]>([]);
+  // Existing photos (already on R2)
+  const [existingPhotos, setExistingPhotos] = useState<ExistingPhoto[]>([]);
+  // New photos staged locally
+  const [newPhotos, setNewPhotos] = useState<NewPhoto[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<FormState>({
@@ -250,9 +255,49 @@ export default function NouvelleAnnoncePage() {
   });
 
   useEffect(() => { setHydrated(true); }, []);
+
+  // Fetch the property and pre-populate form
   useEffect(() => {
-    if (hydrated && !token) router.replace("/connexion-agent");
-  }, [hydrated, token, router]);
+    if (!hydrated || !token || !id) return;
+    if (!agent) { router.replace("/connexion-agent"); return; }
+
+    axios
+      .get(`/api/proxy/properties/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(({ data: p }) => {
+        setForm({
+          listingType: p.listingType === "sale" ? "sale" : "rent",
+          category: p.category ?? "apartment",
+          durationType: deriveDurationType(p.isShortTerm, p.isLongTerm),
+          title: p.title ?? "",
+          subtitle: p.subtitle ?? "",
+          description: p.description ?? "",
+          suburb: p.suburb ?? "",
+          neighborhood: p.neighborhood ?? "",
+          landmark: p.landmark ?? "",
+          bedrooms: p.bedrooms != null ? String(p.bedrooms) : "",
+          bathrooms: p.bathrooms != null ? String(p.bathrooms) : "",
+          areaSqm: p.areaSqm != null ? String(p.areaSqm) : "",
+          isFurnished: p.isFurnished ?? false,
+          availableFrom: p.availableFrom ?? "",
+          price: p.price != null ? String(p.price) : "",
+          currency: p.currency ?? "USD",
+          period: (p.period as FormState["period"]) ?? "month",
+          pricePerNight: p.pricePerNight != null ? String(p.pricePerNight) : "",
+          minStayNights: p.minStayNights != null ? String(p.minStayNights) : "2",
+          maxStayNights: p.maxStayNights != null ? String(p.maxStayNights) : "30",
+          shortTermNotes: p.shortTermNotes ?? "",
+          amenities: Array.isArray(p.amenities) ? p.amenities : [],
+        });
+
+        // Gallery comes back as full URLs — store both url and derived key
+        const gallery: string[] = Array.isArray(p.gallery) ? p.gallery : [];
+        setExistingPhotos(gallery.map((url: string) => ({ url, key: urlToKey(url) })));
+      })
+      .catch(() => setError("Impossible de charger l'annonce."))
+      .finally(() => setLoadingProperty(false));
+  }, [hydrated, token, agent, id, router]);
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -269,37 +314,34 @@ export default function NouvelleAnnoncePage() {
 
   // ── Photo handling ──────────────────────────────────────────────────────────
 
-  function addPhotos(files: FileList | null) {
+  const totalPhotos = existingPhotos.length + newPhotos.length;
+
+  function addNewPhotos(files: FileList | null) {
     if (!files) return;
     const toAdd = Array.from(files)
       .filter((f) => f.type.startsWith("image/"))
-      .slice(0, 15 - photos.length);
-    setPhotos((prev) => [
+      .slice(0, 15 - totalPhotos);
+    setNewPhotos((prev) => [
       ...prev,
       ...toAdd.map((file) => ({ file, preview: URL.createObjectURL(file) })),
     ]);
   }
 
-  function removePhoto(index: number) {
-    setPhotos((prev) => {
+  function removeExisting(index: number) {
+    setExistingPhotos((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function removeNew(index: number) {
+    setNewPhotos((prev) => {
       URL.revokeObjectURL(prev[index].preview);
       return prev.filter((_, i) => i !== index);
     });
   }
 
-  function movePhoto(from: number, to: number) {
-    if (to < 0 || to >= photos.length) return;
-    setPhotos((prev) => {
-      const next = [...prev];
-      [next[from], next[to]] = [next[to], next[from]];
-      return next;
-    });
-  }
+  async function uploadNewPhotos(): Promise<string[]> {
+    if (newPhotos.length === 0) return [];
 
-  async function uploadPhotos(): Promise<string[]> {
-    if (photos.length === 0) return [];
-
-    const files = photos.map((p) => ({
+    const files = newPhotos.map((p) => ({
       filename: p.file.name,
       contentType: p.file.type || "image/jpeg",
     }));
@@ -311,14 +353,11 @@ export default function NouvelleAnnoncePage() {
     );
 
     await Promise.all(
-      presigned.map(async (
-        { url }: { key: string; url: string },
-        i: number
-      ) => {
+      presigned.map(async ({ url }: { key: string; url: string }, i: number) => {
         await fetch(url, {
           method: "PUT",
-          body: photos[i].file,
-          headers: { "Content-Type": photos[i].file.type || "image/jpeg" },
+          body: newPhotos[i].file,
+          headers: { "Content-Type": newPhotos[i].file.type || "image/jpeg" },
         });
         setUploadProgress(Math.round(((i + 1) / presigned.length) * 100));
       })
@@ -330,15 +369,9 @@ export default function NouvelleAnnoncePage() {
   // ── Validation ──────────────────────────────────────────────────────────────
 
   function validateStep(s: number): string | null {
-    if (s === 1) {
-      if (!form.title.trim()) return t.errTitle;
-    }
-    if (s === 2) {
-      if (!form.suburb) return t.errCommune;
-    }
-    if (s === 3) {
-      if (!form.price || isNaN(Number(form.price))) return t.errPrice;
-    }
+    if (s === 1 && !form.title.trim()) return t.errTitle;
+    if (s === 2 && !form.suburb) return t.errCommune;
+    if (s === 3 && (!form.price || isNaN(Number(form.price)))) return t.errPrice;
     return null;
   }
 
@@ -349,123 +382,89 @@ export default function NouvelleAnnoncePage() {
     setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   }
 
-  // ── Build payload ───────────────────────────────────────────────────────────
+  // ── Save ────────────────────────────────────────────────────────────────────
 
-  function buildPayload(gallery: string[]) {
-    const isRent = form.listingType === "rent";
-    const hasShortTerm = form.durationType === "shortterm" || form.durationType === "both";
-    const hasLongTerm = form.durationType === "longterm" || form.durationType === "both";
-    return {
-      listingType:    form.listingType,
-      category:       form.category,
-      title:          form.title.trim(),
-      subtitle:       form.subtitle.trim() || CATEGORIES.find((c) => c.value === form.category)?.label || form.category,
-      description:    form.description.trim() || undefined,
-      price:          Number(form.price),
-      currency:       form.currency,
-      period:         isRent ? form.period : undefined,
-      bedrooms:       form.bedrooms ? Number(form.bedrooms) : 0,
-      bathrooms:      form.bathrooms ? Number(form.bathrooms) : 0,
-      areaSqm:        form.areaSqm ? Number(form.areaSqm) : 0,
-      suburb:         form.suburb,
-      neighborhood:   form.neighborhood.trim() || undefined,
-      landmark:       form.landmark.trim() || undefined,
-      city:           "Kinshasa",
-      isFurnished:    form.isFurnished,
-      availableFrom:  form.availableFrom || undefined,
-      isShortTerm:    hasShortTerm,
-      isLongTerm:     hasLongTerm,
-      pricePerNight:  hasShortTerm && form.pricePerNight ? Number(form.pricePerNight) : undefined,
-      minStayNights:  hasShortTerm && form.minStayNights ? Number(form.minStayNights) : undefined,
-      maxStayNights:  hasShortTerm && form.maxStayNights ? Number(form.maxStayNights) : undefined,
-      shortTermNotes: hasShortTerm ? form.shortTermNotes.trim() || undefined : undefined,
-      amenities:      form.amenities,
-      gallery,
-    };
-  }
-
-  // ── Submit handlers ─────────────────────────────────────────────────────────
-
-  async function handleSaveDraft() {
-    if (!token || !agent) return;
+  async function handleSave() {
+    if (!token || !agent || !id) return;
     const stepErr = validateStep(step);
     if (stepErr) { setError(stepErr); return; }
     setError(null);
-    setSavingDraft(true);
-    try {
-      const gallery = await uploadPhotos();
-      await axios.post("/api/proxy/properties/mine", buildPayload(gallery), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      router.push("/espace-agent/annonces");
-    } catch (e: any) {
-      const msg = e?.response?.data?.message;
-      setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
-    } finally {
-      setSavingDraft(false);
-      setUploadProgress(0);
-    }
-  }
+    setSaving(true);
 
-  async function handleSubmit() {
-    if (!token || !agent) return;
-    if (photos.length < 3) {
-      setError("Ajoutez au moins 3 photos avant de soumettre.");
-      return;
-    }
-    const stepErr = validateStep(3);
-    if (stepErr) { setError(stepErr); return; }
-    setError(null);
-    setSubmitting(true);
     try {
-      const gallery = await uploadPhotos();
-      const { data } = await axios.post("/api/proxy/properties/mine", buildPayload(gallery), {
+      const newKeys = await uploadNewPhotos();
+      // Final gallery = kept existing keys + newly uploaded tmp/ keys
+      const gallery = [...existingPhotos.map((p) => p.key), ...newKeys];
+
+      const isRent = form.listingType === "rent";
+      const hasShortTerm = form.durationType === "shortterm" || form.durationType === "both";
+      const hasLongTerm = form.durationType === "longterm" || form.durationType === "both";
+
+      const payload = {
+        listingType:    form.listingType,
+        category:       form.category,
+        title:          form.title.trim(),
+        subtitle:       form.subtitle.trim() || undefined,
+        description:    form.description.trim() || undefined,
+        price:          Number(form.price),
+        currency:       form.currency,
+        period:         isRent ? form.period : undefined,
+        bedrooms:       form.bedrooms ? Number(form.bedrooms) : 0,
+        bathrooms:      form.bathrooms ? Number(form.bathrooms) : 0,
+        areaSqm:        form.areaSqm ? Number(form.areaSqm) : 0,
+        suburb:         form.suburb,
+        neighborhood:   form.neighborhood.trim() || undefined,
+        landmark:       form.landmark.trim() || undefined,
+        city:           "Kinshasa",
+        isFurnished:    form.isFurnished,
+        availableFrom:  form.availableFrom || undefined,
+        isShortTerm:    hasShortTerm,
+        isLongTerm:     hasLongTerm,
+        pricePerNight:  hasShortTerm && form.pricePerNight ? Number(form.pricePerNight) : undefined,
+        minStayNights:  hasShortTerm && form.minStayNights ? Number(form.minStayNights) : undefined,
+        maxStayNights:  hasShortTerm && form.maxStayNights ? Number(form.maxStayNights) : undefined,
+        shortTermNotes: hasShortTerm ? form.shortTermNotes.trim() || undefined : undefined,
+        amenities:      form.amenities,
+        gallery,
+      };
+
+      await axios.patch(`/api/proxy/properties/mine/${id}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      await axios.post(
-        `/api/proxy/properties/mine/${data.id}/publish`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+
       router.push("/espace-agent/annonces");
     } catch (e: any) {
       const msg = e?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
     } finally {
-      setSubmitting(false);
+      setSaving(false);
       setUploadProgress(0);
     }
   }
 
   if (!hydrated || !token) return null;
 
-  const busy = savingDraft || submitting;
+  if (loadingProperty) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   // ── Step content ────────────────────────────────────────────────────────────
 
   function renderStep() {
     switch (step) {
-      // ─────────── STEP 1 — Informations de base ──────────────────────────────
       case 1:
         return (
           <div className="space-y-6">
             <section>
               <SectionLabel>Type d&apos;annonce</SectionLabel>
               <div className="grid grid-cols-2 gap-3">
-                {[
-                  { value: "rent", label: t.typeRent },
-                  { value: "sale", label: t.typeSale },
-                ].map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => set("listingType", value as "rent" | "sale")}
-                    className={`py-3 rounded-xl border text-sm font-medium transition ${
-                      form.listingType === value
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background hover:border-primary/40"
-                    }`}
-                  >
+                {[{ value: "rent", label: t.typeRent }, { value: "sale", label: t.typeSale }].map(({ value, label }) => (
+                  <button key={value} type="button" onClick={() => set("listingType", value as "rent" | "sale")}
+                    className={`py-3 rounded-xl border text-sm font-medium transition ${form.listingType === value ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary/40"}`}>
                     {label}
                   </button>
                 ))}
@@ -476,16 +475,8 @@ export default function NouvelleAnnoncePage() {
               <SectionLabel>Catégorie de bien</SectionLabel>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CATEGORIES.map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => set("category", value)}
-                    className={`py-2.5 px-3 rounded-xl border text-sm font-medium transition text-left ${
-                      form.category === value
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-background hover:border-primary/30"
-                    }`}
-                  >
+                  <button key={value} type="button" onClick={() => set("category", value)}
+                    className={`py-2.5 px-3 rounded-xl border text-sm font-medium transition text-left ${form.category === value ? "border-primary bg-primary/10 text-primary" : "border-border bg-background hover:border-primary/30"}`}>
                     {label}
                   </button>
                 ))}
@@ -496,21 +487,9 @@ export default function NouvelleAnnoncePage() {
               <section>
                 <SectionLabel>Type de location</SectionLabel>
                 <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { value: "longterm", label: "Long terme" },
-                    { value: "shortterm", label: "Courte durée" },
-                    { value: "both", label: "Les deux" },
-                  ].map(({ value, label }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => set("durationType", value as FormState["durationType"])}
-                      className={`py-2.5 rounded-xl border text-sm font-medium transition ${
-                        form.durationType === value
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background hover:border-primary/40"
-                      }`}
-                    >
+                  {[{ value: "longterm", label: "Long terme" }, { value: "shortterm", label: "Courte durée" }, { value: "both", label: "Les deux" }].map(({ value, label }) => (
+                    <button key={value} type="button" onClick={() => set("durationType", value as FormState["durationType"])}
+                      className={`py-2.5 rounded-xl border text-sm font-medium transition ${form.durationType === value ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary/40"}`}>
                       {label}
                     </button>
                   ))}
@@ -522,34 +501,21 @@ export default function NouvelleAnnoncePage() {
               <SectionLabel>Présentation</SectionLabel>
               <div className="space-y-4">
                 <Field label="Titre" required>
-                  <TextInput
-                    value={form.title}
-                    onChange={(v) => set("title", v)}
-                    placeholder="Appartement 3 chambres — Gombe"
-                  />
+                  <TextInput value={form.title} onChange={(v) => set("title", v)} placeholder="Appartement 3 chambres — Gombe" />
                 </Field>
-                <Field label="Sous-titre" hint="Optionnel — résumé en une ligne">
-                  <TextInput
-                    value={form.subtitle}
-                    onChange={(v) => set("subtitle", v)}
-                    placeholder="Résidence calme, proche école"
-                  />
+                <Field label="Sous-titre" hint="Optionnel">
+                  <TextInput value={form.subtitle} onChange={(v) => set("subtitle", v)} placeholder="Résidence calme, proche école" />
                 </Field>
                 <Field label="Description">
-                  <textarea
-                    value={form.description}
-                    onChange={(e) => set("description", e.target.value)}
-                    placeholder="Décrivez le bien, ses atouts, l'environnement…"
-                    rows={5}
-                    className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
-                  />
+                  <textarea value={form.description} onChange={(e) => set("description", e.target.value)}
+                    placeholder="Décrivez le bien, ses atouts, l'environnement…" rows={5}
+                    className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none" />
                 </Field>
               </div>
             </section>
           </div>
         );
 
-      // ─────────── STEP 2 — Localisation & détails ────────────────────────────
       case 2:
         return (
           <div className="space-y-6">
@@ -564,25 +530,14 @@ export default function NouvelleAnnoncePage() {
                 </Field>
                 <div className="grid grid-cols-2 gap-4">
                   <Field label="Quartier / Avenue">
-                    <TextInput
-                      value={form.neighborhood}
-                      onChange={(v) => set("neighborhood", v)}
-                      placeholder="Avenue Kalembe Lembe"
-                    />
+                    <TextInput value={form.neighborhood} onChange={(v) => set("neighborhood", v)} placeholder="Avenue Kalembe Lembe" />
                   </Field>
                   <Field label="Ville">
                     <TextInput value="Kinshasa" onChange={() => {}} disabled />
                   </Field>
                 </div>
-                <Field
-                  label="Point de repère"
-                  hint="Aide les visiteurs à localiser rapidement le bien"
-                >
-                  <TextInput
-                    value={form.landmark}
-                    onChange={(v) => set("landmark", v)}
-                    placeholder="Près du marché central, de l'école Saint-Pierre…"
-                  />
+                <Field label="Point de repère" hint="Aide les visiteurs à localiser rapidement le bien">
+                  <TextInput value={form.landmark} onChange={(v) => set("landmark", v)} placeholder="Près du marché central, de l'école Saint-Pierre…" />
                 </Field>
               </div>
             </section>
@@ -604,46 +559,27 @@ export default function NouvelleAnnoncePage() {
 
             <section>
               <SectionLabel>Options</SectionLabel>
-              <div className="flex flex-wrap gap-2">
-                <Toggle
-                  label="Meublé"
-                  value={form.isFurnished}
-                  onChange={(v) => set("isFurnished", v)}
-                />
-              </div>
+              <Toggle label="Meublé" value={form.isFurnished} onChange={(v) => set("isFurnished", v)} />
             </section>
 
             <section>
               <SectionLabel>Disponibilité</SectionLabel>
               <Field label="Disponible à partir du" hint="Laisser vide si disponible immédiatement">
-                <TextInput
-                  type="date"
-                  value={form.availableFrom}
-                  onChange={(v) => set("availableFrom", v)}
-                />
+                <TextInput type="date" value={form.availableFrom} onChange={(v) => set("availableFrom", v)} />
               </Field>
             </section>
           </div>
         );
 
-      // ─────────── STEP 3 — Prix ───────────────────────────────────────────────
       case 3: {
-        const showShortTerm =
-          form.listingType === "rent" &&
-          (form.durationType === "shortterm" || form.durationType === "both");
-
+        const showShortTerm = form.listingType === "rent" && (form.durationType === "shortterm" || form.durationType === "both");
         return (
           <div className="space-y-6">
             <section>
               <SectionLabel>Prix</SectionLabel>
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <TextInput
-                    type="number"
-                    value={form.price}
-                    onChange={(v) => set("price", v)}
-                    placeholder="1500"
-                  />
+                  <TextInput type="number" value={form.price} onChange={(v) => set("price", v)} placeholder="1500" />
                 </div>
                 <div className="w-28">
                   <SelectInput value={form.currency} onChange={(v) => set("currency", v)}>
@@ -668,36 +604,17 @@ export default function NouvelleAnnoncePage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-3">
                     <Field label="Prix / nuit">
-                      <TextInput
-                        type="number"
-                        value={form.pricePerNight}
-                        onChange={(v) => set("pricePerNight", v)}
-                        placeholder="80"
-                      />
+                      <TextInput type="number" value={form.pricePerNight} onChange={(v) => set("pricePerNight", v)} placeholder="80" />
                     </Field>
                     <Field label="Séjour min (nuits)">
-                      <TextInput
-                        type="number"
-                        value={form.minStayNights}
-                        onChange={(v) => set("minStayNights", v)}
-                        placeholder="2"
-                      />
+                      <TextInput type="number" value={form.minStayNights} onChange={(v) => set("minStayNights", v)} placeholder="2" />
                     </Field>
                     <Field label="Séjour max (nuits)">
-                      <TextInput
-                        type="number"
-                        value={form.maxStayNights}
-                        onChange={(v) => set("maxStayNights", v)}
-                        placeholder="30"
-                      />
+                      <TextInput type="number" value={form.maxStayNights} onChange={(v) => set("maxStayNights", v)} placeholder="30" />
                     </Field>
                   </div>
                   <Field label="Notes courte durée" hint="Optionnel">
-                    <TextInput
-                      value={form.shortTermNotes}
-                      onChange={(v) => set("shortTermNotes", v)}
-                      placeholder="Idéal pour expats, minimum 3 nuits…"
-                    />
+                    <TextInput value={form.shortTermNotes} onChange={(v) => set("shortTermNotes", v)} placeholder="Idéal pour expats, minimum 3 nuits…" />
                   </Field>
                 </div>
               </section>
@@ -706,93 +623,65 @@ export default function NouvelleAnnoncePage() {
         );
       }
 
-      // ─────────── STEP 4 — Photos & équipements ──────────────────────────────
       case 4:
         return (
           <div className="space-y-6">
             <section>
-              <SectionLabel>Photos *</SectionLabel>
+              <SectionLabel>Photos</SectionLabel>
               <p className="text-xs text-muted-foreground mb-3">
-                Minimum 3 photos pour soumettre · Maximum 15 · La première photo est la couverture
+                {totalPhotos}/15 photos · La première photo est la couverture
               </p>
 
               {/* Upload zone */}
-              <div
-                className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition"
-                onClick={() => fileInputRef.current?.click()}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  addPhotos(e.dataTransfer.files);
-                }}
-              >
-                <Upload className="w-7 h-7 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm font-medium">Glisser-déposer ou cliquer pour parcourir</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {photos.length}/15 images · JPG, PNG, WebP
-                </p>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                onChange={(e) => addPhotos(e.target.files)}
-              />
+              {totalPhotos < 15 && (
+                <div
+                  className="border-2 border-dashed border-border rounded-xl p-5 text-center cursor-pointer hover:border-primary/50 transition mb-3"
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => { e.preventDefault(); addNewPhotos(e.dataTransfer.files); }}
+                >
+                  <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-1.5" />
+                  <p className="text-sm font-medium">Ajouter des photos</p>
+                  <p className="text-xs text-muted-foreground">JPG, PNG, WebP</p>
+                </div>
+              )}
+              <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp"
+                className="hidden" onChange={(e) => addNewPhotos(e.target.files)} />
 
-              {/* Photo grid */}
-              {photos.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-3">
-                  {photos.map((p, i) => (
-                    <div key={i} className="relative group aspect-video rounded-xl overflow-hidden bg-muted">
-                      <Image
-                        src={p.preview}
-                        alt={`Photo ${i + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                      {i === 0 && (
+              {/* Photo grid — existing first, then new */}
+              {(existingPhotos.length > 0 || newPhotos.length > 0) && (
+                <div className="grid grid-cols-3 gap-2">
+                  {existingPhotos.map((p, i) => (
+                    <div key={`ex-${i}`} className="relative group aspect-video rounded-xl overflow-hidden bg-muted">
+                      <Image src={p.url} alt={`Photo ${i + 1}`} fill className="object-cover" />
+                      {i === 0 && existingPhotos.length > 0 && (
                         <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">
                           Couverture
                         </span>
                       )}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-1.5">
-                        {i > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => movePhoto(i, i - 1)}
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5"
-                          >
-                            ←
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => removePhoto(i)}
-                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1"
-                        >
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <button type="button" onClick={() => removeExisting(i)}
+                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1">
                           <Trash2 className="w-3 h-3" />
                         </button>
-                        {i < photos.length - 1 && (
-                          <button
-                            type="button"
-                            onClick={() => movePhoto(i, i + 1)}
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5"
-                          >
-                            →
-                          </button>
-                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {newPhotos.map((p, i) => (
+                    <div key={`new-${i}`} className="relative group aspect-video rounded-xl overflow-hidden bg-muted">
+                      <Image src={p.preview} alt={`Nouvelle photo ${i + 1}`} fill className="object-cover" />
+                      <span className="absolute top-1 right-1 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                        Nouveau
+                      </span>
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <button type="button" onClick={() => removeNew(i)}
+                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1">
+                          <Trash2 className="w-3 h-3" />
+                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
-              )}
-
-              {photos.length < 3 && (
-                <p className="mt-2 text-xs text-amber-600 flex items-center gap-1">
-                  ⚠️ {3 - photos.length} photo{3 - photos.length > 1 ? "s" : ""} manquante{3 - photos.length > 1 ? "s" : ""} pour soumettre
-                </p>
               )}
             </section>
 
@@ -802,16 +691,10 @@ export default function NouvelleAnnoncePage() {
                 {AMENITIES.map((a) => {
                   const selected = form.amenities.includes(a);
                   return (
-                    <button
-                      key={a}
-                      type="button"
-                      onClick={() => toggleAmenity(a)}
+                    <button key={a} type="button" onClick={() => toggleAmenity(a)}
                       className={`text-left px-3 py-2 rounded-xl border text-sm transition ${
-                        selected
-                          ? "border-primary bg-primary/10 text-primary font-medium"
-                          : "border-border bg-background hover:border-primary/30 text-foreground"
-                      }`}
-                    >
+                        selected ? "border-primary bg-primary/10 text-primary font-medium" : "border-border bg-background hover:border-primary/30 text-foreground"
+                      }`}>
                       {selected && "✓ "}{a}
                     </button>
                   );
@@ -821,8 +704,7 @@ export default function NouvelleAnnoncePage() {
           </div>
         );
 
-      default:
-        return null;
+      default: return null;
     }
   }
 
@@ -834,21 +716,17 @@ export default function NouvelleAnnoncePage() {
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <Link
-            href="/espace-agent/annonces"
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
-          >
+          <Link href="/espace-agent/annonces"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition">
             <ArrowLeft className="w-4 h-4" /> {t.back}
           </Link>
           <span className="text-muted-foreground/40">/</span>
-          <span className="text-sm font-medium">{t.newListing}</span>
+          <span className="text-sm font-medium">Modifier l&apos;annonce</span>
         </div>
 
-        {/* Step bar */}
         <StepBar step={step} total={TOTAL_STEPS} />
 
         <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
-          {/* Card header */}
           <div className="px-6 py-4 border-b border-border">
             <h1 className="text-base font-semibold">
               {["Informations de base", "Localisation & détails", "Prix", "Photos & équipements"][step - 1]}
@@ -856,7 +734,6 @@ export default function NouvelleAnnoncePage() {
             <p className="text-xs text-muted-foreground mt-0.5">Étape {step} sur {TOTAL_STEPS}</p>
           </div>
 
-          {/* Form content */}
           <div className="px-6 py-6">
             {error && (
               <div className="mb-4 bg-destructive/10 border border-destructive/30 text-destructive text-sm rounded-xl px-4 py-3 flex items-start gap-2">
@@ -865,18 +742,14 @@ export default function NouvelleAnnoncePage() {
               </div>
             )}
 
-            {/* Upload progress */}
-            {(savingDraft || submitting) && uploadProgress > 0 && uploadProgress < 100 && (
+            {saving && uploadProgress > 0 && uploadProgress < 100 && (
               <div className="mb-4">
                 <div className="flex justify-between text-xs text-muted-foreground mb-1">
                   <span>Téléchargement des photos…</span>
                   <span>{uploadProgress}%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5">
-                  <div
-                    className="bg-primary h-1.5 rounded-full transition-all"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
+                  <div className="bg-primary h-1.5 rounded-full transition-all" style={{ width: `${uploadProgress}%` }} />
                 </div>
               </div>
             )}
@@ -886,15 +759,9 @@ export default function NouvelleAnnoncePage() {
 
           {/* Footer */}
           <div className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between gap-3">
-            {/* Left: back or cancel */}
             <div>
               {step > 1 ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => { setError(null); setStep((s) => s - 1); }}
-                  disabled={busy}
-                >
+                <Button variant="ghost" size="sm" onClick={() => { setError(null); setStep((s) => s - 1); }} disabled={saving}>
                   <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Retour
                 </Button>
               ) : (
@@ -904,33 +771,26 @@ export default function NouvelleAnnoncePage() {
               )}
             </div>
 
-            {/* Right: save draft / next / submit */}
             <div className="flex items-center gap-2">
-              {/* Save draft always visible */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSaveDraft}
-                disabled={busy}
-              >
-                {savingDraft ? (
+              {/* Save on every step */}
+              <Button variant="outline" size="sm" onClick={handleSave} disabled={saving}>
+                {saving ? (
                   <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Enregistrement…</>
                 ) : (
-                  <><Save className="w-3.5 h-3.5 mr-1.5" /> {t.saveDraftBtn}</>
+                  <><Save className="w-3.5 h-3.5 mr-1.5" /> Enregistrer</>
                 )}
               </Button>
 
-              {/* Next step OR submit on last step */}
               {step < TOTAL_STEPS ? (
-                <Button size="sm" onClick={handleNext} disabled={busy}>
+                <Button size="sm" onClick={handleNext} disabled={saving}>
                   Suivant <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                 </Button>
               ) : (
-                <Button size="sm" onClick={handleSubmit} disabled={busy}>
-                  {submitting ? (
-                    <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Envoi…</>
+                <Button size="sm" onClick={handleSave} disabled={saving}>
+                  {saving ? (
+                    <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Enregistrement…</>
                   ) : (
-                    <><SendHorizontal className="w-3.5 h-3.5 mr-1.5" /> {t.submitBtn}</>
+                    "Enregistrer les modifications"
                   )}
                 </Button>
               )}
