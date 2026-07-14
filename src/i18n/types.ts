@@ -404,21 +404,37 @@ export type Messages = {
       manageHeading: string; managePara: string; question: string;
     };
     sell: {
-      tagline: string; heading: string; rentLink: string; popularBadge: string;
-      included: string; plus: string; listBtn: string;
+      // Launch banner
+      bannerBadge: string; bannerHeading: string;
+      bannerBullet1: string; bannerBullet2: string; bannerBullet3: string; bannerCta: string;
+      // Page header
+      heading: string; subheading: string;
+      // Shared feature strings
+      featWhatsApp: string; featDirectContact: string; featUnlimited: string; featAnalytics: string;
+      // Tier 1 — Gratuit
+      tier1Name: string; tier1PriceNote: string; tier1Sub: string; tier1Blurb: string;
+      tier1Feat1: string; tier1Feat2: string; tier1Feat3: string; tier1Cta: string;
+      // Tier 2 — Pro
+      tier2Name: string; tier2PriceNote: string; tier2Blurb: string;
+      tier2Badge: string; tier2Feat1: string; tier2Cta: string;
+      // Tier 3 — Agence
+      tier3Name: string; tier3PriceNote: string; tier3Blurb: string;
+      tier3Feat1: string; tier3Feat2: string; tier3Feat3: string; tier3Feat4: string; tier3Cta: string;
+      // Boost note on tier cards
+      boostNote: string;
+      // Boost section
+      boostHeading: string; boostAvailable: string; boostDesc: string; boostPayment: string;
+      boost1Label: string; boost2Label: string; boost3Label: string; boostRecommended: string;
+      // Testimonials
+      test1Quote: string; test1Author: string; test1Role: string;
+      test2Quote: string; test2Author: string; test2Role: string;
+      // Why / Stats
+      popularBadge: string;
       whyHeading: string; whyPara: string;
       stat1Value: string; stat1Label: string;
       stat2Value: string; stat2Label: string;
       stat3Value: string; stat3Label: string;
       startNow: string;
-      pkg1Name: string; pkg1Price: string; pkg1Blurb: string;
-      pkg2Name: string; pkg2Price: string; pkg2Blurb: string;
-      pkg3Name: string; pkg3Price: string; pkg3Blurb: string;
-      pkg4Name: string; pkg4Price: string; pkg4Blurb: string;
-      feat1: string; feat2: string; feat3: string; feat4: string; feat5: string;
-      feat6: string; feat7: string; feat8: string; feat9: string; feat10: string;
-      inc1: string; inc2: string; inc3: string; inc4: string;
-      plusFeat: string;
     };
   };
   dashboard: {
@@ -717,12 +733,61 @@ export type Messages = {
     photosNote: string;
     publishing: string;
     publishBtn: string;
+    saveDraftBtn: string;
+    submitBtn: string;
     errTitle: string;
     errPrice: string;
     errCommune: string;
     errPublish: string;
     back: string;
     backToListings: string;
+    // Listing lifecycle
+    statusLive: string;
+    statusHidden: string;
+    statusRejected: string;
+    statusExpired: string;
+    tabAll: string;
+    tabLive: string;
+    tabPending: string;
+    tabDraft: string;
+    tabHidden: string;
+    unpublishBtn: string;
+    republishBtn: string;
+    pendingNote: string;
+    rejectedNote: string;
+    deleteBtn: string;
+    // Nouvelle annonce — step bar
+    stepInfoLabel: string; stepLocationLabel: string; stepPriceLabel: string; stepPhotosLabel: string;
+    // Card headers per step
+    cardStep1: string; cardStep2: string; cardStep3: string; cardStep4: string;
+    stepSuffix: string;
+    // Category chips
+    sectionCategory: string;
+    catApartment: string; catVilla: string; catStudio: string; catDuplex: string; catPenthouse: string;
+    catHouse: string; catLand: string; catCommercial: string; catOffice: string; catWarehouse: string;
+    // Duration type
+    sectionDurationType: string; durationLong: string; durationShort: string; durationBoth: string;
+    // Presentation
+    subtitleHint: string;
+    // Location
+    labelLandmark: string; landmarkHint: string; landmarkPlaceholder: string;
+    // Options
+    sectionOptions: string; labelFurnished: string;
+    // Availability
+    sectionAvailability: string; labelAvailableFrom: string; availableFromHint: string;
+    // Short-term
+    sectionShortTerm: string; labelPricePerNight: string; labelMinStay: string; labelMaxStay: string;
+    labelShortTermNotes: string; shortTermNotesHint: string; shortTermNotesPlaceholder: string;
+    // Photos
+    sectionPhotosLabel: string; photosInstruction: string; photosDropzone: string;
+    coverLabel: string; errMinPhotos: string; uploadingPhotos: string;
+    // Amenities
+    sectionAmenities: string;
+    amenWater: string; amenElec: string; amenGenerator: string; amenAC: string;
+    amenGuard: string; amenParking: string; amenTerrace: string; amenKitchen: string;
+    amenInternet: string; amenPool: string; amenGarage: string; amenSecurity: string;
+    // Footer buttons
+    nextBtn: string; backBtn: string; savingBtn: string; submittingBtn: string;
   };
   espaceAgence: {
     // Dashboard

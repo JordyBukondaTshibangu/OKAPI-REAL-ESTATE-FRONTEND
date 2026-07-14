@@ -1,59 +1,83 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import axios from "axios";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  ChevronLeft,
+  Loader2,
+  Save,
+  SendHorizontal,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Constants ─────────────────────────────────────────────────────────────────
 
-const CATEGORIES = [
-  "Appartement", "Villa", "Studio", "Duplex", "Penthouse",
-  "Maison", "Terrain", "Local commercial", "Bureau", "Entrepôt",
-];
+const AMENITY_VALUES = [
+  "Eau courante","Électricité","Groupe électrogène","Climatisation",
+  "Gardiennage","Parking","Terrasse","Cuisine équipée",
+  "Internet","Piscine","Garage","Sécurité 24h/24",
+] as const;
 
 const COMMUNES = [
-  "Gombe", "Limete", "Ngaliema", "Kalamu", "Ndjili",
-  "Kintambo", "Barumbu", "Kinshasa", "Lemba", "Matete",
-  "Selembao", "Makala", "Bumbu", "Masina",
+  "Gombe","Limete","Ngaliema","Kalamu","Ndjili","Kintambo",
+  "Barumbu","Kinshasa","Lemba","Matete","Selembao","Makala","Bumbu","Masina",
 ];
 
 const CURRENCIES = ["USD", "CDF"];
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types ─────────────────────────────────────────────────────────────────────
 
 type FormState = {
-  listingType: string;
+  listingType: "rent" | "sale";
   category: string;
+  durationType: "longterm" | "shortterm" | "both";
   title: string;
   subtitle: string;
-  price: string;
-  currency: string;
-  period: string;
+  description: string;
+  suburb: string;
+  neighborhood: string;
+  landmark: string;
   bedrooms: string;
   bathrooms: string;
   areaSqm: string;
-  suburb: string;
-  neighborhood: string;
-  city: string;
-  description: string;
+  isFurnished: boolean;
+  availableFrom: string;
+  price: string;
+  currency: string;
+  period: "month" | "year" | "day";
+  pricePerNight: string;
+  minStayNights: string;
+  maxStayNights: string;
+  shortTermNotes: string;
+  amenities: string[];
 };
 
-// ─── Small components ─────────────────────────────────────────────────────────
+type StagedPhoto = { file: File; preview: string };
+
+// ─── Small components ───────────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase mb-3 pt-2">
+    <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-3">
       {children}
     </p>
   );
 }
 
-function Field({ label, required, hint, children }: {
+function Field({
+  label, required, hint, children,
+}: {
   label: string; required?: boolean; hint?: string; children: React.ReactNode;
 }) {
   return (
@@ -67,8 +91,11 @@ function Field({ label, required, hint, children }: {
   );
 }
 
-function TextInput({ value, onChange, placeholder, type = "text" }: {
-  value: string; onChange: (v: string) => void; placeholder?: string; type?: string;
+function TextInput({
+  value, onChange, placeholder, type = "text", disabled,
+}: {
+  value: string; onChange: (v: string) => void;
+  placeholder?: string; type?: string; disabled?: boolean;
 }) {
   return (
     <input
@@ -76,62 +103,163 @@ function TextInput({ value, onChange, placeholder, type = "text" }: {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+      disabled={disabled}
+      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition disabled:opacity-50"
     />
   );
 }
 
-function SelectInput({ value, onChange, children }: {
-  value: string; onChange: (v: string) => void; children: React.ReactNode;
+function SelectInput({
+  value, onChange, children, disabled,
+}: {
+  value: string; onChange: (v: string) => void;
+  children: React.ReactNode; disabled?: boolean;
 }) {
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+      disabled={disabled}
+      className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition disabled:opacity-50"
     >
       {children}
     </select>
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+function Toggle({
+  label, value, onChange,
+}: {
+  label: string; value: boolean; onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!value)}
+      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition ${
+        value
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-background hover:border-primary/40 text-foreground"
+      }`}
+    >
+      <span
+        className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${
+          value ? "border-primary-foreground bg-primary-foreground/20" : "border-current"
+        }`}
+      >
+        {value && <CheckCircle2 className="w-3 h-3" />}
+      </span>
+      {label}
+    </button>
+  );
+}
+
+// ─── Step indicator ─────────────────────────────────────────────────────────────
+
+function StepBar({
+  step, labels,
+}: {
+  step: number; labels: string[];
+}) {
+  return (
+    <div className="flex items-center gap-1 mb-6">
+      {labels.map((label, i) => {
+        const n = i + 1;
+        const done = n < step;
+        const active = n === step;
+        return (
+          <div key={n} className="flex items-center gap-1">
+            <div className="flex flex-col items-center">
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition ${
+                  done
+                    ? "bg-primary text-primary-foreground"
+                    : active
+                    ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {done ? <CheckCircle2 className="w-4 h-4" /> : n}
+              </div>
+              <span className={`text-[9px] mt-0.5 font-medium whitespace-nowrap ${active ? "text-primary" : "text-muted-foreground"}`}>
+                {label}
+              </span>
+            </div>
+            {i < labels.length - 1 && (
+              <div className={`h-0.5 w-8 mb-3 transition ${done ? "bg-primary" : "bg-muted"}`} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Page ───────────────────────────────────────────────────────────────────────
+
+const TOTAL_STEPS = 4;
 
 export default function NouvelleAnnoncePage() {
   const router = useRouter();
   const { token, agent } = useAgentSessionStore();
   const t = useT().espaceAgent;
 
-  const LISTING_TYPES = [
-    { value: "sale", label: t.typeSale },
-    { value: "rent", label: t.typeRent },
+  // Build translated category and amenity lists inside the component
+  const CATEGORIES = [
+    { value: "apartment",  label: t.catApartment },
+    { value: "villa",      label: t.catVilla },
+    { value: "studio",     label: t.catStudio },
+    { value: "duplex",     label: t.catDuplex },
+    { value: "penthouse",  label: t.catPenthouse },
+    { value: "house",      label: t.catHouse },
+    { value: "land",       label: t.catLand },
+    { value: "commercial", label: t.catCommercial },
+    { value: "office",     label: t.catOffice },
+    { value: "warehouse",  label: t.catWarehouse },
   ];
 
-  const PERIODS = [
-    { value: "month", label: t.periodMonth },
-    { value: "year",  label: t.periodYear },
-    { value: "day",   label: t.periodDay },
+  const AMENITY_LABELS = [
+    t.amenWater, t.amenElec, t.amenGenerator, t.amenAC,
+    t.amenGuard, t.amenParking, t.amenTerrace, t.amenKitchen,
+    t.amenInternet, t.amenPool, t.amenGarage, t.amenSecurity,
   ];
+
+  const STEP_LABELS = [t.stepInfoLabel, t.stepLocationLabel, t.stepPriceLabel, t.stepPhotosLabel];
+  const CARD_HEADERS = [t.cardStep1, t.cardStep2, t.cardStep3, t.cardStep4];
 
   const [hydrated, setHydrated] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const [photos, setPhotos] = useState<StagedPhoto[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<FormState>({
     listingType: "rent",
-    category: "Appartement",
+    category: "apartment",
+    durationType: "longterm",
     title: "",
     subtitle: "",
-    price: "",
-    currency: "USD",
-    period: "month",
+    description: "",
+    suburb: "",
+    neighborhood: "",
+    landmark: "",
     bedrooms: "",
     bathrooms: "",
     areaSqm: "",
-    suburb: "",
-    neighborhood: "",
-    city: "Kinshasa",
-    description: "",
+    isFurnished: false,
+    availableFrom: "",
+    price: "",
+    currency: "USD",
+    period: "month",
+    pricePerNight: "",
+    minStayNights: "2",
+    maxStayNights: "30",
+    shortTermNotes: "",
+    amenities: [],
   });
 
   useEffect(() => { setHydrated(true); }, []);
@@ -139,86 +267,203 @@ export default function NouvelleAnnoncePage() {
     if (hydrated && !token) router.replace("/connexion-agent");
   }, [hydrated, token, router]);
 
-  function set<K extends keyof FormState>(key: K, value: string) {
+  function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  async function handleSubmit() {
-    if (!token || !agent) return;
+  function toggleAmenity(a: string) {
+    setForm((f) => ({
+      ...f,
+      amenities: f.amenities.includes(a)
+        ? f.amenities.filter((x) => x !== a)
+        : [...f.amenities, a],
+    }));
+  }
+
+  // ── Photo handling ──────────────────────────────────────────────────────────
+
+  function addPhotos(files: FileList | null) {
+    if (!files) return;
+    const toAdd = Array.from(files)
+      .filter((f) => f.type.startsWith("image/"))
+      .slice(0, 15 - photos.length);
+    setPhotos((prev) => [
+      ...prev,
+      ...toAdd.map((file) => ({ file, preview: URL.createObjectURL(file) })),
+    ]);
+  }
+
+  function removePhoto(index: number) {
+    setPhotos((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
+  function movePhoto(from: number, to: number) {
+    if (to < 0 || to >= photos.length) return;
+    setPhotos((prev) => {
+      const next = [...prev];
+      [next[from], next[to]] = [next[to], next[from]];
+      return next;
+    });
+  }
+
+  async function uploadPhotos(): Promise<string[]> {
+    if (photos.length === 0) return [];
+
+    const files = photos.map((p) => ({
+      filename: p.file.name,
+      contentType: p.file.type || "image/jpeg",
+    }));
+
+    const { data: presigned } = await axios.post(
+      "/api/proxy/uploads/presign-property",
+      { files },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    await Promise.all(
+      presigned.map(async (
+        { url }: { key: string; url: string },
+        i: number
+      ) => {
+        await fetch(url, {
+          method: "PUT",
+          body: photos[i].file,
+          headers: { "Content-Type": photos[i].file.type || "image/jpeg" },
+        });
+        setUploadProgress(Math.round(((i + 1) / presigned.length) * 100));
+      })
+    );
+
+    return presigned.map(({ key }: { key: string }) => key);
+  }
+
+  // ── Validation ──────────────────────────────────────────────────────────────
+
+  function validateStep(s: number): string | null {
+    if (s === 1 && !form.title.trim()) return t.errTitle;
+    if (s === 2 && !form.suburb) return t.errCommune;
+    if (s === 3 && (!form.price || isNaN(Number(form.price)))) return t.errPrice;
+    return null;
+  }
+
+  function handleNext() {
+    const err = validateStep(step);
+    if (err) { setError(err); return; }
     setError(null);
+    setStep((s) => Math.min(s + 1, TOTAL_STEPS));
+  }
 
-    if (!form.title.trim()) { setError(t.errTitle); return; }
-    if (!form.price || isNaN(Number(form.price))) { setError(t.errPrice); return; }
-    if (!form.suburb.trim()) { setError(t.errCommune); return; }
+  // ── Build payload ───────────────────────────────────────────────────────────
 
-    setSaving(true);
+  function buildPayload(gallery: string[]) {
+    const isRent = form.listingType === "rent";
+    const hasShortTerm = form.durationType === "shortterm" || form.durationType === "both";
+    const hasLongTerm = form.durationType === "longterm" || form.durationType === "both";
+    return {
+      listingType:    form.listingType,
+      category:       form.category,
+      title:          form.title.trim(),
+      subtitle:       form.subtitle.trim() || CATEGORIES.find((c) => c.value === form.category)?.label || form.category,
+      description:    form.description.trim() || undefined,
+      price:          Number(form.price),
+      currency:       form.currency,
+      period:         isRent ? form.period : undefined,
+      bedrooms:       form.bedrooms ? Number(form.bedrooms) : 0,
+      bathrooms:      form.bathrooms ? Number(form.bathrooms) : 0,
+      areaSqm:        form.areaSqm ? Number(form.areaSqm) : 0,
+      suburb:         form.suburb,
+      neighborhood:   form.neighborhood.trim() || undefined,
+      landmark:       form.landmark.trim() || undefined,
+      city:           "Kinshasa",
+      isFurnished:    form.isFurnished,
+      availableFrom:  form.availableFrom || undefined,
+      isShortTerm:    hasShortTerm,
+      isLongTerm:     hasLongTerm,
+      pricePerNight:  hasShortTerm && form.pricePerNight ? Number(form.pricePerNight) : undefined,
+      minStayNights:  hasShortTerm && form.minStayNights ? Number(form.minStayNights) : undefined,
+      maxStayNights:  hasShortTerm && form.maxStayNights ? Number(form.maxStayNights) : undefined,
+      shortTermNotes: hasShortTerm ? form.shortTermNotes.trim() || undefined : undefined,
+      amenities:      form.amenities,
+      gallery,
+    };
+  }
+
+  // ── Submit handlers ─────────────────────────────────────────────────────────
+
+  async function handleSaveDraft() {
+    if (!token || !agent) return;
+    const stepErr = validateStep(step);
+    if (stepErr) { setError(stepErr); return; }
+    setError(null);
+    setSavingDraft(true);
     try {
-      const payload = {
-        listingType:  form.listingType,
-        category:     form.category,
-        title:        form.title.trim(),
-        subtitle:     form.subtitle.trim() || form.category,
-        price:        Number(form.price),
-        currency:     form.currency,
-        period:       form.listingType === "rent" ? form.period : undefined,
-        bedrooms:     form.bedrooms ? Number(form.bedrooms) : undefined,
-        bathrooms:    form.bathrooms ? Number(form.bathrooms) : undefined,
-        areaSqm:      form.areaSqm ? Number(form.areaSqm) : undefined,
-        suburb:       form.suburb.trim(),
-        neighborhood: form.neighborhood.trim() || undefined,
-        city:         form.city,
-        description:  form.description.trim() || undefined,
-        amenities:    [],
-        gallery:      [],
-      };
-
-      await axios.post("/api/proxy/properties/mine", payload, {
+      const gallery = await uploadPhotos();
+      await axios.post("/api/proxy/properties/mine", buildPayload(gallery), {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       router.push("/espace-agent/annonces");
     } catch (e: any) {
       const msg = e?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
     } finally {
-      setSaving(false);
+      setSavingDraft(false);
+      setUploadProgress(0);
+    }
+  }
+
+  async function handleSubmit() {
+    if (!token || !agent) return;
+    if (photos.length < 3) {
+      setError(t.errMinPhotos);
+      return;
+    }
+    const stepErr = validateStep(3);
+    if (stepErr) { setError(stepErr); return; }
+    setError(null);
+    setSubmitting(true);
+    try {
+      const gallery = await uploadPhotos();
+      const { data } = await axios.post("/api/proxy/properties/mine", buildPayload(gallery), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      await axios.post(
+        `/api/proxy/properties/mine/${data.id}/publish`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      router.push("/espace-agent/annonces");
+    } catch (e: any) {
+      const msg = e?.response?.data?.message;
+      setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
+    } finally {
+      setSubmitting(false);
+      setUploadProgress(0);
     }
   }
 
   if (!hydrated || !token) return null;
 
-  return (
-    <div className="min-h-screen bg-muted">
-      <main className="max-w-2xl mx-auto px-4 py-8">
+  const busy = savingDraft || submitting;
+  const missingPhotos = Math.max(0, 3 - photos.length);
 
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <Link href="/espace-agent/annonces" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition">
-            <ArrowLeft className="w-4 h-4" /> {t.back}
-          </Link>
-          <span className="text-muted-foreground/40">/</span>
-          <span className="text-sm font-medium">{t.newListing}</span>
-        </div>
+  // ── Step content ────────────────────────────────────────────────────────────
 
-        <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-6 py-5 border-b border-border">
-            <h1 className="text-lg font-semibold">{t.nouvelleTitle}</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">{t.nouvelleSubtitle}</p>
-          </div>
-
-          <div className="px-6 py-6 space-y-6">
-
-            {error && (
-              <div className="bg-destructive/10 border border-destructive/30 text-destructive text-sm rounded-xl px-4 py-3">
-                {error}
-              </div>
-            )}
-
-            {/* ── Type & Catégorie ── */}
+  function renderStep() {
+    switch (step) {
+      // ─────────── STEP 1 ─────────────────────────────────────────────────────
+      case 1:
+        return (
+          <div className="space-y-6">
             <section>
               <SectionLabel>{t.sectionType}</SectionLabel>
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                {LISTING_TYPES.map(({ value, label }) => (
+              <div className="grid grid-cols-2 gap-3">
+                {([
+                  { value: "rent", label: t.typeRent },
+                  { value: "sale", label: t.typeSale },
+                ] as const).map(({ value, label }) => (
                   <button
                     key={value}
                     type="button"
@@ -233,22 +478,70 @@ export default function NouvelleAnnoncePage() {
                   </button>
                 ))}
               </div>
-              <Field label={t.labelCommune} required>
-                <SelectInput value={form.category} onChange={(v) => set("category", v)}>
-                  {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                </SelectInput>
-              </Field>
             </section>
 
-            {/* ── Titre & Description ── */}
+            <section>
+              <SectionLabel>{t.sectionCategory}</SectionLabel>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {CATEGORIES.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => set("category", value)}
+                    className={`py-2.5 px-3 rounded-xl border text-sm font-medium transition text-left ${
+                      form.category === value
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background hover:border-primary/30"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {form.listingType === "rent" && (
+              <section>
+                <SectionLabel>{t.sectionDurationType}</SectionLabel>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { value: "longterm",  label: t.durationLong },
+                    { value: "shortterm", label: t.durationShort },
+                    { value: "both",      label: t.durationBoth },
+                  ] as const).map(({ value, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => set("durationType", value)}
+                      className={`py-2.5 rounded-xl border text-sm font-medium transition ${
+                        form.durationType === value
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background hover:border-primary/40"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
             <section>
               <SectionLabel>{t.sectionPresentation}</SectionLabel>
               <div className="space-y-4">
                 <Field label={t.labelTitle} required>
-                  <TextInput value={form.title} onChange={(v) => set("title", v)} placeholder={t.titlePlaceholder} />
+                  <TextInput
+                    value={form.title}
+                    onChange={(v) => set("title", v)}
+                    placeholder={t.titlePlaceholder}
+                  />
                 </Field>
-                <Field label={t.labelSubtitle}>
-                  <TextInput value={form.subtitle} onChange={(v) => set("subtitle", v)} placeholder={t.subtitlePlaceholder} />
+                <Field label={t.labelSubtitle} hint={t.subtitleHint}>
+                  <TextInput
+                    value={form.subtitle}
+                    onChange={(v) => set("subtitle", v)}
+                    placeholder={t.subtitlePlaceholder}
+                  />
                 </Field>
                 <Field label={t.labelDescription}>
                   <textarea
@@ -261,30 +554,44 @@ export default function NouvelleAnnoncePage() {
                 </Field>
               </div>
             </section>
+          </div>
+        );
 
-            {/* ── Prix ── */}
+      // ─────────── STEP 2 ─────────────────────────────────────────────────────
+      case 2:
+        return (
+          <div className="space-y-6">
             <section>
-              <SectionLabel>{t.sectionPrice}</SectionLabel>
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <TextInput type="number" value={form.price} onChange={(v) => set("price", v)} placeholder="1500" />
-                </div>
-                <div className="w-28">
-                  <SelectInput value={form.currency} onChange={(v) => set("currency", v)}>
-                    {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              <SectionLabel>{t.sectionLocation}</SectionLabel>
+              <div className="space-y-4">
+                <Field label={t.labelCommune} required>
+                  <SelectInput value={form.suburb} onChange={(v) => set("suburb", v)}>
+                    <option value="">{t.communePlaceholder}</option>
+                    {COMMUNES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </SelectInput>
+                </Field>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label={t.labelNeighborhood}>
+                    <TextInput
+                      value={form.neighborhood}
+                      onChange={(v) => set("neighborhood", v)}
+                      placeholder={t.neighborhoodPlaceholder}
+                    />
+                  </Field>
+                  <Field label={t.labelCity}>
+                    <TextInput value="Kinshasa" onChange={() => {}} disabled />
+                  </Field>
                 </div>
-                {form.listingType === "rent" && (
-                  <div className="w-32">
-                    <SelectInput value={form.period} onChange={(v) => set("period", v)}>
-                      {PERIODS.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
-                    </SelectInput>
-                  </div>
-                )}
+                <Field label={t.labelLandmark} hint={t.landmarkHint}>
+                  <TextInput
+                    value={form.landmark}
+                    onChange={(v) => set("landmark", v)}
+                    placeholder={t.landmarkPlaceholder}
+                  />
+                </Field>
               </div>
             </section>
 
-            {/* ── Caractéristiques ── */}
             <section>
               <SectionLabel>{t.sectionFeatures}</SectionLabel>
               <div className="grid grid-cols-3 gap-3">
@@ -300,43 +607,306 @@ export default function NouvelleAnnoncePage() {
               </div>
             </section>
 
-            {/* ── Localisation ── */}
             <section>
-              <SectionLabel>{t.sectionLocation}</SectionLabel>
-              <div className="space-y-4">
-                <Field label={t.labelCommune} required>
-                  <SelectInput value={form.suburb} onChange={(v) => set("suburb", v)}>
-                    <option value="">{t.communePlaceholder}</option>
-                    {COMMUNES.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </SelectInput>
-                </Field>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label={t.labelNeighborhood}>
-                    <TextInput value={form.neighborhood} onChange={(v) => set("neighborhood", v)} placeholder={t.neighborhoodPlaceholder} />
-                  </Field>
-                  <Field label={t.labelCity} required>
-                    <TextInput value={form.city} onChange={(v) => set("city", v)} placeholder="Kinshasa" />
-                  </Field>
-                </div>
+              <SectionLabel>{t.sectionOptions}</SectionLabel>
+              <div className="flex flex-wrap gap-2">
+                <Toggle
+                  label={t.labelFurnished}
+                  value={form.isFurnished}
+                  onChange={(v) => set("isFurnished", v)}
+                />
               </div>
             </section>
 
+            <section>
+              <SectionLabel>{t.sectionAvailability}</SectionLabel>
+              <Field label={t.labelAvailableFrom} hint={t.availableFromHint}>
+                <TextInput
+                  type="date"
+                  value={form.availableFrom}
+                  onChange={(v) => set("availableFrom", v)}
+                />
+              </Field>
+            </section>
+          </div>
+        );
+
+      // ─────────── STEP 3 ─────────────────────────────────────────────────────
+      case 3: {
+        const showShortTerm =
+          form.listingType === "rent" &&
+          (form.durationType === "shortterm" || form.durationType === "both");
+
+        return (
+          <div className="space-y-6">
+            <section>
+              <SectionLabel>{t.sectionPrice}</SectionLabel>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <TextInput
+                    type="number"
+                    value={form.price}
+                    onChange={(v) => set("price", v)}
+                    placeholder="1500"
+                  />
+                </div>
+                <div className="w-28">
+                  <SelectInput value={form.currency} onChange={(v) => set("currency", v)}>
+                    {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </SelectInput>
+                </div>
+                {form.listingType === "rent" && (
+                  <div className="w-32">
+                    <SelectInput value={form.period} onChange={(v) => set("period", v as FormState["period"])}>
+                      <option value="month">{t.periodMonth}</option>
+                      <option value="year">{t.periodYear}</option>
+                      <option value="day">{t.periodDay}</option>
+                    </SelectInput>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {showShortTerm && (
+              <section>
+                <SectionLabel>{t.sectionShortTerm}</SectionLabel>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    <Field label={t.labelPricePerNight}>
+                      <TextInput
+                        type="number"
+                        value={form.pricePerNight}
+                        onChange={(v) => set("pricePerNight", v)}
+                        placeholder="80"
+                      />
+                    </Field>
+                    <Field label={t.labelMinStay}>
+                      <TextInput
+                        type="number"
+                        value={form.minStayNights}
+                        onChange={(v) => set("minStayNights", v)}
+                        placeholder="2"
+                      />
+                    </Field>
+                    <Field label={t.labelMaxStay}>
+                      <TextInput
+                        type="number"
+                        value={form.maxStayNights}
+                        onChange={(v) => set("maxStayNights", v)}
+                        placeholder="30"
+                      />
+                    </Field>
+                  </div>
+                  <Field label={t.labelShortTermNotes} hint={t.shortTermNotesHint}>
+                    <TextInput
+                      value={form.shortTermNotes}
+                      onChange={(v) => set("shortTermNotes", v)}
+                      placeholder={t.shortTermNotesPlaceholder}
+                    />
+                  </Field>
+                </div>
+              </section>
+            )}
+          </div>
+        );
+      }
+
+      // ─────────── STEP 4 ─────────────────────────────────────────────────────
+      case 4:
+        return (
+          <div className="space-y-6">
+            <section>
+              <SectionLabel>{t.sectionPhotosLabel} *</SectionLabel>
+              <p className="text-xs text-muted-foreground mb-3">{t.photosInstruction}</p>
+
+              <div
+                className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition"
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  addPhotos(e.dataTransfer.files);
+                }}
+              >
+                <Upload className="w-7 h-7 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm font-medium">{t.photosDropzone}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {photos.length}/15 · JPG, PNG, WebP
+                </p>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) => addPhotos(e.target.files)}
+              />
+
+              {photos.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-3">
+                  {photos.map((p, i) => (
+                    <div key={i} className="relative group aspect-video rounded-xl overflow-hidden bg-muted">
+                      <Image src={p.preview} alt={`Photo ${i + 1}`} fill className="object-cover" />
+                      {i === 0 && (
+                        <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">
+                          {t.coverLabel}
+                        </span>
+                      )}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-1.5">
+                        {i > 0 && (
+                          <button type="button" onClick={() => movePhoto(i, i - 1)}
+                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5">←</button>
+                        )}
+                        <button type="button" onClick={() => removePhoto(i)}
+                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1">
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                        {i < photos.length - 1 && (
+                          <button type="button" onClick={() => movePhoto(i, i + 1)}
+                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5">→</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {missingPhotos > 0 && (
+                <p className="mt-2 text-xs text-amber-600 flex items-center gap-1">
+                  ⚠️ {t.errMinPhotos}
+                </p>
+              )}
+            </section>
+
+            <section>
+              <SectionLabel>{t.sectionAmenities}</SectionLabel>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {AMENITY_VALUES.map((value, idx) => {
+                  const selected = form.amenities.includes(value);
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => toggleAmenity(value)}
+                      className={`text-left px-3 py-2 rounded-xl border text-sm transition ${
+                        selected
+                          ? "border-primary bg-primary/10 text-primary font-medium"
+                          : "border-border bg-background hover:border-primary/30 text-foreground"
+                      }`}
+                    >
+                      {selected && "✓ "}{AMENITY_LABELS[idx]}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  }
+
+  // ── Render ──────────────────────────────────────────────────────────────────
+
+  return (
+    <div className="min-h-screen bg-muted">
+      <main className="max-w-2xl mx-auto px-4 py-8">
+
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <Link
+            href="/espace-agent/annonces"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
+          >
+            <ArrowLeft className="w-4 h-4" /> {t.back}
+          </Link>
+          <span className="text-muted-foreground/40">/</span>
+          <span className="text-sm font-medium">{t.newListing}</span>
+        </div>
+
+        {/* Step bar */}
+        <StepBar step={step} labels={STEP_LABELS} />
+
+        <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
+          {/* Card header */}
+          <div className="px-6 py-4 border-b border-border">
+            <h1 className="text-base font-semibold">{CARD_HEADERS[step - 1]}</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {step} {t.stepSuffix} {TOTAL_STEPS}
+            </p>
           </div>
 
-          {/* Footer actions */}
-          <div className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">{t.photosNote}</p>
-            <div className="flex gap-3">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/espace-agent/annonces">{t.cancelBtn}</Link>
+          {/* Form content */}
+          <div className="px-6 py-6">
+            {error && (
+              <div className="mb-4 bg-destructive/10 border border-destructive/30 text-destructive text-sm rounded-xl px-4 py-3 flex items-start gap-2">
+                <X className="w-4 h-4 shrink-0 mt-0.5" />
+                {error}
+              </div>
+            )}
+
+            {(savingDraft || submitting) && uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="mb-4">
+                <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                  <span>{t.uploadingPhotos}</span>
+                  <span>{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-1.5">
+                  <div className="bg-primary h-1.5 rounded-full transition-all" style={{ width: `${uploadProgress}%` }} />
+                </div>
+              </div>
+            )}
+
+            {renderStep()}
+          </div>
+
+          {/* Footer */}
+          <div className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between gap-3">
+            <div>
+              {step > 1 ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { setError(null); setStep((s) => s - 1); }}
+                  disabled={busy}
+                >
+                  <ChevronLeft className="w-3.5 h-3.5 mr-1" /> {t.backBtn}
+                </Button>
+              ) : (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/espace-agent/annonces">{t.cancelBtn}</Link>
+                </Button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleSaveDraft} disabled={busy}>
+                {savingDraft ? (
+                  <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.savingBtn}</>
+                ) : (
+                  <><Save className="w-3.5 h-3.5 mr-1.5" /> {t.saveDraftBtn}</>
+                )}
               </Button>
-              <Button size="sm" onClick={handleSubmit} disabled={saving}>
-                {saving ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />{t.publishing}</> : t.publishBtn}
-              </Button>
+
+              {step < TOTAL_STEPS ? (
+                <Button size="sm" onClick={handleNext} disabled={busy}>
+                  {t.nextBtn} <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                </Button>
+              ) : (
+                <Button size="sm" onClick={handleSubmit} disabled={busy}>
+                  {submitting ? (
+                    <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.submittingBtn}</>
+                  ) : (
+                    <><SendHorizontal className="w-3.5 h-3.5 mr-1.5" /> {t.submitBtn}</>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         </div>
-
       </main>
     </div>
   );
