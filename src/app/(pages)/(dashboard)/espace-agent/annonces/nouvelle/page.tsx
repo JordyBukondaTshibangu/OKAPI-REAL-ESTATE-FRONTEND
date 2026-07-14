@@ -23,18 +23,11 @@ import { useT } from "@/i18n/useT";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
-const CATEGORIES = [
-  { value: "apartment",  label: "Appartement" },
-  { value: "villa",      label: "Villa" },
-  { value: "studio",     label: "Studio" },
-  { value: "duplex",     label: "Duplex" },
-  { value: "penthouse",  label: "Penthouse" },
-  { value: "house",      label: "Maison" },
-  { value: "land",       label: "Terrain" },
-  { value: "commercial", label: "Local commercial" },
-  { value: "office",     label: "Bureau" },
-  { value: "warehouse",  label: "Entrepôt" },
-];
+const AMENITY_VALUES = [
+  "Eau courante","Électricité","Groupe électrogène","Climatisation",
+  "Gardiennage","Parking","Terrasse","Cuisine équipée",
+  "Internet","Piscine","Garage","Sécurité 24h/24",
+] as const;
 
 const COMMUNES = [
   "Gombe","Limete","Ngaliema","Kalamu","Ndjili","Kintambo",
@@ -42,12 +35,6 @@ const COMMUNES = [
 ];
 
 const CURRENCIES = ["USD", "CDF"];
-
-const AMENITIES = [
-  "Eau courante","Électricité","Groupe électrogène","Climatisation",
-  "Gardiennage","Parking","Terrasse","Cuisine équipée",
-  "Internet","Piscine","Garage","Sécurité 24h/24",
-];
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -169,8 +156,11 @@ function Toggle({
 
 // ─── Step indicator ─────────────────────────────────────────────────────────────
 
-function StepBar({ step, total }: { step: number; total: number }) {
-  const labels = ["Informations", "Localisation", "Prix", "Photos"];
+function StepBar({
+  step, labels,
+}: {
+  step: number; labels: string[];
+}) {
   return (
     <div className="flex items-center gap-1 mb-6">
       {labels.map((label, i) => {
@@ -213,6 +203,29 @@ export default function NouvelleAnnoncePage() {
   const router = useRouter();
   const { token, agent } = useAgentSessionStore();
   const t = useT().espaceAgent;
+
+  // Build translated category and amenity lists inside the component
+  const CATEGORIES = [
+    { value: "apartment",  label: t.catApartment },
+    { value: "villa",      label: t.catVilla },
+    { value: "studio",     label: t.catStudio },
+    { value: "duplex",     label: t.catDuplex },
+    { value: "penthouse",  label: t.catPenthouse },
+    { value: "house",      label: t.catHouse },
+    { value: "land",       label: t.catLand },
+    { value: "commercial", label: t.catCommercial },
+    { value: "office",     label: t.catOffice },
+    { value: "warehouse",  label: t.catWarehouse },
+  ];
+
+  const AMENITY_LABELS = [
+    t.amenWater, t.amenElec, t.amenGenerator, t.amenAC,
+    t.amenGuard, t.amenParking, t.amenTerrace, t.amenKitchen,
+    t.amenInternet, t.amenPool, t.amenGarage, t.amenSecurity,
+  ];
+
+  const STEP_LABELS = [t.stepInfoLabel, t.stepLocationLabel, t.stepPriceLabel, t.stepPhotosLabel];
+  const CARD_HEADERS = [t.cardStep1, t.cardStep2, t.cardStep3, t.cardStep4];
 
   const [hydrated, setHydrated] = useState(false);
   const [step, setStep] = useState(1);
@@ -330,15 +343,9 @@ export default function NouvelleAnnoncePage() {
   // ── Validation ──────────────────────────────────────────────────────────────
 
   function validateStep(s: number): string | null {
-    if (s === 1) {
-      if (!form.title.trim()) return t.errTitle;
-    }
-    if (s === 2) {
-      if (!form.suburb) return t.errCommune;
-    }
-    if (s === 3) {
-      if (!form.price || isNaN(Number(form.price))) return t.errPrice;
-    }
+    if (s === 1 && !form.title.trim()) return t.errTitle;
+    if (s === 2 && !form.suburb) return t.errCommune;
+    if (s === 3 && (!form.price || isNaN(Number(form.price)))) return t.errPrice;
     return null;
   }
 
@@ -410,7 +417,7 @@ export default function NouvelleAnnoncePage() {
   async function handleSubmit() {
     if (!token || !agent) return;
     if (photos.length < 3) {
-      setError("Ajoutez au moins 3 photos avant de soumettre.");
+      setError(t.errMinPhotos);
       return;
     }
     const stepErr = validateStep(3);
@@ -440,26 +447,27 @@ export default function NouvelleAnnoncePage() {
   if (!hydrated || !token) return null;
 
   const busy = savingDraft || submitting;
+  const missingPhotos = Math.max(0, 3 - photos.length);
 
   // ── Step content ────────────────────────────────────────────────────────────
 
   function renderStep() {
     switch (step) {
-      // ─────────── STEP 1 — Informations de base ──────────────────────────────
+      // ─────────── STEP 1 ─────────────────────────────────────────────────────
       case 1:
         return (
           <div className="space-y-6">
             <section>
-              <SectionLabel>Type d&apos;annonce</SectionLabel>
+              <SectionLabel>{t.sectionType}</SectionLabel>
               <div className="grid grid-cols-2 gap-3">
-                {[
+                {([
                   { value: "rent", label: t.typeRent },
                   { value: "sale", label: t.typeSale },
-                ].map(({ value, label }) => (
+                ] as const).map(({ value, label }) => (
                   <button
                     key={value}
                     type="button"
-                    onClick={() => set("listingType", value as "rent" | "sale")}
+                    onClick={() => set("listingType", value)}
                     className={`py-3 rounded-xl border text-sm font-medium transition ${
                       form.listingType === value
                         ? "border-primary bg-primary text-primary-foreground"
@@ -473,7 +481,7 @@ export default function NouvelleAnnoncePage() {
             </section>
 
             <section>
-              <SectionLabel>Catégorie de bien</SectionLabel>
+              <SectionLabel>{t.sectionCategory}</SectionLabel>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CATEGORIES.map(({ value, label }) => (
                   <button
@@ -494,17 +502,17 @@ export default function NouvelleAnnoncePage() {
 
             {form.listingType === "rent" && (
               <section>
-                <SectionLabel>Type de location</SectionLabel>
+                <SectionLabel>{t.sectionDurationType}</SectionLabel>
                 <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { value: "longterm", label: "Long terme" },
-                    { value: "shortterm", label: "Courte durée" },
-                    { value: "both", label: "Les deux" },
-                  ].map(({ value, label }) => (
+                  {([
+                    { value: "longterm",  label: t.durationLong },
+                    { value: "shortterm", label: t.durationShort },
+                    { value: "both",      label: t.durationBoth },
+                  ] as const).map(({ value, label }) => (
                     <button
                       key={value}
                       type="button"
-                      onClick={() => set("durationType", value as FormState["durationType"])}
+                      onClick={() => set("durationType", value)}
                       className={`py-2.5 rounded-xl border text-sm font-medium transition ${
                         form.durationType === value
                           ? "border-primary bg-primary text-primary-foreground"
@@ -519,27 +527,27 @@ export default function NouvelleAnnoncePage() {
             )}
 
             <section>
-              <SectionLabel>Présentation</SectionLabel>
+              <SectionLabel>{t.sectionPresentation}</SectionLabel>
               <div className="space-y-4">
-                <Field label="Titre" required>
+                <Field label={t.labelTitle} required>
                   <TextInput
                     value={form.title}
                     onChange={(v) => set("title", v)}
-                    placeholder="Appartement 3 chambres — Gombe"
+                    placeholder={t.titlePlaceholder}
                   />
                 </Field>
-                <Field label="Sous-titre" hint="Optionnel — résumé en une ligne">
+                <Field label={t.labelSubtitle} hint={t.subtitleHint}>
                   <TextInput
                     value={form.subtitle}
                     onChange={(v) => set("subtitle", v)}
-                    placeholder="Résidence calme, proche école"
+                    placeholder={t.subtitlePlaceholder}
                   />
                 </Field>
-                <Field label="Description">
+                <Field label={t.labelDescription}>
                   <textarea
                     value={form.description}
                     onChange={(e) => set("description", e.target.value)}
-                    placeholder="Décrivez le bien, ses atouts, l'environnement…"
+                    placeholder={t.descPlaceholder}
                     rows={5}
                     className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
                   />
@@ -549,64 +557,61 @@ export default function NouvelleAnnoncePage() {
           </div>
         );
 
-      // ─────────── STEP 2 — Localisation & détails ────────────────────────────
+      // ─────────── STEP 2 ─────────────────────────────────────────────────────
       case 2:
         return (
           <div className="space-y-6">
             <section>
-              <SectionLabel>Localisation</SectionLabel>
+              <SectionLabel>{t.sectionLocation}</SectionLabel>
               <div className="space-y-4">
-                <Field label="Commune" required>
+                <Field label={t.labelCommune} required>
                   <SelectInput value={form.suburb} onChange={(v) => set("suburb", v)}>
-                    <option value="">— Sélectionner</option>
+                    <option value="">{t.communePlaceholder}</option>
                     {COMMUNES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </SelectInput>
                 </Field>
                 <div className="grid grid-cols-2 gap-4">
-                  <Field label="Quartier / Avenue">
+                  <Field label={t.labelNeighborhood}>
                     <TextInput
                       value={form.neighborhood}
                       onChange={(v) => set("neighborhood", v)}
-                      placeholder="Avenue Kalembe Lembe"
+                      placeholder={t.neighborhoodPlaceholder}
                     />
                   </Field>
-                  <Field label="Ville">
+                  <Field label={t.labelCity}>
                     <TextInput value="Kinshasa" onChange={() => {}} disabled />
                   </Field>
                 </div>
-                <Field
-                  label="Point de repère"
-                  hint="Aide les visiteurs à localiser rapidement le bien"
-                >
+                <Field label={t.labelLandmark} hint={t.landmarkHint}>
                   <TextInput
                     value={form.landmark}
                     onChange={(v) => set("landmark", v)}
-                    placeholder="Près du marché central, de l'école Saint-Pierre…"
+                    placeholder={t.landmarkPlaceholder}
                   />
                 </Field>
               </div>
             </section>
 
             <section>
-              <SectionLabel>Caractéristiques</SectionLabel>
+              <SectionLabel>{t.sectionFeatures}</SectionLabel>
               <div className="grid grid-cols-3 gap-3">
-                <Field label="Chambres">
+                <Field label={t.labelBedrooms}>
                   <TextInput type="number" value={form.bedrooms} onChange={(v) => set("bedrooms", v)} placeholder="3" />
                 </Field>
-                <Field label="Salles de bain">
+                <Field label={t.labelBathrooms}>
                   <TextInput type="number" value={form.bathrooms} onChange={(v) => set("bathrooms", v)} placeholder="2" />
                 </Field>
-                <Field label="Surface (m²)">
+                <Field label={t.labelArea}>
                   <TextInput type="number" value={form.areaSqm} onChange={(v) => set("areaSqm", v)} placeholder="120" />
                 </Field>
               </div>
             </section>
 
             <section>
-              <SectionLabel>Options</SectionLabel>
+              <SectionLabel>{t.sectionOptions}</SectionLabel>
               <div className="flex flex-wrap gap-2">
                 <Toggle
-                  label="Meublé"
+                  label={t.labelFurnished}
                   value={form.isFurnished}
                   onChange={(v) => set("isFurnished", v)}
                 />
@@ -614,8 +619,8 @@ export default function NouvelleAnnoncePage() {
             </section>
 
             <section>
-              <SectionLabel>Disponibilité</SectionLabel>
-              <Field label="Disponible à partir du" hint="Laisser vide si disponible immédiatement">
+              <SectionLabel>{t.sectionAvailability}</SectionLabel>
+              <Field label={t.labelAvailableFrom} hint={t.availableFromHint}>
                 <TextInput
                   type="date"
                   value={form.availableFrom}
@@ -626,7 +631,7 @@ export default function NouvelleAnnoncePage() {
           </div>
         );
 
-      // ─────────── STEP 3 — Prix ───────────────────────────────────────────────
+      // ─────────── STEP 3 ─────────────────────────────────────────────────────
       case 3: {
         const showShortTerm =
           form.listingType === "rent" &&
@@ -635,7 +640,7 @@ export default function NouvelleAnnoncePage() {
         return (
           <div className="space-y-6">
             <section>
-              <SectionLabel>Prix</SectionLabel>
+              <SectionLabel>{t.sectionPrice}</SectionLabel>
               <div className="flex gap-3">
                 <div className="flex-1">
                   <TextInput
@@ -653,9 +658,9 @@ export default function NouvelleAnnoncePage() {
                 {form.listingType === "rent" && (
                   <div className="w-32">
                     <SelectInput value={form.period} onChange={(v) => set("period", v as FormState["period"])}>
-                      <option value="month">/ mois</option>
-                      <option value="year">/ an</option>
-                      <option value="day">/ jour</option>
+                      <option value="month">{t.periodMonth}</option>
+                      <option value="year">{t.periodYear}</option>
+                      <option value="day">{t.periodDay}</option>
                     </SelectInput>
                   </div>
                 )}
@@ -664,10 +669,10 @@ export default function NouvelleAnnoncePage() {
 
             {showShortTerm && (
               <section>
-                <SectionLabel>Courte durée</SectionLabel>
+                <SectionLabel>{t.sectionShortTerm}</SectionLabel>
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-3">
-                    <Field label="Prix / nuit">
+                    <Field label={t.labelPricePerNight}>
                       <TextInput
                         type="number"
                         value={form.pricePerNight}
@@ -675,7 +680,7 @@ export default function NouvelleAnnoncePage() {
                         placeholder="80"
                       />
                     </Field>
-                    <Field label="Séjour min (nuits)">
+                    <Field label={t.labelMinStay}>
                       <TextInput
                         type="number"
                         value={form.minStayNights}
@@ -683,7 +688,7 @@ export default function NouvelleAnnoncePage() {
                         placeholder="2"
                       />
                     </Field>
-                    <Field label="Séjour max (nuits)">
+                    <Field label={t.labelMaxStay}>
                       <TextInput
                         type="number"
                         value={form.maxStayNights}
@@ -692,11 +697,11 @@ export default function NouvelleAnnoncePage() {
                       />
                     </Field>
                   </div>
-                  <Field label="Notes courte durée" hint="Optionnel">
+                  <Field label={t.labelShortTermNotes} hint={t.shortTermNotesHint}>
                     <TextInput
                       value={form.shortTermNotes}
                       onChange={(v) => set("shortTermNotes", v)}
-                      placeholder="Idéal pour expats, minimum 3 nuits…"
+                      placeholder={t.shortTermNotesPlaceholder}
                     />
                   </Field>
                 </div>
@@ -706,17 +711,14 @@ export default function NouvelleAnnoncePage() {
         );
       }
 
-      // ─────────── STEP 4 — Photos & équipements ──────────────────────────────
+      // ─────────── STEP 4 ─────────────────────────────────────────────────────
       case 4:
         return (
           <div className="space-y-6">
             <section>
-              <SectionLabel>Photos *</SectionLabel>
-              <p className="text-xs text-muted-foreground mb-3">
-                Minimum 3 photos pour soumettre · Maximum 15 · La première photo est la couverture
-              </p>
+              <SectionLabel>{t.sectionPhotosLabel} *</SectionLabel>
+              <p className="text-xs text-muted-foreground mb-3">{t.photosInstruction}</p>
 
-              {/* Upload zone */}
               <div
                 className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition"
                 onClick={() => fileInputRef.current?.click()}
@@ -727,9 +729,9 @@ export default function NouvelleAnnoncePage() {
                 }}
               >
                 <Upload className="w-7 h-7 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm font-medium">Glisser-déposer ou cliquer pour parcourir</p>
+                <p className="text-sm font-medium">{t.photosDropzone}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {photos.length}/15 images · JPG, PNG, WebP
+                  {photos.length}/15 · JPG, PNG, WebP
                 </p>
               </div>
               <input
@@ -741,47 +743,28 @@ export default function NouvelleAnnoncePage() {
                 onChange={(e) => addPhotos(e.target.files)}
               />
 
-              {/* Photo grid */}
               {photos.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 mt-3">
                   {photos.map((p, i) => (
                     <div key={i} className="relative group aspect-video rounded-xl overflow-hidden bg-muted">
-                      <Image
-                        src={p.preview}
-                        alt={`Photo ${i + 1}`}
-                        fill
-                        className="object-cover"
-                      />
+                      <Image src={p.preview} alt={`Photo ${i + 1}`} fill className="object-cover" />
                       {i === 0 && (
                         <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          Couverture
+                          {t.coverLabel}
                         </span>
                       )}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-1.5">
                         {i > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => movePhoto(i, i - 1)}
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5"
-                          >
-                            ←
-                          </button>
+                          <button type="button" onClick={() => movePhoto(i, i - 1)}
+                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5">←</button>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => removePhoto(i)}
-                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1"
-                        >
+                        <button type="button" onClick={() => removePhoto(i)}
+                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1">
                           <Trash2 className="w-3 h-3" />
                         </button>
                         {i < photos.length - 1 && (
-                          <button
-                            type="button"
-                            onClick={() => movePhoto(i, i + 1)}
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5"
-                          >
-                            →
-                          </button>
+                          <button type="button" onClick={() => movePhoto(i, i + 1)}
+                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5">→</button>
                         )}
                       </div>
                     </div>
@@ -789,30 +772,30 @@ export default function NouvelleAnnoncePage() {
                 </div>
               )}
 
-              {photos.length < 3 && (
+              {missingPhotos > 0 && (
                 <p className="mt-2 text-xs text-amber-600 flex items-center gap-1">
-                  ⚠️ {3 - photos.length} photo{3 - photos.length > 1 ? "s" : ""} manquante{3 - photos.length > 1 ? "s" : ""} pour soumettre
+                  ⚠️ {t.errMinPhotos}
                 </p>
               )}
             </section>
 
             <section>
-              <SectionLabel>Équipements</SectionLabel>
+              <SectionLabel>{t.sectionAmenities}</SectionLabel>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {AMENITIES.map((a) => {
-                  const selected = form.amenities.includes(a);
+                {AMENITY_VALUES.map((value, idx) => {
+                  const selected = form.amenities.includes(value);
                   return (
                     <button
-                      key={a}
+                      key={value}
                       type="button"
-                      onClick={() => toggleAmenity(a)}
+                      onClick={() => toggleAmenity(value)}
                       className={`text-left px-3 py-2 rounded-xl border text-sm transition ${
                         selected
                           ? "border-primary bg-primary/10 text-primary font-medium"
                           : "border-border bg-background hover:border-primary/30 text-foreground"
                       }`}
                     >
-                      {selected && "✓ "}{a}
+                      {selected && "✓ "}{AMENITY_LABELS[idx]}
                     </button>
                   );
                 })}
@@ -845,15 +828,15 @@ export default function NouvelleAnnoncePage() {
         </div>
 
         {/* Step bar */}
-        <StepBar step={step} total={TOTAL_STEPS} />
+        <StepBar step={step} labels={STEP_LABELS} />
 
         <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
           {/* Card header */}
           <div className="px-6 py-4 border-b border-border">
-            <h1 className="text-base font-semibold">
-              {["Informations de base", "Localisation & détails", "Prix", "Photos & équipements"][step - 1]}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Étape {step} sur {TOTAL_STEPS}</p>
+            <h1 className="text-base font-semibold">{CARD_HEADERS[step - 1]}</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {step} {t.stepSuffix} {TOTAL_STEPS}
+            </p>
           </div>
 
           {/* Form content */}
@@ -865,18 +848,14 @@ export default function NouvelleAnnoncePage() {
               </div>
             )}
 
-            {/* Upload progress */}
             {(savingDraft || submitting) && uploadProgress > 0 && uploadProgress < 100 && (
               <div className="mb-4">
                 <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>Téléchargement des photos…</span>
+                  <span>{t.uploadingPhotos}</span>
                   <span>{uploadProgress}%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5">
-                  <div
-                    className="bg-primary h-1.5 rounded-full transition-all"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
+                  <div className="bg-primary h-1.5 rounded-full transition-all" style={{ width: `${uploadProgress}%` }} />
                 </div>
               </div>
             )}
@@ -886,7 +865,6 @@ export default function NouvelleAnnoncePage() {
 
           {/* Footer */}
           <div className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between gap-3">
-            {/* Left: back or cancel */}
             <div>
               {step > 1 ? (
                 <Button
@@ -895,7 +873,7 @@ export default function NouvelleAnnoncePage() {
                   onClick={() => { setError(null); setStep((s) => s - 1); }}
                   disabled={busy}
                 >
-                  <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Retour
+                  <ChevronLeft className="w-3.5 h-3.5 mr-1" /> {t.backBtn}
                 </Button>
               ) : (
                 <Button variant="ghost" size="sm" asChild>
@@ -904,31 +882,23 @@ export default function NouvelleAnnoncePage() {
               )}
             </div>
 
-            {/* Right: save draft / next / submit */}
             <div className="flex items-center gap-2">
-              {/* Save draft always visible */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSaveDraft}
-                disabled={busy}
-              >
+              <Button variant="outline" size="sm" onClick={handleSaveDraft} disabled={busy}>
                 {savingDraft ? (
-                  <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Enregistrement…</>
+                  <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.savingBtn}</>
                 ) : (
                   <><Save className="w-3.5 h-3.5 mr-1.5" /> {t.saveDraftBtn}</>
                 )}
               </Button>
 
-              {/* Next step OR submit on last step */}
               {step < TOTAL_STEPS ? (
                 <Button size="sm" onClick={handleNext} disabled={busy}>
-                  Suivant <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                  {t.nextBtn} <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                 </Button>
               ) : (
                 <Button size="sm" onClick={handleSubmit} disabled={busy}>
                   {submitting ? (
-                    <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Envoi…</>
+                    <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.submittingBtn}</>
                   ) : (
                     <><SendHorizontal className="w-3.5 h-3.5 mr-1.5" /> {t.submitBtn}</>
                   )}

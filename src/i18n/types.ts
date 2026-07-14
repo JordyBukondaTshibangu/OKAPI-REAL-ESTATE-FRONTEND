@@ -756,6 +756,38 @@ export type Messages = {
     pendingNote: string;
     rejectedNote: string;
     deleteBtn: string;
+    // Nouvelle annonce — step bar
+    stepInfoLabel: string; stepLocationLabel: string; stepPriceLabel: string; stepPhotosLabel: string;
+    // Card headers per step
+    cardStep1: string; cardStep2: string; cardStep3: string; cardStep4: string;
+    stepSuffix: string;
+    // Category chips
+    sectionCategory: string;
+    catApartment: string; catVilla: string; catStudio: string; catDuplex: string; catPenthouse: string;
+    catHouse: string; catLand: string; catCommercial: string; catOffice: string; catWarehouse: string;
+    // Duration type
+    sectionDurationType: string; durationLong: string; durationShort: string; durationBoth: string;
+    // Presentation
+    subtitleHint: string;
+    // Location
+    labelLandmark: string; landmarkHint: string; landmarkPlaceholder: string;
+    // Options
+    sectionOptions: string; labelFurnished: string;
+    // Availability
+    sectionAvailability: string; labelAvailableFrom: string; availableFromHint: string;
+    // Short-term
+    sectionShortTerm: string; labelPricePerNight: string; labelMinStay: string; labelMaxStay: string;
+    labelShortTermNotes: string; shortTermNotesHint: string; shortTermNotesPlaceholder: string;
+    // Photos
+    sectionPhotosLabel: string; photosInstruction: string; photosDropzone: string;
+    coverLabel: string; errMinPhotos: string; uploadingPhotos: string;
+    // Amenities
+    sectionAmenities: string;
+    amenWater: string; amenElec: string; amenGenerator: string; amenAC: string;
+    amenGuard: string; amenParking: string; amenTerrace: string; amenKitchen: string;
+    amenInternet: string; amenPool: string; amenGarage: string; amenSecurity: string;
+    // Footer buttons
+    nextBtn: string; backBtn: string; savingBtn: string; submittingBtn: string;
   };
   espaceAgence: {
     // Dashboard
