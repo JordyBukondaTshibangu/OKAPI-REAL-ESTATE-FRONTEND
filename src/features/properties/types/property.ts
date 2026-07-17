@@ -43,6 +43,8 @@ export type PropertyPerformance = {
   shared: number;
   /** Live count of users who favorited the property */
   saved: number;
+  /** Total WhatsApp button clicks (POST /properties/:id/whatsapp-click) */
+  whatsappClicks: number;
 };
 
 export type Property = {
@@ -64,7 +66,7 @@ export type Property = {
   premium: boolean;
   isNew: boolean;
   listedDaysAgo: number;
-  agent: { name: string; title: string; photo: string };
+  agent: { name: string; title: string; photo: string } | null;
   imageGradient: string;
   iconType: "building" | "home" | "land" | "office" | "store" | "warehouse";
   transaction?: CommercialTransaction;
@@ -87,7 +89,7 @@ export type PropertyDetail = Property & {
   amenities: string[];
   reference: string;
   zone: string | null;
-  agency: Agency;
+  agency: Agency | null;
   brokerLicense: string | null;
   agentLicense: string | null;
   permitNumber: string | null;

@@ -246,8 +246,8 @@ function ProfileMenu() {
       .split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
     const isAgencyOwner = agentSession.agentType === "AGENCY_OWNER" && !!agentSession.agencyId;
     const portalHref = isAgencyOwner ? "/espace-agence" : "/espace-agent";
-    const portalLabel = isAgencyOwner ? "Espace agence" : "Espace agent";
-    const portalLinkLabel = isAgencyOwner ? "Mon espace agence" : "Mon espace agent";
+    const portalLabel = isAgencyOwner ? t.espaceAgent.agencyPortalLabel : t.espaceAgent.agentPortalLabel;
+    const portalLinkLabel = isAgencyOwner ? t.espaceAgent.myAgencyPortalLink : t.espaceAgent.myAgentPortalLink;
     return (
       <div className="flex items-center gap-2">
         <UtilityCluster />
@@ -461,7 +461,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-primary uppercase tracking-wide">
-                  {agentSession.agentType === "AGENCY_OWNER" && agentSession.agencyId ? "Espace agence" : "Espace agent"}
+                  {agentSession.agentType === "AGENCY_OWNER" && agentSession.agencyId ? t.espaceAgent.agencyPortalLabel : t.espaceAgent.agentPortalLabel}
                 </p>
                 <p className="text-sm font-semibold text-foreground truncate">{agentSession.name}</p>
               </div>
@@ -470,7 +470,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
                 onClick={onClose}
                 className="text-xs text-primary hover:underline shrink-0"
               >
-                Mon espace
+                {t.espaceAgent.agentNavPortal}
               </Link>
             </div>
           ) : isAuthenticated && user ? (
@@ -498,8 +498,8 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
             </div>
           )}
 
-          {/* Quick account links (authenticated only) */}
-          {isAuthenticated && (
+          {/* Quick account links (user only — not shown for agents) */}
+          {isAuthenticated && !isAgentAuth && (
             <div className="grid grid-cols-3 gap-0 border-b border-border">
               {profileLinks.slice(0, 3).map(({ label, href, icon: Icon }) => (
                 <Link
@@ -526,89 +526,111 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
             </div>
           )}
 
-          {/* Home quick link */}
-          <Link
-            href="/"
-            onClick={onClose}
-            className={`flex items-center gap-3 px-5 py-3.5 text-sm font-medium border-b border-border transition-colors ${pathname === "/" ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-muted"}`}
-          >
-            <Home className="w-4 h-4 shrink-0 text-muted-foreground" />
-            Accueil
-          </Link>
-
-          {/* Main nav accordion */}
-          {navItems.map((item) => {
-            const isActive = pathname.startsWith(item.href);
-            const isOpen = expanded === item.label;
-
-            return (
-              <div key={item.label} className="border-b border-border">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!item.columns) { router.push(item.href); onClose(); return; }
-                    setExpanded(isOpen ? null : item.label);
-                  }}
-                  className={`w-full flex items-center justify-between px-5 py-3.5 text-sm font-medium transition-colors ${isActive ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-muted"}`}
+          {/* Agent mobile nav — shown only when agent is signed in */}
+          {isAgentAuth ? (
+            <>
+              {[
+                { label: t.espaceAgent.agentNavSearch, href: "/acheter", icon: Home },
+                { label: t.espaceAgent.agentNavListings, href: "/espace-agent/annonces", icon: Home },
+                { label: t.espaceAgent.agentNavBoosts, href: "/espace-agent/boost", icon: Star },
+                { label: t.espaceAgent.agentNavPortal, href: "/espace-agent", icon: User },
+              ].map(({ label, href, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={onClose}
+                  className={`flex items-center gap-3 px-5 py-3.5 text-sm font-medium border-b border-border transition-colors ${pathname.startsWith(href) ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-muted"}`}
                 >
-                  <span>{item.label}</span>
-                  {item.columns ? (
-                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </button>
+                  <Icon className="w-4 h-4 shrink-0 text-muted-foreground" />
+                  {label}
+                </Link>
+              ))}
+            </>
+          ) : (
+            <>
+              {/* Home quick link */}
+              <Link
+                href="/"
+                onClick={onClose}
+                className={`flex items-center gap-3 px-5 py-3.5 text-sm font-medium border-b border-border transition-colors ${pathname === "/" ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-muted"}`}
+              >
+                <Home className="w-4 h-4 shrink-0 text-muted-foreground" />
+                Accueil
+              </Link>
 
-                {item.columns && isOpen && (
-                  <div className="bg-muted/40 pb-2">
-                    {item.columns.map((col, idx) => (
-                      <div key={idx} className="px-5 pt-3">
-                        {col.title && (
-                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
-                            {col.title}
-                          </p>
-                        )}
-                        <ul className="space-y-0">
-                          {col.links.map((link) => (
-                            <li key={link.label}>
-                              <Link
-                                href={link.href}
-                                onClick={onClose}
-                                className={`flex items-center gap-2 py-2 text-sm transition-colors ${pathname === link.href ? "text-primary font-medium" : "text-foreground/70 hover:text-primary"}`}
-                              >
-                                <span className="w-1 h-1 rounded-full bg-muted-foreground/50 shrink-0" />
-                                {link.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+              {/* Main nav accordion */}
+              {navItems.map((item) => {
+                const isActive = pathname.startsWith(item.href);
+                const isOpen = expanded === item.label;
 
-                    {/* Direct link to section */}
-                    <Link
-                      href={item.href}
-                      onClick={onClose}
-                      className="flex items-center gap-1.5 mx-5 mt-3 text-xs font-semibold text-primary hover:underline"
+                return (
+                  <div key={item.label} className="border-b border-border">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!item.columns) { router.push(item.href); onClose(); return; }
+                        setExpanded(isOpen ? null : item.label);
+                      }}
+                      className={`w-full flex items-center justify-between px-5 py-3.5 text-sm font-medium transition-colors ${isActive ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-muted"}`}
                     >
-                      Voir tout <ChevronRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                      <span>{item.label}</span>
+                      {item.columns ? (
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </button>
 
-          {/* List your property CTA */}
-          <div className="px-5 py-4 border-b border-border">
-            <Link
-              href="/vendre"
-              onClick={onClose}
-              className="flex items-center justify-center gap-2 w-full rounded-full bg-secondary text-secondary-foreground px-5 py-3 text-sm font-semibold hover:bg-secondary/90 transition-colors"
-            >
-              {t.nav.list}
-            </Link>
-          </div>
+                    {item.columns && isOpen && (
+                      <div className="bg-muted/40 pb-2">
+                        {item.columns.map((col, idx) => (
+                          <div key={idx} className="px-5 pt-3">
+                            {col.title && (
+                              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
+                                {col.title}
+                              </p>
+                            )}
+                            <ul className="space-y-0">
+                              {col.links.map((link) => (
+                                <li key={link.label}>
+                                  <Link
+                                    href={link.href}
+                                    onClick={onClose}
+                                    className={`flex items-center gap-2 py-2 text-sm transition-colors ${pathname === link.href ? "text-primary font-medium" : "text-foreground/70 hover:text-primary"}`}
+                                  >
+                                    <span className="w-1 h-1 rounded-full bg-muted-foreground/50 shrink-0" />
+                                    {link.label}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                        <Link
+                          href={item.href}
+                          onClick={onClose}
+                          className="flex items-center gap-1.5 mx-5 mt-3 text-xs font-semibold text-primary hover:underline"
+                        >
+                          Voir tout <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* List your property CTA */}
+              <div className="px-5 py-4 border-b border-border">
+                <Link
+                  href="/vendre"
+                  onClick={onClose}
+                  className="flex items-center justify-center gap-2 w-full rounded-full bg-secondary text-secondary-foreground px-5 py-3 text-sm font-semibold hover:bg-secondary/90 transition-colors"
+                >
+                  {t.nav.list}
+                </Link>
+              </div>
+            </>
+          )}
 
           {/* Logout (authenticated) */}
           {(isAuthenticated || isAgentAuth) && (
@@ -638,12 +660,58 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
   );
 }
 
+// ── Agent nav links (desktop) ────────────────────────────────────────────────
+
+function AgentDesktopNav({ pathname }: { pathname: string }) {
+  const { espaceAgent: p } = useT();
+  const agentLinks = [
+    { label: p.agentNavSearch, href: "/acheter" },
+  ];
+  const agentActions = [
+    { label: p.agentNavListings, href: "/espace-agent/annonces" },
+    { label: p.agentNavBoosts, href: "/espace-agent/boost" },
+  ];
+  return (
+    <nav className="hidden lg:flex items-center gap-1">
+      {agentLinks.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className={`px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors duration-200 ${
+            pathname.startsWith(link.href)
+              ? "text-secondary border-secondary"
+              : "text-white/80 border-transparent hover:text-secondary hover:border-secondary/50"
+          }`}
+        >
+          {link.label}
+        </Link>
+      ))}
+      <div className="w-px h-5 bg-white/20 mx-2" />
+      {agentActions.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className={`px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors duration-200 ${
+            pathname.startsWith(link.href)
+              ? "text-secondary border-secondary"
+              : "text-white/80 border-transparent hover:text-secondary hover:border-secondary/50"
+          }`}
+        >
+          {link.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navItems = useNavItems();
   const pathname = usePathname();
+  const { isAuthenticated: isAgentAuth } = useAgentSessionStore();
+  const mounted = useMounted();
 
   useEffect(() => {
     function onScroll() {
@@ -652,6 +720,9 @@ export default function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close mega menu when agent is signed in (no mega menu for agents)
+  const showMegaMenu = !isAgentAuth && openMenu;
 
   return (
     <header
@@ -664,7 +735,7 @@ export default function Header() {
     >
       <div className="max-w-6xl mx-auto px-6 h-28 flex items-center justify-between">
         <div className="w-full flex items-center justify-between gap-8">
-          <Link href="/" className="flex items-center shrink-0">
+          <Link href={mounted && isAgentAuth ? "/espace-agent" : "/"} className="flex items-center shrink-0">
             <Image
               src="/assets/images/company-logo.png"
               alt="Okapi Real Estate"
@@ -675,39 +746,45 @@ export default function Header() {
             />
           </Link>
 
-          <nav className="hidden lg:flex items-center">
-            {navItems.map((item) => {
-              const isMenuOpen = openMenu === item.label;
-              const isCurrentPage = pathname.startsWith(item.href);
-              const isHighlighted = isMenuOpen || isCurrentPage;
-              return (
-                <div
-                  key={item.label}
-                  className="group"
-                  onMouseEnter={() => setOpenMenu(item.label)}
-                >
-                  <Link
-                    href={item.href}
-                    className={`flex items-center gap-1 px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors duration-200 ${
-                      isHighlighted
-                        ? "text-secondary border-secondary"
-                        : "text-white/80 border-transparent hover:text-secondary hover:border-secondary/50"
-                    }`}
+          {/* Public nav — hidden when agent is signed in */}
+          {(!mounted || !isAgentAuth) && (
+            <nav className="hidden lg:flex items-center">
+              {navItems.map((item) => {
+                const isMenuOpen = openMenu === item.label;
+                const isCurrentPage = pathname.startsWith(item.href);
+                const isHighlighted = isMenuOpen || isCurrentPage;
+                return (
+                  <div
+                    key={item.label}
+                    className="group"
+                    onMouseEnter={() => setOpenMenu(item.label)}
                   >
-                    {item.label}
-                    {item.columns && (
-                      <ChevronDown
-                        className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                          isHighlighted ? "rotate-180" : "group-hover:rotate-180"
-                        }`}
-                      />
-                    )}
-                  </Link>
-                </div>
-              );
-            })}
-            <NavListButton navItems={navItems} setOpenMenu={setOpenMenu} />
-          </nav>
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-1 px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors duration-200 ${
+                        isHighlighted
+                          ? "text-secondary border-secondary"
+                          : "text-white/80 border-transparent hover:text-secondary hover:border-secondary/50"
+                      }`}
+                    >
+                      {item.label}
+                      {item.columns && (
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
+                            isHighlighted ? "rotate-180" : "group-hover:rotate-180"
+                          }`}
+                        />
+                      )}
+                    </Link>
+                  </div>
+                );
+              })}
+              <NavListButton navItems={navItems} setOpenMenu={setOpenMenu} />
+            </nav>
+          )}
+
+          {/* Agent nav — shown only when agent is signed in */}
+          {mounted && isAgentAuth && <AgentDesktopNav pathname={pathname} />}
 
           <div className="flex items-center gap-2">
             <ProfileMenu />
@@ -726,8 +803,8 @@ export default function Header() {
       {/* Mobile drawer */}
       <MobileDrawer open={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-      {/* Mega Menu Dropdown */}
-      {openMenu && (
+      {/* Mega Menu Dropdown — public only */}
+      {showMegaMenu && (
         <div
           className="absolute left-0 right-0 top-full bg-background border-b border-border shadow-lg animate-in fade-in slide-in-from-top-2 duration-150"
           onMouseEnter={() => setOpenMenu(openMenu)}

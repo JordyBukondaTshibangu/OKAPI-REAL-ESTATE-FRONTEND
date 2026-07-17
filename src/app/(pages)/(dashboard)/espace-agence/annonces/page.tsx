@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
@@ -66,15 +67,11 @@ export default function AgenceAnnoncesPage() {
       color: "text-muted-foreground bg-muted border-border",
     },
   };
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useMounted();
   const [properties, setProperties] = useState<Property[]>([]);
   const [filter, setFilter] = useState<string>("all"); // agentId or "all"
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
 
   useEffect(() => {
     if (!hydrated) return;

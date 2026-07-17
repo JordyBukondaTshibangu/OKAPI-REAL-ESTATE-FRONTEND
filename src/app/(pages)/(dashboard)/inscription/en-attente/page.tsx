@@ -6,15 +6,30 @@ import { CheckCircle2, Clock, ShieldCheck } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useT } from "@/i18n/useT";
 
-export default function AgentPendingPage() {
-  const t = useT();
-  const s = t.agentSignup;
+export default function UserPendingPage() {
+  const t = useT().userPending;
 
-  const STEPS = [
-    { icon: CheckCircle2, title: s.stepAccountCreated,  desc: s.stepAccountCreatedDesc,  done: true  },
-    { icon: CheckCircle2, title: s.stepEmailVerified,   desc: s.stepEmailVerifiedDesc,   done: true  },
-    { icon: Clock,        title: s.stepValidating,      desc: s.stepValidatingDesc,      done: false },
-    { icon: ShieldCheck,  title: s.stepActivated,       desc: s.stepActivatedDesc,       done: false },
+  const steps = [
+    {
+      icon: CheckCircle2,
+      title: t.stepCreated,
+      desc: t.stepCreatedDesc,
+      done: true,
+    },
+    {
+      icon: Clock,
+      title: t.stepVerifying,
+      desc: t.stepVerifyingDesc,
+      done: false,
+      active: true,
+    },
+    {
+      icon: ShieldCheck,
+      title: t.stepActivated,
+      desc: t.stepActivatedDesc,
+      done: false,
+      active: false,
+    },
   ];
 
   return (
@@ -35,17 +50,21 @@ export default function AgentPendingPage() {
         </div>
 
         <div className="bg-card rounded-2xl shadow-lg p-8">
-          {/* Amber pending icon */}
+          {/* Pending icon */}
           <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center mx-auto mb-5">
             <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
           </div>
 
-          <h1 className="text-xl font-semibold text-center mb-2">{s.pendingTitle}</h1>
-          <p className="text-sm text-muted-foreground text-center mb-8">{s.pendingSubtitle}</p>
+          <h1 className="text-xl font-semibold text-center mb-2">
+            {t.title}
+          </h1>
+          <p className="text-sm text-muted-foreground text-center mb-8">
+            {t.subtitle}
+          </p>
 
           {/* Progress steps */}
           <ol className="space-y-4 mb-8">
-            {STEPS.map((step, i) => {
+            {steps.map((step, i) => {
               const Icon = step.icon;
               return (
                 <li key={i} className="flex gap-3 items-start">
@@ -53,7 +72,7 @@ export default function AgentPendingPage() {
                     className={`w-5 h-5 mt-0.5 shrink-0 ${
                       step.done
                         ? "text-emerald-500"
-                        : i === 2
+                        : step.active
                         ? "text-amber-500"
                         : "text-muted-foreground/40"
                     }`}
@@ -61,11 +80,7 @@ export default function AgentPendingPage() {
                   <div>
                     <p
                       className={`text-sm font-medium ${
-                        step.done
-                          ? "text-foreground"
-                          : i === 2
-                          ? "text-foreground"
-                          : "text-muted-foreground/50"
+                        step.done || step.active ? "text-foreground" : "text-muted-foreground/50"
                       }`}
                     >
                       {step.title}
@@ -79,33 +94,24 @@ export default function AgentPendingPage() {
 
           {/* Info box */}
           <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 px-4 py-3 text-sm text-amber-800 dark:text-amber-300 mb-6">
-            <strong className="font-semibold">{s.pendingInfoDelay}</strong>{" "}
-            {s.pendingInfoCheck}
+            <strong className="font-semibold">{t.infoDelay}</strong>{" "}
+            {t.infoEmail}
           </div>
 
           <div className="flex flex-col gap-3">
-            {/* Primary CTA: let pending agents prepare drafts now */}
             <Button asChild className="w-full">
-              <Link href="/espace-agent/annonces/nouvelle">
-                📝 Préparer mes annonces
-              </Link>
+              <Link href="/">{t.backHome}</Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/">{s.backToHome}</Link>
-            </Button>
-            <Button asChild variant="ghost" className="w-full text-sm">
-              <Link href="/agents">{s.discoverAgents}</Link>
+              <Link href="/acheter">{t.browseListings}</Link>
             </Button>
           </div>
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-4">
-          {s.supportPrompt}{" "}
-          <a
-            href="mailto:support@okapi.immo"
-            className="text-primary hover:underline"
-          >
-            {s.supportLink}
+          {t.supportPrompt}{" "}
+          <a href="mailto:support@okapi.immo" className="text-primary hover:underline">
+            {t.supportLink}
           </a>
         </p>
       </div>

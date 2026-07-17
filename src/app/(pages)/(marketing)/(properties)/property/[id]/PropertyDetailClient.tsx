@@ -5,8 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { addFavourite, removeFavourite, createEnquiry } from "@/services/auth";
-import { recordPropertyView, recordPropertyShare } from "@/services/properties";
+import { recordPropertyView, recordPropertyShare, recordPropertyWhatsAppClick } from "@/services/properties";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import ShareButton from "@/shared/components/ui/ShareButton";
 import { PerformancePanel } from "@/features/properties/components/PerformancePulse";
 import {
@@ -146,15 +147,17 @@ function AgentInitials({ name, profile }: { name: string; profile?: string }) {
   return <AgentAvatar name={name} photo={profile} size={48} />;
 }
 
-function AgentCard({ detail, t }: { detail: PropertyDetail; t: ReturnType<typeof useT> }) {
+function AgentCard({ detail, t, id, onPerf }: {
+  detail: PropertyDetail; t: ReturnType<typeof useT>; id: string; onPerf: (p: PropertyPerformance) => void;
+}) {
   const dp = t.detail.property;
   return (
     <aside className="bg-white dark:bg-card rounded-2xl border border-border shadow-sm p-5 lg:sticky lg:top-28">
       <div className="flex items-center gap-3 mb-4">
-        <AgentInitials name={detail.agent.name} profile={detail.agent.photo} />
+        <AgentInitials name={detail.agent?.name ?? "—"} profile={detail.agent?.photo} />
         <div className="leading-tight">
-          <p className="text-[10px] font-semibold text-secondary tracking-widest">{detail.agent.title}</p>
-          <p className="text-sm font-semibold text-foreground">{detail.agent.name}</p>
+          <p className="text-[10px] font-semibold text-secondary tracking-widest">{detail.agent?.title}</p>
+          <p className="text-sm font-semibold text-foreground">{detail.agent?.name ?? "—"}</p>
           <p className="text-xs text-muted-foreground mt-0.5">{dp.responseTime}</p>
         </div>
       </div>
@@ -173,6 +176,7 @@ function AgentCard({ detail, t }: { detail: PropertyDetail; t: ReturnType<typeof
               .replace("{link}", link)
               .replace("{ref}", detail.reference ?? "");
             window.open(`https://wa.me/971523787362?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+            recordPropertyWhatsAppClick(id).then((p) => { if (p) onPerf(p); });
           }}
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -189,9 +193,9 @@ function AgentCard({ detail, t }: { detail: PropertyDetail; t: ReturnType<typeof
       <div className="mt-5 pt-5 border-t border-border">
         <p className="text-[10px] text-muted-foreground tracking-widest font-semibold mb-2">{dp.agencySection}</p>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-md bg-navy text-secondary flex items-center justify-center font-bold tracking-tight">{detail.agency.monogram}</div>
+          <div className="w-12 h-12 rounded-md bg-navy text-secondary flex items-center justify-center font-bold tracking-tight">{detail.agency?.monogram}</div>
           <div>
-            <p className="text-sm font-semibold text-foreground">{detail.agency.name}</p>
+            <p className="text-sm font-semibold text-foreground">{detail.agency?.name ?? "—"}</p>
             <Link href="/a-propos" className="text-xs text-primary hover:underline">{dp.viewAgency}</Link>
           </div>
         </div>
@@ -218,9 +222,10 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
   const [enquirySubmitted, setEnquirySubmitted] = useState(false);
   const [enquiryError, setEnquiryError] = useState<string | null>(null);
   const { token, isAuthenticated } = useAuthStore();
+  const { isAuthenticated: isAgentAuth } = useAgentSessionStore();
   const router = useRouter();
   const [perf, setPerf] = useState<PropertyPerformance>(
-    detail.performance ?? { viewed: 0, shared: 0, saved: 0 },
+    detail.performance ?? { viewed: 0, shared: 0, saved: 0, whatsappClicks: 0 },
   );
   const gallery = detail.gallery
     .map(getR2ImageUrl)
@@ -294,11 +299,13 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
             </div>
 
             <div className="flex items-center gap-0.5 text-sm shrink-0">
-              <button onClick={handleToggleFavourite} disabled={saving}
-                className={`inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted transition-colors disabled:opacity-60 ${saved ? "text-secondary" : "text-foreground/80"}`}>
-                <Heart className={`w-4 h-4 shrink-0 ${saved ? "fill-current" : ""}`} />
-                <span className="hidden md:inline">{saved ? dp.saved : dp.saveBtn}</span>
-              </button>
+              {!isAgentAuth && (
+                <button onClick={handleToggleFavourite} disabled={saving}
+                  className={`inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted transition-colors disabled:opacity-60 ${saved ? "text-secondary" : "text-foreground/80"}`}>
+                  <Heart className={`w-4 h-4 shrink-0 ${saved ? "fill-current" : ""}`} />
+                  <span className="hidden md:inline">{saved ? dp.saved : dp.saveBtn}</span>
+                </button>
+              )}
               <ShareButton title={detail.title} onShare={handleShared} iconOnly />
               <button className="inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted text-foreground/80">
                 <Flag className="w-4 h-4 shrink-0" />
@@ -503,10 +510,10 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
               <SectionHeading>{dp.presentedByHeading}</SectionHeading>
               <div className="rounded-xl border border-border bg-white dark:bg-card p-5">
                 <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-                  <AgentInitials name={detail.agent.name} profile={detail.agent.photo} />
+                  <AgentInitials name={detail.agent?.name ?? "—"} profile={detail.agent?.photo} />
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-foreground">{detail.agent.name}</p>
-                    <p className="text-xs text-muted-foreground">{detail.agent.title}</p>
+                    <p className="text-sm font-semibold text-foreground">{detail.agent?.name ?? "—"}</p>
+                    <p className="text-xs text-muted-foreground">{detail.agent?.title}</p>
                     <Link href="#" className="text-xs text-primary hover:underline mt-1 inline-block">{dp.agentPropertiesLink}</Link>
                   </div>
                   <div className="grid grid-cols-3 gap-3 text-center text-xs">
@@ -518,8 +525,8 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
               </div>
             </section>
 
-            {/* Enquiry */}
-            <section className="pt-2 border-t border-border">
+            {/* Enquiry — hidden for agents (they don't send enquiries) */}
+            {!isAgentAuth && <section className="pt-2 border-t border-border">
               <SectionHeading>{dp.enquiryHeading}</SectionHeading>
               {enquirySubmitted ? (
                 <div className="rounded-xl border border-green-200 bg-green-50 p-6 text-center">
@@ -542,7 +549,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                   </Button>
                 </div>
               )}
-            </section>
+            </section>}
 
             {/* Property details */}
             <section className="pt-2 border-t border-border">
@@ -560,7 +567,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                   <DetailRow label={dp.referenceLabel} value={detail.reference} />
                   <DetailRow label={dp.listedLabel} value={formatListedAgo(detail.listedDaysAgo)} />
                   <DetailRow label={dp.licenseLabel} value={detail.brokerLicense} />
-                  <DetailRow label={dp.agencyLabel} value={detail.agency.name} />
+                  <DetailRow label={dp.agencyLabel} value={detail.agency?.name} />
                   <DetailRow label={dp.zoneLabel} value={detail.zone} />
                   <DetailRow label={dp.permitLabel} value={detail.permitNumber} />
                 </div>
@@ -569,7 +576,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
           </div>
 
           {/* RIGHT */}
-          <AgentCard detail={detail} t={t} />
+          <AgentCard detail={detail} t={t} id={id} onPerf={setPerf} />
         </div>
 
         {/* Recommended */}
@@ -744,11 +751,11 @@ function RecommendedCard({ property, t }: { property: Property; t: ReturnType<ty
           sizes="280px"
         />
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
-          <AgentInitials name={property.agent.name} profile={property.agent.photo} />
+          <AgentInitials name={property.agent?.name ?? "—"} profile={property.agent?.photo} />
         </div>
       </div>
       <div className="p-4">
-        <p className="text-sm font-semibold text-foreground mb-1">{property.agent.name}</p>
+        <p className="text-sm font-semibold text-foreground mb-1">{property.agent?.name ?? "—"}</p>
         <p className="text-base font-bold text-foreground">{formatPrice(property.price, property.currency, property.period)}</p>
         <p className="text-xs text-muted-foreground mt-1">
           {property.bedrooms > 0 ? `${property.bedrooms} ${dp.bedroom} · ` : ""}

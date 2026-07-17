@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getMyAgentProfile } from "@/services/agentAuth";
 import { useT } from "@/i18n/useT";
@@ -888,9 +889,13 @@ function ActionSection({
 
       {/* Primary CTA */}
       <div className="px-4 py-4 border-b border-border">
-        <Button className="w-full justify-start gap-2" asChild>
+        <Button
+          size="sm"
+          className="w-full justify-start gap-2 text-xs whitespace-nowrap"
+          asChild
+        >
           <Link href="/espace-agence/annonces/nouvelle">
-            <PlusCircle className="w-4 h-4" />
+            <PlusCircle className="w-3.5 h-3.5 shrink-0" />
             {t.publishListing}
           </Link>
         </Button>
@@ -1109,11 +1114,7 @@ export default function EspaceAgencePage() {
   );
   const [loading, setLoading] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
+  const hydrated = useMounted();
 
   // Guard: redirect if no session (only after Zustand persist rehydrates)
   useEffect(() => {

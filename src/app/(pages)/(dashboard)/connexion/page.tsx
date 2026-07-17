@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { loginUser, getMe } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 
 const schema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
@@ -27,6 +28,7 @@ export default function LoginPage() {
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
   const { setAuth } = useAuthStore();
+  const { logout: clearAgentSession } = useAgentSessionStore();
 
   const {
     register,
@@ -39,6 +41,7 @@ export default function LoginPage() {
     try {
       const { access_token } = await loginUser(data.email, data.password);
       const user = await getMe(access_token);
+      clearAgentSession(); // enforce one role per session
       setAuth(access_token, user);
       router.push("/");
     } catch (err: unknown) {

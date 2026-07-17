@@ -13,13 +13,13 @@ export async function POST(
     const userId = request.headers.get("x-user-id");
     if (sessionId) headers["x-session-id"] = sessionId;
     if (userId) headers["x-user-id"] = userId;
-    const res = await axios.post(`${url}/properties/${id}/view`, {}, { headers });
+    const res = await axios.post(`${url}/properties/${id}/whatsapp-click`, {}, { headers });
     return new Response(JSON.stringify(res.data), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error recording property view:", error);
-    return new Response(JSON.stringify({ error: "Failed to record view" }), {
+    console.error("Error recording WhatsApp click:", error);
+    return new Response(JSON.stringify({ error: "Failed to record click" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

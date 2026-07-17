@@ -1,13 +1,33 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Check, Star, ArrowRight } from "lucide-react";
+import {
+  Check,
+  Star,
+  ArrowRight,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+} from "lucide-react";
 import { useT } from "@/i18n/useT";
+import { useAgentSessionStore } from "@/store/useAgentSessionStore";
+import { getMyAgentProfile } from "@/services/agentAuth";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+type AgentPlan = "FREE" | "PRO" | "AGENCY";
+
+type AgentProfile = {
+  plan: AgentPlan;
+  graceEndsAt: string | null;
+  properties?: { status: string }[];
+};
+
+type TierId = "gratuit" | "pro" | "agence";
+
 type Tier = {
-  id: string;
+  id: TierId;
   name: string;
   price: string | null;
   priceNote: string;
@@ -28,9 +48,102 @@ type BoostOption = {
   recommended: boolean;
 };
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+type CtaVariant = "primary" | "secondary" | "current" | "destructive" | "disabled" | "default";
 
-function TierCard({ tier }: { tier: Tier }) {
+// ── Plan status banner ────────────────────────────────────────────────────────
+
+function PlanBanner({ profile }: { profile: AgentProfile }) {
+  const p = useT().pages.sell;
+  const { plan, graceEndsAt } = profile;
+
+  if (plan === "PRO") {
+    return (
+      <div className="max-w-5xl mx-auto px-6 mb-2">
+        <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <p className="text-sm text-emerald-800 dark:text-emerald-300">
+            {p.planBannerProActive}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (plan === "AGENCY") {
+    return (
+      <div className="max-w-5xl mx-auto px-6 mb-2">
+        <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <p className="text-sm text-emerald-800 dark:text-emerald-300">
+            {p.planBannerAgencyActive}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // FREE plan — check grace period
+  const now = new Date();
+  const graceEnd = graceEndsAt ? new Date(graceEndsAt) : null;
+  const daysLeft = graceEnd
+    ? Math.ceil((graceEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+  const liveCount = (profile.properties ?? []).filter((prop) => prop.status === "LIVE").length;
+
+  if (!graceEnd || daysLeft <= 0) {
+    return (
+      <div className="max-w-5xl mx-auto px-6 mb-2">
+        <div className="flex items-start gap-3 px-5 py-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
+          <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-800 dark:text-red-300">
+            {p.planBannerGraceExpired}
+            {liveCount >= 10 && <span> {p.planBannerGraceExpiredCapReached.replace("{count}", String(liveCount))}</span>}
+            {" "}{p.planBannerGraceExpiredUpgrade}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (daysLeft <= 30) {
+    return (
+      <div className="max-w-5xl mx-auto px-6 mb-2">
+        <div className="flex items-start gap-3 px-5 py-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-700">
+          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 dark:text-amber-300">
+            {p.planBannerGraceExpiring.replace("{days}", String(daysLeft))}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Active grace — > 30 days left
+  return (
+    <div className="max-w-5xl mx-auto px-6 mb-2">
+      <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+        <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+        <p className="text-sm text-emerald-800 dark:text-emerald-300">
+          {p.planBannerGraceActive.replace("{days}", String(daysLeft))}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── TierCard ──────────────────────────────────────────────────────────────────
+
+function TierCard({
+  tier,
+  ctaVariant = "default",
+  ctaLabel,
+  ctaHref,
+}: {
+  tier: Tier;
+  ctaVariant?: CtaVariant;
+  ctaLabel?: string;
+  ctaHref?: string;
+}) {
   const { highlight, dark } = tier;
 
   const cardClass = dark
@@ -48,11 +161,55 @@ function TierCard({ tier }: { tier: Tier }) {
   const boostColor = dark ? "text-yellow-400" : "text-amber-500";
   const divColor   = dark ? "border-white/10" : "border-border";
 
-  const ctaClass = dark
-    ? "bg-white text-[#0d1b3e] hover:bg-white/90"
-    : highlight
-    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-    : "bg-background border border-border text-foreground hover:bg-muted";
+  // Resolve CTA
+  const resolvedLabel = ctaLabel ?? tier.cta;
+  const resolvedHref  = ctaHref  ?? tier.ctaHref;
+
+  let ctaClass: string;
+  let ctaContent: React.ReactNode;
+  let isClickable = true;
+
+  switch (ctaVariant) {
+    case "current":
+      isClickable = false;
+      ctaClass = dark
+        ? "bg-white/10 text-white/50"
+        : "bg-muted text-muted-foreground";
+      ctaContent = <><Check className="w-4 h-4" /> {resolvedLabel}</>;
+      break;
+
+    case "destructive":
+      ctaClass = "bg-transparent border border-destructive/50 text-destructive hover:bg-destructive/5";
+      ctaContent = <>{resolvedLabel} <ArrowRight className="w-4 h-4" /></>;
+      break;
+
+    case "disabled":
+      isClickable = false;
+      ctaClass = dark
+        ? "bg-white/5 text-white/30"
+        : "bg-muted/50 text-muted-foreground/50";
+      ctaContent = <span className="text-lg">—</span>;
+      break;
+
+    case "primary":
+      ctaClass = "bg-primary text-primary-foreground hover:bg-primary/90";
+      ctaContent = <>{resolvedLabel} <ArrowRight className="w-4 h-4" /></>;
+      break;
+
+    case "secondary":
+      ctaClass = "bg-background border border-border text-foreground hover:bg-muted";
+      ctaContent = <>{resolvedLabel} <ArrowRight className="w-4 h-4" /></>;
+      break;
+
+    default:
+      // Original style — based on card variant
+      ctaClass = dark
+        ? "bg-white text-[#0d1b3e] hover:bg-white/90"
+        : highlight
+        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+        : "bg-background border border-border text-foreground hover:bg-muted";
+      ctaContent = <>{resolvedLabel} <ArrowRight className="w-4 h-4" /></>;
+  }
 
   return (
     <div className={`relative flex flex-col rounded-2xl shadow-sm overflow-hidden ${cardClass}`}>
@@ -80,8 +237,15 @@ function TierCard({ tier }: { tier: Tier }) {
           </div>
         )}
 
+        {/* Cap note — more prominent styling */}
         {tier.sub && (
-          <p className={`mt-1.5 text-xs ${noteColor}`}>{tier.sub}</p>
+          <p className={`mt-2.5 text-[11px] font-semibold tracking-wide uppercase px-3 py-1 rounded-full inline-block ${
+            dark
+              ? "text-yellow-300 bg-yellow-900/30"
+              : "text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-900/30"
+          }`}>
+            {tier.sub}
+          </p>
         )}
 
         <p className={`mt-4 text-sm leading-relaxed ${blurbColor}`}>{tier.blurb}</p>
@@ -106,16 +270,53 @@ function TierCard({ tier }: { tier: Tier }) {
 
       {/* CTA */}
       <div className="px-6 pb-7 pt-2">
-        <Link
-          href={tier.ctaHref}
-          className={`flex items-center justify-center gap-2 w-full rounded-full h-11 text-sm font-semibold transition-colors ${ctaClass}`}
-        >
-          {tier.cta}
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+        {isClickable ? (
+          <Link
+            href={resolvedHref}
+            className={`flex items-center justify-center gap-2 w-full rounded-full h-11 text-sm font-semibold transition-colors ${ctaClass}`}
+          >
+            {ctaContent}
+          </Link>
+        ) : (
+          <div className={`flex items-center justify-center gap-2 w-full rounded-full h-11 text-sm font-semibold ${ctaClass}`}>
+            {ctaContent}
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function getTierCta(
+  tierId: TierId,
+  agentPlan: AgentPlan | null,
+  p: ReturnType<typeof useT>["pages"]["sell"],
+): { ctaVariant?: CtaVariant; ctaLabel?: string; ctaHref?: string } {
+  if (!agentPlan) return {};
+
+  const planHref = "/espace-agent/plan";
+
+  if (agentPlan === "FREE") {
+    if (tierId === "gratuit") return { ctaVariant: "current",     ctaLabel: p.ctaCurrentPlan };
+    if (tierId === "pro")     return { ctaVariant: "primary",     ctaLabel: p.ctaUpgradePro,    ctaHref: planHref };
+    if (tierId === "agence")  return { ctaVariant: "secondary",   ctaLabel: p.ctaUpgradeAgency, ctaHref: planHref };
+  }
+
+  if (agentPlan === "PRO") {
+    if (tierId === "gratuit") return { ctaVariant: "destructive", ctaLabel: p.ctaDowngrade,      ctaHref: planHref };
+    if (tierId === "pro")     return { ctaVariant: "current",     ctaLabel: p.ctaCurrentPlan };
+    if (tierId === "agence")  return { ctaVariant: "secondary",   ctaLabel: p.ctaUpgradeAgency, ctaHref: planHref };
+  }
+
+  if (agentPlan === "AGENCY") {
+    if (tierId === "gratuit") return { ctaVariant: "disabled" };
+    if (tierId === "pro")     return { ctaVariant: "disabled" };
+    if (tierId === "agence")  return { ctaVariant: "primary",     ctaLabel: p.ctaManagePlan,    ctaHref: planHref };
+  }
+
+  return {};
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -123,6 +324,18 @@ function TierCard({ tier }: { tier: Tier }) {
 export default function VendrePage() {
   const t = useT();
   const p = t.pages.sell;
+
+  const { isAuthenticated: isAgentAuth, token } = useAgentSessionStore();
+  const [agentProfile, setAgentProfile] = useState<AgentProfile | null>(null);
+
+  useEffect(() => {
+    if (!isAgentAuth || !token) return;
+    getMyAgentProfile(token)
+      .then((data: AgentProfile) => setAgentProfile(data))
+      .catch(() => {}); // fail silently — page renders fine without it
+  }, [isAgentAuth, token]);
+
+  const agentPlan: AgentPlan | null = agentProfile?.plan ?? null;
 
   const TIERS: Tier[] = [
     {
@@ -143,7 +356,7 @@ export default function VendrePage() {
       price: "$15",
       priceNote: p.tier2PriceNote,
       blurb: p.tier2Blurb,
-      features: [p.featUnlimited, p.tier2Feat1, p.featWhatsApp, p.featDirectContact, p.featAnalytics],
+      features: [p.featUnlimited, p.tier2Feat1, p.tier2Feat2, p.featWhatsApp, p.featDirectContact, p.featAnalytics],
       badge: p.tier2Badge,
       highlight: true,
       cta: p.tier2Cta,
@@ -182,31 +395,33 @@ export default function VendrePage() {
   return (
     <div className="bg-background-alt">
 
-      {/* ── Launch banner ── */}
-      <div className="bg-emerald-50 border-b border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800">
-        <div className="max-w-3xl mx-auto px-6 py-10 text-center">
-          <span className="inline-block bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wide uppercase">
-            {p.bannerBadge}
-          </span>
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
-            {p.bannerHeading}
-          </h2>
-          <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
-            {[p.bannerBullet1, p.bannerBullet2, p.bannerBullet3].map((b, i) => (
-              <li key={i} className="flex items-center justify-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500" /> {b}
-              </li>
-            ))}
-          </ul>
-          <Link
-            href="/devenir-agent"
-            className="mt-6 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-7 h-11 text-sm font-semibold transition-colors"
-          >
-            {p.bannerCta}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+      {/* ── Launch banner — hidden for signed-in agents ── */}
+      {!isAgentAuth && (
+        <div className="bg-emerald-50 border-b border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800">
+          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
+            <span className="inline-block bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wide uppercase">
+              {p.bannerBadge}
+            </span>
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+              {p.bannerHeading}
+            </h2>
+            <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+              {[p.bannerBullet1, p.bannerBullet2, p.bannerBullet3].map((b, i) => (
+                <li key={i} className="flex items-center justify-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-500" /> {b}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/devenir-agent"
+              className="mt-6 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-7 h-11 text-sm font-semibold transition-colors"
+            >
+              {p.bannerCta}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Header ── */}
       <section className="max-w-6xl mx-auto px-6 pt-14 pb-4 text-center">
@@ -216,12 +431,28 @@ export default function VendrePage() {
         <p className="mt-3 text-muted-foreground text-base">{p.subheading}</p>
       </section>
 
+      {/* ── Plan status banner (agents only) ── */}
+      {isAgentAuth && agentProfile && (
+        <section className="pt-6">
+          <PlanBanner profile={agentProfile} />
+        </section>
+      )}
+
       {/* ── Tier cards ── */}
       <section className="max-w-5xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TIERS.map((tier) => (
-            <TierCard key={tier.id} tier={tier} />
-          ))}
+          {TIERS.map((tier) => {
+            const cta = getTierCta(tier.id as TierId, agentPlan, p);
+            return (
+              <TierCard
+                key={tier.id}
+                tier={tier}
+                ctaVariant={cta.ctaVariant}
+                ctaLabel={cta.ctaLabel}
+                ctaHref={cta.ctaHref}
+              />
+            );
+          })}
         </div>
       </section>
 
@@ -308,13 +539,23 @@ export default function VendrePage() {
             ))}
           </div>
           <div className="mt-10">
-            <Link
-              href="/devenir-agent"
-              className="inline-flex items-center gap-2 rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-colors"
-            >
-              {p.startNow}
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {!isAgentAuth ? (
+              <Link
+                href="/devenir-agent"
+                className="inline-flex items-center gap-2 rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-colors"
+              >
+                {p.startNow}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <Link
+                href="/espace-agent"
+                className="inline-flex items-center gap-2 rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-colors"
+              >
+                {p.ctaAgentPortal}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </div>
       </section>

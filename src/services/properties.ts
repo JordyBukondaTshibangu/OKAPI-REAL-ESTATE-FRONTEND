@@ -3,6 +3,7 @@ import type {
   PropertyDetail,
   PropertyPerformance,
 } from "@/features/properties/types/property";
+import { getOrCreateSessionId } from "@/lib/session";
 
 export type PropertyParams = {
   listingType?: string;
@@ -37,12 +38,23 @@ export async function fetchPropertyById(id: string): Promise<PropertyDetail> {
  * Records a page view for a property. Fire-and-forget friendly:
  * returns the fresh performance counters, or null on failure.
  */
+/** Builds tracking headers — always sends x-session-id for deduplication. */
+function trackingHeaders(): Record<string, string> {
+  const sessionId = getOrCreateSessionId();
+  return sessionId ? { "x-session-id": sessionId } : {};
+}
+
+/**
+ * Records a page view for a property. Deduplicates by browser session —
+ * the same visitor can only increment the counter once.
+ */
 export async function recordPropertyView(
   id: string,
 ): Promise<PropertyPerformance | null> {
   try {
     const res = await fetch(`/api/listings/properties/${id}/view`, {
       method: "POST",
+      headers: trackingHeaders(),
     });
     if (!res.ok) return null;
     return res.json();
@@ -52,8 +64,7 @@ export async function recordPropertyView(
 }
 
 /**
- * Records a share for a property. Returns the fresh performance
- * counters, or null on failure.
+ * Records a share for a property. Deduplicates by browser session.
  */
 export async function recordPropertyShare(
   id: string,
@@ -61,6 +72,25 @@ export async function recordPropertyShare(
   try {
     const res = await fetch(`/api/listings/properties/${id}/share`, {
       method: "POST",
+      headers: trackingHeaders(),
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Records a WhatsApp button click. Deduplicates by browser session.
+ */
+export async function recordPropertyWhatsAppClick(
+  id: string,
+): Promise<PropertyPerformance | null> {
+  try {
+    const res = await fetch(`/api/listings/properties/${id}/whatsapp-click`, {
+      method: "POST",
+      headers: trackingHeaders(),
     });
     if (!res.ok) return null;
     return res.json();

@@ -12,6 +12,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { loginAgent } from "@/services/agentAuth";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const schema = z.object({
   identifier: z
@@ -29,6 +30,7 @@ export default function AgentLoginPage() {
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
   const { setSession } = useAgentSessionStore();
+  const { logout: clearUserSession } = useAuthStore();
 
   const {
     register,
@@ -43,13 +45,14 @@ export default function AgentLoginPage() {
         data.identifier,
         data.password,
       );
+      clearUserSession(); // enforce one role per session
       setSession(access_token, agent);
 
-      // Redirect based on approval state and agent type
+      // Redirect based on email verification + agent type.
+      // NON_VERIFIE agents land in espace-agent (with a pending banner) so they
+      // can create draft listings while waiting for admin approval.
       if (!agent.emailVerified) {
         router.push("/devenir-agent/verification");
-      } else if (agent.verificationTier === "NON_VERIFIE") {
-        router.push("/devenir-agent/en-attente");
       } else if (agent.agentType === "AGENCY_OWNER" && agent.agencyId) {
         router.push("/espace-agence");
       } else {

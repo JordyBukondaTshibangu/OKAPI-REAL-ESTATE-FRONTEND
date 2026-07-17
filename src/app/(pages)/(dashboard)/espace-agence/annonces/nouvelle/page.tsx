@@ -6,6 +6,7 @@ import Link from "next/link";
 import axios from "axios";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getMyAgentProfile } from "@/services/agentAuth";
 import { useT } from "@/i18n/useT";
@@ -58,7 +59,7 @@ export default function NouvelleAnnonceAgencePage() {
 
   const LISTING_TYPES = [{ value: "sale", label: t.typeSale }, { value: "rent", label: t.typeRent }];
   const PERIODS = [{ value: "month", label: t.periodMonth }, { value: "year", label: t.periodYear }, { value: "day", label: t.periodDay }];
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useMounted();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [teamAgents, setTeamAgents] = useState<{ id: string; name: string }[]>([]);
@@ -70,8 +71,6 @@ export default function NouvelleAnnonceAgencePage() {
     suburb: "", neighborhood: "", city: "Kinshasa",
     description: "", agentId: "",
   });
-
-  useEffect(() => { setHydrated(true); }, []);
 
   useEffect(() => {
     if (!hydrated) return;

@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { registerUser, getMe } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 
 const schema = z
   .object({
@@ -39,6 +40,7 @@ export default function RegisterPage() {
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
   const { setAuth } = useAuthStore();
+  const { logout: clearAgentSession } = useAgentSessionStore();
 
   const {
     register,
@@ -57,8 +59,9 @@ export default function RegisterPage() {
         password: data.password,
       });
       const user = await getMe(access_token);
+      clearAgentSession(); // enforce one role per session
       setAuth(access_token, user);
-      router.push("/profil");
+      router.push("/inscription/en-attente");
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       if (status === 409) {

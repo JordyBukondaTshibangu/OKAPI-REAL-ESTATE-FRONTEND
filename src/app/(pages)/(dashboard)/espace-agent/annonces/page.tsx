@@ -19,6 +19,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
@@ -92,14 +93,12 @@ export default function MesAnnoncesPage() {
     { key: "HIDDEN", label: t.tabHidden },
   ];
 
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useMounted();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [actioning, setActioning] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("ALL");
-
-  useEffect(() => { setHydrated(true); }, []);
 
   const fetchListings = useCallback(() => {
     if (!token) return;

@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
@@ -216,7 +217,7 @@ export default function ModifierAnnoncePage() {
   const { token, agent } = useAgentSessionStore();
   const t = useT().espaceAgent;
 
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useMounted();
   const [loadingProperty, setLoadingProperty] = useState(true);
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
@@ -253,8 +254,6 @@ export default function ModifierAnnoncePage() {
     shortTermNotes: "",
     amenities: [],
   });
-
-  useEffect(() => { setHydrated(true); }, []);
 
   // Fetch the property and pre-populate form
   useEffect(() => {
@@ -318,6 +317,9 @@ export default function ModifierAnnoncePage() {
 
   function addNewPhotos(files: FileList | null) {
     if (!files) return;
+    const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+    const oversized = Array.from(files).find((f) => f.size > MAX_SIZE);
+    if (oversized) { setError(t.errImageSize); return; }
     const toAdd = Array.from(files)
       .filter((f) => f.type.startsWith("image/"))
       .slice(0, 15 - totalPhotos);
@@ -369,9 +371,26 @@ export default function ModifierAnnoncePage() {
   // ── Validation ──────────────────────────────────────────────────────────────
 
   function validateStep(s: number): string | null {
-    if (s === 1 && !form.title.trim()) return t.errTitle;
-    if (s === 2 && !form.suburb) return t.errCommune;
-    if (s === 3 && (!form.price || isNaN(Number(form.price)))) return t.errPrice;
+    if (s === 1) {
+      const title = form.title.trim();
+      if (!title) return t.errTitle;
+      if (title.length < 10) return t.errTitleMin;
+      const desc = form.description.trim();
+      if (!desc) return t.errDescription;
+      if (desc.length < 20) return t.errDescMin;
+    }
+    if (s === 2) {
+      if (!form.suburb) return t.errCommune;
+      if (form.bedrooms && (Number(form.bedrooms) < 0 || Number(form.bedrooms) > 50)) return t.errBedroomsRange;
+      if (form.bathrooms && (Number(form.bathrooms) < 0 || Number(form.bathrooms) > 30)) return t.errBathroomsRange;
+      if (form.areaSqm && (Number(form.areaSqm) < 1 || Number(form.areaSqm) > 100_000)) return t.errAreaRange;
+    }
+    if (s === 3) {
+      const price = Number(form.price);
+      if (!form.price || isNaN(price) || price <= 0) return t.errPrice;
+      const minPrice = form.currency === "CDF" ? 1_000 : 10;
+      if (price < minPrice) return t.errPriceMin;
+    }
     return null;
   }
 

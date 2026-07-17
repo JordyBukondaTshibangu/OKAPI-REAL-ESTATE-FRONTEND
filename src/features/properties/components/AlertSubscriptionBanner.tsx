@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { createAlert } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 
 type Mode = "rent" | "sale" | "buy" | "commercial";
 
@@ -41,7 +42,11 @@ export default function AlertSubscriptionBanner({ mode }: { mode: Mode }) {
   const params = useSearchParams();
   const router = useRouter();
   const { token } = useAuthStore();
+  const { isAuthenticated: isAgentAuth } = useAgentSessionStore();
   const [state, setState] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  // Agents don't create saved searches
+  if (isAgentAuth) return null;
 
   const listingType = mode === "rent" ? "for-rent" : "for-sale";
 

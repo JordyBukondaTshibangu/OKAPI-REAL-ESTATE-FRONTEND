@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Breadcrumbs, { Crumb } from "./Breadcrumbs";
 import SearchFilterBar from "./SearchFilterBar";
 import { useT } from "@/i18n/useT";
@@ -22,12 +24,20 @@ export default function ListingHero({
   typeRoutes?: Record<string, string>;
 }) {
   const t = useT();
+  const pathname = usePathname();
   const title =
     mode === "rent"
       ? t.listingHero.rentTitle
       : mode === "commercial"
       ? t.listingHero.commercialTitle
       : t.listingHero.buyTitle;
+
+  const modeTabs = [
+    { label: t.nav.buy, href: "/acheter" },
+    { label: t.nav.rent, href: "/louer" },
+    { label: t.nav.commercial, href: "/commercial" },
+  ];
+
   return (
     <section className="relative z-40 bg-background-alt pt-8 pb-16 px-6">
       {/* Decorative side art — abstract Kinshasa skyline */}
@@ -96,6 +106,25 @@ export default function ListingHero({
         </div>
 
         <div className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border p-6 md:p-7 lg:min-w-2xl">
+          {/* Mode tabs */}
+          <div className="flex gap-1 mb-5 border-b border-border">
+            {modeTabs.map((tab) => {
+              const active = pathname?.startsWith(tab.href);
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                    active
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </div>
           <div className="mb-5">
             <h1 className="text-2xl md:text-3xl font-semibold text-foreground inline">
               {title}

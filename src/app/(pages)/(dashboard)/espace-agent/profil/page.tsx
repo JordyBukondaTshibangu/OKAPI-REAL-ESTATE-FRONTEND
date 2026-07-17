@@ -15,6 +15,7 @@ import {
   FileText,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getMyAgentProfile } from "@/services/agentAuth";
 import { useT } from "@/i18n/useT";
@@ -139,13 +140,14 @@ export default function EditProfilePage() {
   const router = useRouter();
   const { token, setAgent, agent: sessionAgent } = useAgentSessionStore();
   const t = useT().espaceAgent;
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useMounted();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
   const [initials, setInitials] = useState("??");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const AGENT_TYPES = [
@@ -172,10 +174,6 @@ export default function EditProfilePage() {
     yearsExperienceLabel: "",
     bio: "",
   });
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -239,6 +237,38 @@ export default function EditProfilePage() {
         [key]: arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val],
       };
     });
+  }
+
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+    setUploadingPhoto(true);
+    setError(null);
+    try {
+      // 1. Get presigned upload URL
+      const { data: { url, key } } = await axios.post(
+        "/api/proxy/uploads/presign-agent-avatar",
+        { filename: file.name, contentType: file.type },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      // 2. Upload directly to R2
+      await axios.put(url, file, { headers: { "Content-Type": file.type } });
+      // 3. Save the key to the agent profile
+      await axios.patch(
+        "/api/proxy/agents/me/photo",
+        { key },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      // 4. Show preview immediately (CDN URL loads on next profile fetch)
+      setAvatarSrc(URL.createObjectURL(file));
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      setError(Array.isArray(msg) ? msg.join(", ") : (msg ?? "Impossible de mettre à jour la photo."));
+    } finally {
+      setUploadingPhoto(false);
+      // Reset so the same file can be re-selected if needed
+      if (fileRef.current) fileRef.current.value = "";
+    }
   }
 
   async function handleSave() {
@@ -344,27 +374,32 @@ export default function EditProfilePage() {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="hidden lg:flex items-center gap-1.5 text-xs text-primary border border-primary/30 bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition"
+                  disabled={uploadingPhoto}
+                  className="hidden lg:flex items-center gap-1.5 text-xs text-primary border border-primary/30 bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition disabled:opacity-50"
                 >
-                  <Camera className="w-3 h-3" /> {t.changePhoto}
+                  {uploadingPhoto
+                    ? <Loader2 className="w-3 h-3 animate-spin" />
+                    : <Camera className="w-3 h-3" />}
+                  {t.changePhoto}
                 </button>
                 {/* Mobile change photo: icon only */}
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="lg:hidden flex-shrink-0 w-8 h-8 rounded-full border border-border bg-muted flex items-center justify-center hover:bg-muted/80 transition"
+                  disabled={uploadingPhoto}
+                  className="lg:hidden flex-shrink-0 w-8 h-8 rounded-full border border-border bg-muted flex items-center justify-center hover:bg-muted/80 transition disabled:opacity-50"
                   title={t.changePhoto}
                 >
-                  <Camera className="w-3.5 h-3.5 text-muted-foreground" />
+                  {uploadingPhoto
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                    : <Camera className="w-3.5 h-3.5 text-muted-foreground" />}
                 </button>
                 <input
                   ref={fileRef}
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={() => {
-                    /* handled separately */
-                  }}
+                  onChange={handlePhotoChange}
                 />
               </div>
 
@@ -403,14 +438,14 @@ export default function EditProfilePage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 text-xs"
+                    className="flex-1 text-xs whitespace-nowrap"
                     asChild
                   >
                     <Link href="/espace-agent">{t.cancelBtn}</Link>
                   </Button>
                   <Button
                     size="sm"
-                    className="flex-1 text-xs"
+                    className="flex-1 text-xs whitespace-nowrap"
                     onClick={handleSave}
                     disabled={saving}
                   >

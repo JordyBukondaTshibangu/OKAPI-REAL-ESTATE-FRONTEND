@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Eye, Flame, Heart, Share2, TrendingUp } from "lucide-react";
+import { Eye, Flame, Heart, MessageCircle, Share2, TrendingUp } from "lucide-react";
 import type { PropertyPerformance } from "@/features/properties/types/property";
 import { formatCompactCount } from "@/lib/properties";
 import { useT } from "@/i18n/useT";
@@ -11,7 +11,7 @@ import { useT } from "@/i18n/useT";
    Score doubles as the gauge percentage (capped at 100).               */
 
 export function demandScore(perf: PropertyPerformance): number {
-  return perf.viewed + perf.shared * 5 + perf.saved * 10;
+  return perf.viewed + perf.shared * 5 + perf.saved * 10 + (perf.whatsappClicks ?? 0) * 15;
 }
 
 export function isHotProperty(perf?: PropertyPerformance | null): boolean {
@@ -124,7 +124,7 @@ export function PerformancePanel({ perf }: { perf: PropertyPerformance }) {
         {hot && <HotBadge label={dp.perfHot} />}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatTile
           icon={<Eye className="w-4 h-4" />}
           value={perf.viewed}
@@ -142,6 +142,12 @@ export function PerformancePanel({ perf }: { perf: PropertyPerformance }) {
           value={perf.saved}
           label={dp.perfSaves}
           accent="bg-rose-500/10 text-rose-500"
+        />
+        <StatTile
+          icon={<MessageCircle className="w-4 h-4" />}
+          value={perf.whatsappClicks ?? 0}
+          label={dp.perfWhatsApp}
+          accent="bg-green-500/10 text-green-600"
         />
       </div>
 

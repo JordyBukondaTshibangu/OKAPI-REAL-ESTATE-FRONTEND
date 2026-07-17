@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
@@ -227,7 +228,7 @@ export default function NouvelleAnnoncePage() {
   const STEP_LABELS = [t.stepInfoLabel, t.stepLocationLabel, t.stepPriceLabel, t.stepPhotosLabel];
   const CARD_HEADERS = [t.cardStep1, t.cardStep2, t.cardStep3, t.cardStep4];
 
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useMounted();
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [savingDraft, setSavingDraft] = useState(false);
@@ -262,7 +263,6 @@ export default function NouvelleAnnoncePage() {
     amenities: [],
   });
 
-  useEffect(() => { setHydrated(true); }, []);
   useEffect(() => {
     if (hydrated && !token) router.replace("/connexion-agent");
   }, [hydrated, token, router]);
@@ -284,6 +284,9 @@ export default function NouvelleAnnoncePage() {
 
   function addPhotos(files: FileList | null) {
     if (!files) return;
+    const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+    const oversized = Array.from(files).find((f) => f.size > MAX_SIZE);
+    if (oversized) { setError(t.errImageSize); return; }
     const toAdd = Array.from(files)
       .filter((f) => f.type.startsWith("image/"))
       .slice(0, 15 - photos.length);
@@ -343,9 +346,35 @@ export default function NouvelleAnnoncePage() {
   // ── Validation ──────────────────────────────────────────────────────────────
 
   function validateStep(s: number): string | null {
-    if (s === 1 && !form.title.trim()) return t.errTitle;
-    if (s === 2 && !form.suburb) return t.errCommune;
-    if (s === 3 && (!form.price || isNaN(Number(form.price)))) return t.errPrice;
+    if (s === 1) {
+      const title = form.title.trim();
+      if (!title) return t.errTitle;
+      if (title.length < 10) return t.errTitleMin;
+      const desc = form.description.trim();
+      if (!desc) return t.errDescription;
+      if (desc.length < 20) return t.errDescMin;
+    }
+    if (s === 2) {
+      if (!form.suburb) return t.errCommune;
+      if (form.bedrooms && (Number(form.bedrooms) < 0 || Number(form.bedrooms) > 50)) return t.errBedroomsRange;
+      if (form.bathrooms && (Number(form.bathrooms) < 0 || Number(form.bathrooms) > 30)) return t.errBathroomsRange;
+      if (form.areaSqm && (Number(form.areaSqm) < 1 || Number(form.areaSqm) > 100_000)) return t.errAreaRange;
+    }
+    if (s === 3) {
+      const price = Number(form.price);
+      if (!form.price || isNaN(price) || price <= 0) return t.errPrice;
+      const minPrice = form.currency === "CDF" ? 1_000 : 10;
+      if (price < minPrice) return t.errPriceMin;
+    }
+    return null;
+  }
+
+  /** Full pre-submit check across all steps. */
+  function validateForSubmit(): string | null {
+    for (let s = 1; s <= 3; s++) {
+      const err = validateStep(s);
+      if (err) return err;
+    }
     return null;
   }
 
@@ -420,7 +449,7 @@ export default function NouvelleAnnoncePage() {
       setError(t.errMinPhotos);
       return;
     }
-    const stepErr = validateStep(3);
+    const stepErr = validateForSubmit();
     if (stepErr) { setError(stepErr); return; }
     setError(null);
     setSubmitting(true);

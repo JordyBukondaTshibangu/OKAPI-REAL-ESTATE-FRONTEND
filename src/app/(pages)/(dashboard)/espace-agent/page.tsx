@@ -10,7 +10,6 @@ import {
   Phone,
   MessageCircle,
   CheckCircle,
-  AlertCircle,
   ChevronRight,
   Lock,
   Eye,
@@ -25,6 +24,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getMyAgentProfile } from "@/services/agentAuth";
 import { useT } from "@/i18n/useT";
@@ -367,20 +367,33 @@ function GracePeriodBar({ profile, t }: { profile: AgentProfile; t: T }) {
   );
 }
 
-function NotificationStrip({ profile, t }: { profile: AgentProfile; t: T }) {
-  const notices: {
-    type: "warn" | "info" | "alert";
-    text: string;
-    cta?: { label: string; href: string };
-  }[] = [];
-
+// Replaces the old multi-banner NotificationStrip with a single checklist card.
+function TodoCard({ profile, t }: { profile: AgentProfile; t: T }) {
+  const isPending = profile.verificationTier === "NON_VERIFIE";
   const profileIncomplete =
     !profile.bio && (!profile.communes || profile.communes.length === 0);
+  const hasListings = (profile.properties?.length ?? 0) > 0;
+
+  const items: {
+    text: string;
+    ctaLabel: string;
+    ctaHref: string;
+    warn?: boolean;
+  }[] = [];
+
   if (profileIncomplete) {
-    notices.push({
-      type: "warn",
-      text: t.notifIncomplete,
-      cta: { label: t.notifIncompleteLink, href: "/espace-agent/profil" },
+    items.push({
+      text: t.todoCompleteProfile,
+      ctaLabel: t.notifIncompleteLink,
+      ctaHref: "/espace-agent/profil",
+    });
+  }
+
+  if (!hasListings) {
+    items.push({
+      text: t.todoCreateListing,
+      ctaLabel: t.todoCreateListingCta,
+      ctaHref: "/espace-agent/annonces/nouvelle",
     });
   }
 
@@ -389,39 +402,77 @@ function NotificationStrip({ profile, t }: { profile: AgentProfile; t: T }) {
       (new Date(profile.graceEndsAt).getTime() - Date.now()) / 86400000,
     );
     if (daysLeft > 0 && daysLeft <= 30) {
-      notices.push({
-        type: "info",
+      items.push({
         text: t.notifGraceEnding.replace("{days}", String(daysLeft)),
-        cta: { label: t.notifGraceEndingCta, href: "/plans" },
+        ctaLabel: t.notifGraceEndingCta,
+        ctaHref: "/plans",
+        warn: true,
       });
     }
   }
 
-  if (notices.length === 0) return null;
+  // Nothing to show at all
+  if (items.length === 0 && !isPending) return null;
 
   return (
-    <div className="space-y-2">
-      {notices.map((n, i) => (
-        <div
-          key={i}
-          className={`flex items-start gap-3 px-4 py-3 rounded-xl border text-sm ${
-            n.type === "warn"
-              ? "bg-amber-50 border-amber-200 text-amber-800"
-              : "bg-blue-50 border-blue-200 text-blue-800"
-          }`}
-        >
-          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-          <p className="flex-1">{n.text}</p>
-          {n.cta && (
-            <Link
-              href={n.cta.href}
-              className="underline underline-offset-2 whitespace-nowrap font-medium"
+    <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+      <div className="px-4 py-3 bg-muted/40 border-b border-border">
+        <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
+          {t.todoCardTitle}
+        </p>
+      </div>
+
+      <div className="divide-y divide-border">
+        {items.map((item, i) => (
+          <div
+            key={i}
+            className={`flex items-center gap-3 px-4 py-3 ${item.warn ? "bg-amber-50/60 dark:bg-amber-950/20" : ""}`}
+          >
+            {/* Checkbox visual */}
+            <div className="w-4 h-4 rounded border border-muted-foreground/30 flex-shrink-0" />
+            <span
+              className={`flex-1 text-sm ${item.warn ? "text-amber-800 dark:text-amber-300" : "text-foreground"}`}
             >
-              {n.cta.label} →
+              {item.text}
+            </span>
+            <Link
+              href={item.ctaHref}
+              className="text-xs text-primary font-semibold hover:underline whitespace-nowrap shrink-0"
+            >
+              {item.ctaLabel} →
             </Link>
-          )}
-        </div>
-      ))}
+          </div>
+        ))}
+
+        {/* Pending status row — always shown while account is pending */}
+        {isPending && (
+          <div className="flex items-center gap-3 px-4 py-3">
+            <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
+            <span className="text-sm text-muted-foreground">
+              {t.todoPendingStatus}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PendingPrompt({ t }: { t: T }) {
+  return (
+    <div className="bg-card rounded-2xl shadow-sm p-6 text-center">
+      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+        <User className="w-6 h-6 text-primary" />
+      </div>
+      <p className="text-sm font-semibold text-foreground mb-1">
+        {t.pendingPromptTitle}
+      </p>
+      <p className="text-xs text-muted-foreground mb-4 max-w-xs mx-auto leading-relaxed">
+        {t.pendingPromptBody}
+      </p>
+      <Button size="sm" asChild>
+        <Link href="/espace-agent/profil">{t.pendingPromptCta}</Link>
+      </Button>
     </div>
   );
 }
@@ -565,9 +616,13 @@ function ActionSection({ t }: { t: T }) {
 
       {/* Primary CTA */}
       <div className="px-4 py-4 border-b border-border">
-        <Button className="w-full justify-start gap-2" asChild>
+        <Button
+          size="sm"
+          className="w-full justify-start gap-2 text-xs whitespace-nowrap"
+          asChild
+        >
           <Link href="/espace-agent/annonces/nouvelle">
-            <PlusCircle className="w-4 h-4" />
+            <PlusCircle className="w-3.5 h-3.5 shrink-0" />
             {t.publishListing}
           </Link>
         </Button>
@@ -686,7 +741,12 @@ function ListingsSection({
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-medium truncate">{p.title}</p>
                       <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${st.color}`}
+                        className={`text-[10px] px-1.5 py-0.5 rounded border font-medium cursor-help ${st.color}`}
+                        title={
+                          p.status === "pending"
+                            ? "En cours de vérification — visible sous 24h"
+                            : undefined
+                        }
                       >
                         {st.label}
                       </span>
@@ -755,11 +815,7 @@ export default function EspaceAgentPage() {
   const t = useT().espaceAgent;
   const [profile, setProfile] = useState<AgentProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
+  const hydrated = useMounted();
 
   useEffect(() => {
     if (!hydrated) return;
@@ -800,41 +856,48 @@ export default function EspaceAgentPage() {
     .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-muted">
-      <main className="max-w-[1400px] mx-auto px-4 py-6">
-        {/* ── Mobile / Tablet: single column stacked ── */}
-        <div className="flex flex-col gap-5 lg:hidden">
+    <div className="min-h-screen bg-muted overflow-x-hidden">
+      <main className="w-full max-w-[1400px] mx-auto px-4 py-6">
+        {/* ── Mobile: single column ── */}
+        <div className="flex flex-col gap-5 md:hidden">
           <ProfileSection profile={agent} initials={initials} t={t} />
           <GracePeriodBar profile={agent} t={t} />
-          <NotificationStrip profile={agent} t={t} />
-          <KpiCards profile={agent} t={t} />
+          <TodoCard profile={agent} t={t} />
+          {agent.verificationTier === "NON_VERIFIE" ? (
+            <PendingPrompt t={t} />
+          ) : (
+            <KpiCards profile={agent} t={t} />
+          )}
           <ActionSection t={t} />
           <ListingsSection properties={agent.properties} t={t} />
-          <p className="text-center text-xs text-muted-foreground pb-2">
-            {t.comingSoon}
-          </p>
         </div>
 
-        {/* ── Desktop: 3-column grid ── */}
-        <div className="hidden lg:grid lg:grid-cols-[300px_1fr_300px] lg:gap-5 lg:items-start">
+        {/* ── Tablet + Desktop: multi-column grid ── */}
+        {/* md: 2-col [sidebar | main]   lg: 3-col [sidebar | main | actions] */}
+        <div className="hidden md:grid md:grid-cols-[260px_1fr] lg:grid-cols-[280px_1fr_260px] gap-5 items-start">
           {/* LEFT sidebar */}
           <div className="flex flex-col gap-4 min-w-0">
             <ProfileSection profile={agent} initials={initials} t={t} />
             <GracePeriodBar profile={agent} t={t} />
-            <NotificationStrip profile={agent} t={t} />
+            <TodoCard profile={agent} t={t} />
           </div>
 
           {/* CENTER column */}
           <div className="flex flex-col gap-4 min-w-0">
-            <KpiCards profile={agent} t={t} />
+            {agent.verificationTier === "NON_VERIFIE" ? (
+              <PendingPrompt t={t} />
+            ) : (
+              <KpiCards profile={agent} t={t} />
+            )}
             <ListingsSection properties={agent.properties} t={t} />
-            <p className="text-center text-xs text-muted-foreground pb-2">
-              {t.comingSoon}
-            </p>
+            {/* ActionSection moves here on tablet (< lg) */}
+            <div className="lg:hidden">
+              <ActionSection t={t} />
+            </div>
           </div>
 
-          {/* RIGHT sidebar */}
-          <div className="flex flex-col gap-4 min-w-0">
+          {/* RIGHT sidebar — desktop only */}
+          <div className="hidden lg:flex flex-col gap-4 min-w-0">
             <ActionSection t={t} />
           </div>
         </div>

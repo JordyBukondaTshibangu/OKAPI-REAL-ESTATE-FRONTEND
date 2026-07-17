@@ -255,7 +255,7 @@ export type Messages = {
       recommendedHeading: string; prevBtn: string; nextBtn: string;
       breadHome: string; breadRent: string; breadBuy: string;
       perfHeading: string; perfHot: string;
-      perfViews: string; perfShares: string; perfSaves: string;
+      perfViews: string; perfShares: string; perfSaves: string; perfWhatsApp: string;
       perfDemandLabel: string;
       perfDemandLow: string; perfDemandModerate: string; perfDemandHigh: string; perfDemandVeryHigh: string;
       perfSavedNote: string;
@@ -416,7 +416,7 @@ export type Messages = {
       tier1Feat1: string; tier1Feat2: string; tier1Feat3: string; tier1Cta: string;
       // Tier 2 — Pro
       tier2Name: string; tier2PriceNote: string; tier2Blurb: string;
-      tier2Badge: string; tier2Feat1: string; tier2Cta: string;
+      tier2Badge: string; tier2Feat1: string; tier2Feat2: string; tier2Cta: string;
       // Tier 3 — Agence
       tier3Name: string; tier3PriceNote: string; tier3Blurb: string;
       tier3Feat1: string; tier3Feat2: string; tier3Feat3: string; tier3Feat4: string; tier3Cta: string;
@@ -435,7 +435,25 @@ export type Messages = {
       stat2Value: string; stat2Label: string;
       stat3Value: string; stat3Label: string;
       startNow: string;
+      // Plan-aware CTAs
+      ctaCurrentPlan: string; ctaUpgradePro: string; ctaUpgradeAgency: string;
+      ctaDowngrade: string; ctaManagePlan: string; ctaAgentPortal: string;
+      // Plan status banners
+      planBannerProActive: string; planBannerAgencyActive: string;
+      planBannerGraceExpired: string; planBannerGraceExpiredCapReached: string;
+      planBannerGraceExpiredUpgrade: string;
+      planBannerGraceExpiring: string;
+      planBannerGraceActive: string;
     };
+  };
+  userPending: {
+    stepCreated: string; stepCreatedDesc: string;
+    stepVerifying: string; stepVerifyingDesc: string;
+    stepActivated: string; stepActivatedDesc: string;
+    title: string; subtitle: string;
+    infoDelay: string; infoEmail: string;
+    backHome: string; browseListings: string;
+    supportPrompt: string; supportLink: string;
   };
   dashboard: {
     userFallback: string;
@@ -658,6 +676,19 @@ export type Messages = {
     notifGraceEnding: string;
     notifGraceEndingCta: string;
     publishFirstListing: string;
+    // TodoCard
+    todoCardTitle: string;
+    todoCompleteProfile: string;
+    todoCreateListing: string; todoCreateListingCta: string;
+    todoPendingStatus: string;
+    // PendingPrompt
+    pendingPromptTitle: string; pendingPromptBody: string; pendingPromptCta: string;
+    // Listing badge tooltip
+    pendingBadgeTooltip: string;
+    // Agent nav (Header)
+    agentNavSearch: string; agentNavListings: string; agentNavBoosts: string; agentNavPortal: string;
+    agentPortalLabel: string; agencyPortalLabel: string;
+    myAgentPortalLink: string; myAgencyPortalLink: string;
     // Agent types
     typeAgent: string;
     typeOther: string;
@@ -736,9 +767,17 @@ export type Messages = {
     saveDraftBtn: string;
     submitBtn: string;
     errTitle: string;
+    errTitleMin: string;
+    errDescription: string;
+    errDescMin: string;
     errPrice: string;
+    errPriceMin: string;
     errCommune: string;
     errPublish: string;
+    errImageSize: string;
+    errBedroomsRange: string;
+    errBathroomsRange: string;
+    errAreaRange: string;
     back: string;
     backToListings: string;
     // Listing lifecycle
@@ -929,9 +968,17 @@ export type Messages = {
     publishing: string;
     publishBtn: string;
     errTitle: string;
+    errTitleMin: string;
+    errDescription: string;
+    errDescMin: string;
     errPrice: string;
+    errPriceMin: string;
     errCommune: string;
     errPublish: string;
+    errImageSize: string;
+    errBedroomsRange: string;
+    errBathroomsRange: string;
+    errAreaRange: string;
     back: string;
     backToListings: string;
   };

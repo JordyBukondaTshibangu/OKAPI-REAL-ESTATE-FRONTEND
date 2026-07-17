@@ -21,6 +21,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ShareButton from "@/shared/components/ui/ShareButton";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getAgentReviews, createReview, type Review } from "@/services/auth";
 import { useT } from "@/i18n/useT";
 
@@ -120,6 +121,7 @@ export default function AgentDetailClient({
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const { token, isAuthenticated } = useAuthStore();
+  const { isAuthenticated: isAgentAuth } = useAgentSessionStore();
   const router = useRouter();
 
   const t = useT();
@@ -479,8 +481,8 @@ export default function AgentDetailClient({
             )}
           </div>
 
-          {/* Submit review */}
-          <div className="mb-6 rounded-xl bg-accent/50 border border-accent p-5">
+          {/* Submit review — hidden for agents */}
+          {!isAgentAuth && <div className="mb-6 rounded-xl bg-accent/50 border border-accent p-5">
             <h3 className="text-sm font-semibold text-foreground mb-3">
               {isAuthenticated ? da.leaveReviewLabel : da.loginToReviewLabel}
             </h3>
@@ -538,7 +540,7 @@ export default function AgentDetailClient({
                 {reviewSubmitting ? da.publishingLabel : da.publishBtn}
               </Button>
             </div>
-          </div>
+          </div>}
 
           {/* Reviews list */}
           {reviewsLoading ? (

@@ -13,6 +13,7 @@ import {
   Globe,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getMyAgentProfile } from "@/services/agentAuth";
 import { useT } from "@/i18n/useT";
@@ -134,7 +135,7 @@ export default function EditAgencyProfilePage() {
   const router = useRouter();
   const { token, agent: sessionAgent } = useAgentSessionStore();
   const t = useT().espaceAgence;
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useMounted();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -153,10 +154,6 @@ export default function EditAgencyProfilePage() {
     rentalFocus: "LONG_TERM",
     languages: [],
   });
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -366,14 +363,14 @@ export default function EditAgencyProfilePage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 text-xs"
+                    className="flex-1 text-xs whitespace-nowrap"
                     asChild
                   >
                     <Link href="/espace-agence">{t.cancelBtn}</Link>
                   </Button>
                   <Button
                     size="sm"
-                    className="flex-1 text-xs"
+                    className="flex-1 text-xs whitespace-nowrap"
                     onClick={handleSave}
                     disabled={saving}
                   >
