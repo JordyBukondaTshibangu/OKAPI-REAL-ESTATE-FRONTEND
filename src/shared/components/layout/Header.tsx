@@ -6,6 +6,7 @@ import ThemeToggle from "@/shared/components/ui/ThemeToggle";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useMounted } from "@/shared/hooks/useMounted";
+import { useAuthHydrated } from "@/shared/hooks/useAuthHydrated";
 import { useT } from "@/i18n/useT";
 import {
   Bell,
@@ -192,6 +193,7 @@ function UtilityCluster() {
 function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const mounted = useMounted();
+  const hydrated = useAuthHydrated();
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -228,7 +230,7 @@ function ProfileMenu() {
     router.push("/");
   }
 
-  if (!mounted) {
+  if (!mounted || !hydrated) {
     return (
       <div className="flex items-center gap-2">
         <UtilityCluster />

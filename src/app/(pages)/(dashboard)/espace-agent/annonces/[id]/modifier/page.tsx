@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { KINSHASA_COMMUNES } from "@/constants/kinshasa";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -38,10 +39,7 @@ const CATEGORIES = [
   { value: "warehouse",  label: "Entrepôt" },
 ];
 
-const COMMUNES = [
-  "Gombe","Limete","Ngaliema","Kalamu","Ndjili","Kintambo",
-  "Barumbu","Kinshasa","Lemba","Matete","Selembao","Makala","Bumbu","Masina",
-];
+const COMMUNES = KINSHASA_COMMUNES;
 
 const CURRENCIES = ["USD", "CDF"];
 

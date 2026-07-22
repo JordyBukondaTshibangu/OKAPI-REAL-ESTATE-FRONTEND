@@ -85,12 +85,17 @@ export default function PropertyListingPage({
           </div>
 
           {(activeFilters > 0 || travelFilterIds) && (
-            <p className="text-sm text-muted-foreground mb-4">
-              <span className="font-semibold text-foreground">
-                {filteredProperties.length}
-              </span>{" "}
-              {t.listing.foundWithFilters.replace("{count}", String(filteredProperties.length))}
-            </p>
+            <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+              <p className="text-sm text-muted-foreground">
+                <span className="font-semibold text-foreground">
+                  {filteredProperties.length}
+                </span>{" "}
+                {t.listing.foundWithFilters.replace("{count}", String(filteredProperties.length))}
+              </p>
+              {filteredProperties.length > 0 && (
+                <AlertSubscriptionBanner mode={mode} compact />
+              )}
+            </div>
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">

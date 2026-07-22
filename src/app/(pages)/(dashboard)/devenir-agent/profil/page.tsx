@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { KINSHASA_COMMUNES } from "@/constants/kinshasa";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,10 +32,7 @@ const YEARS_EXP = [
   "Plus de 5 ans",
 ];
 
-const COMMUNES = [
-  "Gombe", "Limete", "Ngaliema", "Kalamu", "Ndjili",
-  "Kintambo", "Barumbu", "Kinshasa", "Autre",
-];
+const COMMUNES = KINSHASA_COMMUNES;
 
 const PROPERTY_TYPES = [
   "Appartements", "Villas", "Studios", "Commerciaux",

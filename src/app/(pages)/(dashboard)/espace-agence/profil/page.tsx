@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { KINSHASA_COMMUNES } from "@/constants/kinshasa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
@@ -20,23 +21,7 @@ import { useT } from "@/i18n/useT";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const COMMUNES = [
-  "Gombe",
-  "Limete",
-  "Ngaliema",
-  "Kalamu",
-  "Ndjili",
-  "Kintambo",
-  "Barumbu",
-  "Kinshasa (toute)",
-  "Lemba",
-  "Matete",
-  "Selembao",
-  "Makala",
-  "Bumbu",
-  "Masina",
-  "N'Sele",
-];
+const COMMUNES = KINSHASA_COMMUNES;
 
 const PROPERTY_TYPES = [
   "Appartements",

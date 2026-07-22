@@ -182,8 +182,15 @@ export type Favourite = {
     price: number;
     imageUrl?: string;
     location: string;
+    suburb: string | null;
+    city: string | null;
     type: string;
-    gallery : string[]
+    category: string | null;
+    listingType: string | null;
+    status: string | null;
+    period: string | null;
+    gallery: string[];
+    agent?: { whatsappNumber: string | null; phoneNumber: string | null } | null;
   };
   createdAt: string;
 };
@@ -208,6 +215,18 @@ export async function removeFavourite(token: string, propertyId: string) {
   await axios.delete(`${BASE}/api/user/favorites/${propertyId}`, {
     headers: authHeader(token),
   });
+}
+
+export async function createAlertFromFavourite(
+  token: string,
+  propertyId: string
+): Promise<{ alert: Alert; created: boolean }> {
+  const res = await axios.post(
+    `${BASE}/api/user/alerts/from-favourite/${propertyId}`,
+    {},
+    { headers: authHeader(token) }
+  );
+  return res.data;
 }
 
 // ── Enquiries ─────────────────────────────────────────────────────────────────

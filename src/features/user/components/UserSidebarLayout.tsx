@@ -8,6 +8,7 @@ import { User, Heart, MessageSquare, Bell, Star, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useT } from "@/i18n/useT";
 import { useMounted } from "@/shared/hooks/useMounted";
+import { useAuthHydrated } from "@/shared/hooks/useAuthHydrated";
 
 export default function UserSidebarLayout({
   children,
@@ -19,6 +20,7 @@ export default function UserSidebarLayout({
   const { logout, user, isAuthenticated } = useAuthStore();
   const t = useT();
   const mounted = useMounted();
+  const hydrated = useAuthHydrated();
 
   const navItems = [
     { label: t.auth.profile, href: "/profil", icon: User },
@@ -29,17 +31,20 @@ export default function UserSidebarLayout({
   ];
 
   useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (hydrated && !isAuthenticated) {
       router.replace("/connexion");
     }
-  }, [mounted, isAuthenticated, router]);
+  }, [hydrated, isAuthenticated, router]);
 
   function handleLogout() {
     logout();
     router.push("/");
   }
 
-  if (!mounted || !isAuthenticated) return null;
+  // Render nothing until Zustand has read auth state from localStorage.
+  // Without this guard the effect fires with isAuthenticated=false (default)
+  // before the persisted token is loaded, causing a spurious redirect.
+  if (!mounted || !hydrated || !isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-muted">

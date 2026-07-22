@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { KINSHASA_COMMUNES } from "@/constants/kinshasa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
@@ -11,7 +12,7 @@ import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getMyAgentProfile } from "@/services/agentAuth";
 import { useT } from "@/i18n/useT";
 const CATEGORIES = ["Appartement","Villa","Studio","Duplex","Penthouse","Maison","Terrain","Local commercial","Bureau","Entrepôt"];
-const COMMUNES = ["Gombe","Limete","Ngaliema","Kalamu","Ndjili","Kintambo","Barumbu","Kinshasa","Lemba","Matete","Selembao","Makala","Bumbu","Masina"];
+const COMMUNES = KINSHASA_COMMUNES;
 const CURRENCIES = ["USD", "CDF"];
 
 type FormState = {
