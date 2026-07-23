@@ -534,7 +534,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
               {[
                 { label: t.espaceAgent.agentNavSearch, href: "/acheter", icon: Home },
                 { label: t.espaceAgent.agentNavListings, href: "/espace-agent/annonces", icon: Home },
-                { label: t.espaceAgent.agentNavBoosts, href: "/espace-agent/boost", icon: Star },
+                { label: t.espaceAgent.agentNavBoosts, href: "/espace-agent/boosts", icon: Star },
                 { label: t.espaceAgent.agentNavPortal, href: "/espace-agent", icon: User },
               ].map(({ label, href, icon: Icon }) => (
                 <Link
@@ -671,7 +671,7 @@ function AgentDesktopNav({ pathname }: { pathname: string }) {
   ];
   const agentActions = [
     { label: p.agentNavListings, href: "/espace-agent/annonces" },
-    { label: p.agentNavBoosts, href: "/espace-agent/boost" },
+    { label: p.agentNavBoosts, href: "/espace-agent/boosts" },
   ];
   return (
     <nav className="hidden lg:flex items-center gap-1">

@@ -102,3 +102,85 @@ export async function resendAgentVerification(
   );
   return res.data;
 }
+
+// ── Boost types & service functions ────────────────────────────────────────────
+
+export type BoostPaymentMethod = "ORANGE_MONEY" | "MTN_MONEY" | "AIRTEL_MONEY" | "MPESA" | "CASH";
+export type BoostStatus = "PENDING" | "CONFIRMED" | "REJECTED" | "EXPIRED";
+
+export type BoostRequest = {
+  id: string;
+  propertyId: string;
+  property: {
+    id: string;
+    title: string;
+    suburb: string;
+    city: string;
+    category: string;
+    gallery: string[];
+    isBoosted: boolean;
+    boostedUntil: string | null;
+  };
+  durationDays: number;
+  amount: number;
+  currency: string;
+  paymentMethod: BoostPaymentMethod;
+  paymentReference: string | null;
+  screenshotUrl: string | null;
+  status: BoostStatus;
+  rejectionReason: string | null;
+  createdAt: string;
+};
+
+export type CreateBoostRequestPayload = {
+  durationDays: 7 | 15 | 30;
+  paymentMethod: BoostPaymentMethod;
+  screenshotUrl?: string;
+};
+
+export async function createBoostRequest(
+  token: string,
+  propertyId: string,
+  data: CreateBoostRequestPayload,
+): Promise<BoostRequest> {
+  const res = await axios.post<BoostRequest>(
+    `/api/proxy/boosts/properties/${propertyId}/request`,
+    data,
+    { headers: agentAuthHeader(token) },
+  );
+  return res.data;
+}
+
+export async function getMyBoosts(token: string): Promise<BoostRequest[]> {
+  const res = await axios.get<BoostRequest[]>(`/api/proxy/boosts/mine`, {
+    headers: agentAuthHeader(token),
+  });
+  return res.data;
+}
+
+export async function updateBoostScreenshot(
+  token: string,
+  boostId: string,
+  screenshotUrl: string,
+): Promise<BoostRequest> {
+  const res = await axios.patch<BoostRequest>(
+    `/api/proxy/boosts/${boostId}/screenshot`,
+    { screenshotUrl },
+    { headers: agentAuthHeader(token) },
+  );
+  return res.data;
+}
+
+/** Presign a payment screenshot upload via R2. */
+export async function presignBoostScreenshot(
+  token: string,
+  filename: string,
+  contentType: string,
+): Promise<{ key: string; url: string }> {
+  const res = await axios.post<{ key: string; url: string }>(
+    `/api/proxy/uploads/presign-boost-screenshot`,
+    { filename, contentType },
+    { headers: agentAuthHeader(token) },
+  );
+  return res.data;
+}

@@ -82,8 +82,13 @@ export default function PropertyCard({ property, priority }: { property: Propert
             className="absolute inset-0 z-10"
           />
 
-          {/* Verified + New + Hot badges */}
+          {/* Verified + New + Hot + Boosted badges */}
           <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
+            {property.isBoosted && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/90 text-white shadow-sm backdrop-blur-sm">
+                ✨ En vedette
+              </span>
+            )}
             {property.verified && <VerifiedBadge />}
             {property.isNew && <NewBadge />}
             {isHotProperty(property.performance) && (

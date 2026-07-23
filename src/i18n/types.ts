@@ -827,6 +827,22 @@ export type Messages = {
     amenInternet: string; amenPool: string; amenGarage: string; amenSecurity: string;
     // Footer buttons
     nextBtn: string; backBtn: string; savingBtn: string; submittingBtn: string;
+    // Boosts page
+    boostsTitle: string; boostBadge: string; boostVisibilityTitle: string; boostVisibilityDesc: string;
+    boostModalTitle: string; boostStep1: string; boostStep2: string; boostStep3: string;
+    boostPlanDesc: string; boostRecommended: string; boostPaymentMethodLabel: string;
+    boostContinueBtn: string; boostPayNumber: string; boostPayName: string; boostPayRef: string;
+    boostPayRefWarning: string; boostPayRefCopied: string;
+    boostScreenshotLabel: string; boostScreenshotOptional: string; boostScreenshotChoose: string;
+    boostScreenshotUploading: string; boostScreenshotSuccess: string;
+    boostSkipBtn: string; boostPaidBtn: string;
+    boostConfirmTitle: string; boostConfirmDesc: string;
+    boostSummaryPlan: string; boostSummaryPayment: string; boostSummaryRef: string;
+    boostDoneBtn: string; boostTabPending: string; boostTabActive: string; boostTabHistory: string;
+    boostEmpty: string; boostEmptyDesc: string; boostViewCapture: string;
+    boostStatusPending: string; boostStatusConfirmed: string; boostStatusRejected: string; boostStatusExpired: string;
+    boostActiveUntil: string; boostRejectedReason: string;
+    boostDays: string; boostErrCreate: string; boostErrUpload: string;
   };
   espaceAgence: {
     // Dashboard

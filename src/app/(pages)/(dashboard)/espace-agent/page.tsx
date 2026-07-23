@@ -22,6 +22,12 @@ import {
   Clock,
   Zap,
   ExternalLink,
+  Building2,
+  Briefcase,
+  Warehouse,
+  ShoppingBag,
+  TreePine,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useMounted } from "@/shared/hooks/useMounted";
@@ -42,7 +48,9 @@ type AgentProperty = {
   price?: number;
   currency?: string;
   listingType?: string;
+  category?: string;
   boostedUntil?: string | null;
+  gallery?: string[];
 };
 
 type AgentProfile = {
@@ -115,6 +123,43 @@ function formatDate(dateStr: string): string {
     month: "long",
     year: "numeric",
   });
+}
+
+// ─── Property thumbnail ───────────────────────────────────────────────────────
+
+const CATEGORY_ICON: Record<string, { Icon: LucideIcon; bg: string; color: string }> = {
+  apartment:  { Icon: Building2,   bg: "bg-blue-50",    color: "text-blue-400"    },
+  studio:     { Icon: Building2,   bg: "bg-blue-50",    color: "text-blue-400"    },
+  duplex:     { Icon: Building2,   bg: "bg-indigo-50",  color: "text-indigo-400"  },
+  penthouse:  { Icon: Building2,   bg: "bg-violet-50",  color: "text-violet-400"  },
+  villa:      { Icon: Home,        bg: "bg-emerald-50", color: "text-emerald-400" },
+  townhouse:  { Icon: Home,        bg: "bg-teal-50",    color: "text-teal-400"    },
+  house:      { Icon: Home,        bg: "bg-green-50",   color: "text-green-400"   },
+  land:       { Icon: TreePine,    bg: "bg-lime-50",    color: "text-lime-500"    },
+  terrain:    { Icon: TreePine,    bg: "bg-lime-50",    color: "text-lime-500"    },
+  office:     { Icon: Briefcase,   bg: "bg-amber-50",   color: "text-amber-400"   },
+  warehouse:  { Icon: Warehouse,   bg: "bg-orange-50",  color: "text-orange-400"  },
+  retail:     { Icon: ShoppingBag, bg: "bg-rose-50",    color: "text-rose-400"    },
+  store:      { Icon: ShoppingBag, bg: "bg-rose-50",    color: "text-rose-400"    },
+  commercial: { Icon: ShoppingBag, bg: "bg-pink-50",    color: "text-pink-400"    },
+};
+
+function PropertyThumb({ src, category, title }: { src?: string; category?: string; title: string }) {
+  const [failed, setFailed] = useState(false);
+  const key = (category ?? "").toLowerCase();
+  const { Icon, bg, color } = CATEGORY_ICON[key] ?? { Icon: Home, bg: "bg-muted", color: "text-muted-foreground/40" };
+
+  if (!src || failed) {
+    return (
+      <div className={`w-full h-full flex items-center justify-center ${bg}`}>
+        <Icon className={`w-5 h-5 ${color}`} />
+      </div>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={title} className="w-full h-full object-cover" onError={() => setFailed(true)} />
+  );
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -578,7 +623,7 @@ function ActionSection({ t }: { t: T }) {
     {
       icon: <Zap className="w-4 h-4" />,
       label: t.boostListing,
-      href: "/espace-agent/boost",
+      href: "/espace-agent/boosts",
       locked: false,
     },
     {
@@ -734,9 +779,14 @@ function ListingsSection({
             const location = [p.suburb ?? p.neighborhood, p.city]
               .filter(Boolean)
               .join(" · ");
+            const thumb = p.gallery?.[0];
             return (
-              <div key={p.id} className="px-6 py-4">
-                <div className="flex items-start justify-between gap-3">
+              <div key={p.id} className="px-4 py-4">
+                <div className="flex items-start gap-3">
+                  {/* Thumbnail */}
+                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-border">
+                    <PropertyThumb src={thumb} category={p.category} title={p.title} />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-medium truncate">{p.title}</p>
@@ -765,7 +815,7 @@ function ListingsSection({
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 mt-3">
+                <div className="flex gap-2 mt-3 pl-[68px]">
                   <Button
                     variant="outline"
                     size="sm"
@@ -776,16 +826,12 @@ function ListingsSection({
                       <Pencil className="w-3 h-3 mr-1" /> {t.editBtn}
                     </Link>
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs h-7 px-2.5"
-                    asChild
+                  <Link
+                    href={`/espace-agent/boosts?propertyId=${p.id}&title=${encodeURIComponent(p.title ?? "")}`}
+                    className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm shadow-amber-200 hover:shadow-amber-300 hover:from-amber-500 hover:to-orange-500 transition-all duration-200"
                   >
-                    <Link href={`/espace-agent/boost?id=${p.id}`}>
-                      <Zap className="w-3 h-3 mr-1" /> {t.boostBtn}
-                    </Link>
-                  </Button>
+                    <Zap className="w-3 h-3 fill-white" /> {t.boostBtn}
+                  </Link>
                   {p.status === "draft" && (
                     <Button size="sm" className="text-xs h-7 px-2.5" asChild>
                       <Link href={`/espace-agent/annonces/${p.id}/publier`}>
