@@ -487,10 +487,12 @@ function EspaceAgentBoostsPageInner() {
   useEffect(() => {
     if (!mounted) return;
     if (!isAuthenticated || !token) { router.replace("/connexion?agent=1"); return; }
+    /* eslint-disable react-hooks/set-state-in-effect -- mount-triggered fetch + URL param parsing, not derived state */
     loadBoosts();
     const pid = searchParams.get("propertyId");
     const ptitle = searchParams.get("title");
     if (pid && ptitle) setModal({ propertyId: pid, propertyTitle: decodeURIComponent(ptitle) });
+    /* eslint-enable react-hooks/set-state-in-effect */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isAuthenticated]);
 
