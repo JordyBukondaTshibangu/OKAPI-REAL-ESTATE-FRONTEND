@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft, Briefcase, Building2, Check, ChevronRight, Clock, Copy,
@@ -463,7 +463,7 @@ function BoostCard({ b, t, onViewScreenshot }: { b: BoostRequest; t: T; onViewSc
 
 type Tab = "PENDING" | "ACTIVE" | "HISTORY";
 
-export default function EspaceAgentBoostsPage() {
+function EspaceAgentBoostsPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const mounted = useMounted();
@@ -597,5 +597,13 @@ export default function EspaceAgentBoostsPage() {
         <BoostModal modal={modal} token={token} t={t} onClose={() => setModal(null)} onSuccess={loadBoosts} />
       )}
     </div>
+  );
+}
+
+export default function EspaceAgentBoostsPage() {
+  return (
+    <Suspense fallback={null}>
+      <EspaceAgentBoostsPageInner />
+    </Suspense>
   );
 }
