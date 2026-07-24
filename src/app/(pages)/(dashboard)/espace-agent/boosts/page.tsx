@@ -475,6 +475,15 @@ function EspaceAgentBoostsPageInner() {
   const [tab, setTab] = useState<Tab>("PENDING");
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
+  const loadBoosts = async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const data = await getMyBoosts(token);
+      setBoosts(Array.isArray(data) ? data : []);
+    } catch { /* silent */ } finally { setLoading(false); }
+  };
+
   useEffect(() => {
     if (!mounted) return;
     if (!isAuthenticated || !token) { router.replace("/connexion?agent=1"); return; }
@@ -484,15 +493,6 @@ function EspaceAgentBoostsPageInner() {
     if (pid && ptitle) setModal({ propertyId: pid, propertyTitle: decodeURIComponent(ptitle) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isAuthenticated]);
-
-  const loadBoosts = async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const data = await getMyBoosts(token);
-      setBoosts(Array.isArray(data) ? data : []);
-    } catch { /* silent */ } finally { setLoading(false); }
-  };
 
   if (!mounted) return null;
 
