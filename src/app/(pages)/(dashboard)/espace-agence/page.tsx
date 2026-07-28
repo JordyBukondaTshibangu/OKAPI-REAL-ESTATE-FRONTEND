@@ -54,6 +54,7 @@ type Agency = {
   rccmNumber?: string;
   gracePeriodEndsAt?: string;
   freeListingCap: number;
+  freeAgentCap?: number;
   listingCount: number;
   agentCount: number;
   founded?: number;
@@ -312,7 +313,7 @@ function GracePeriodBar({
                 ? "text-destructive"
                 : grace.endingSoon
                   ? "text-amber-700"
-                  : "text-emerald-700"
+                  : "text-foreground"
             }`}
           >
             {grace.expired
@@ -331,7 +332,7 @@ function GracePeriodBar({
           className="shrink-0 text-xs"
           asChild
         >
-          <Link href="/plans">{t.planAgence}</Link>
+          <Link href="/agence">{t.planAgence}</Link>
         </Button>
       </div>
 
@@ -362,7 +363,7 @@ function GracePeriodBar({
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{t.agentsActive}</span>
           <span className="font-medium text-foreground">
-            {agentCount} / {t.unlimited}
+            {agentCount} / {agency.freeAgentCap ?? 3}
           </span>
         </div>
 
@@ -380,6 +381,25 @@ function GracePeriodBar({
       <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
         {t.gracePeriodUpgrade}
       </p>
+    </div>
+  );
+}
+
+function UpgradeAgencyCard({
+  t,
+}: {
+  t: ReturnType<typeof useT>["espaceAgence"];
+}) {
+  return (
+    <div className="rounded-2xl shadow-sm p-5 bg-[#0B1D3A] text-white">
+      <p className="text-sm font-bold leading-tight mb-1.5">{t.upgradeAgencyTitle}</p>
+      <p className="text-xs text-[#94A3B8] leading-relaxed mb-4">{t.upgradeAgencyBody}</p>
+      <Link
+        href="/agence"
+        className="inline-block text-xs font-bold bg-[#C9A84C] hover:bg-[#B8973B] text-[#0B1D3A] px-4 py-2 rounded-lg transition-colors"
+      >
+        {t.upgradeAgencyCta}
+      </Link>
     </div>
   );
 }
@@ -553,11 +573,15 @@ function TeamSection({
   agency,
   teamAgents,
   onCopyInviteLink,
+  copySuccess,
+  agentListingCounts,
   t,
 }: {
   agency: Agency;
   teamAgents: TeamAgent[];
   onCopyInviteLink: () => void;
+  copySuccess: boolean;
+  agentListingCounts: Record<string, number>;
   t: ReturnType<typeof useT>["espaceAgence"];
 }) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -624,10 +648,10 @@ function TeamSection({
               <button
                 type="button"
                 onClick={onCopyInviteLink}
-                className="flex-shrink-0 text-primary hover:text-primary/80"
+                className="flex-shrink-0 text-primary hover:text-primary/80 text-xs font-medium"
                 title={t.copyLink}
               >
-                <Copy className="w-3.5 h-3.5" />
+                {copySuccess ? t.linkCopied : <Copy className="w-3.5 h-3.5" />}
               </button>
             </div>
           </div>
@@ -643,7 +667,10 @@ function TeamSection({
                 .join("")
                 .slice(0, 2)
                 .toUpperCase();
-              const listingCount = agent.properties?.length ?? 0;
+              const listingCount =
+                agentListingCounts[agent.id] ??
+                agent.properties?.length ??
+                0;
 
               return (
                 <div key={agent.id} className="px-6 py-4">
@@ -813,10 +840,10 @@ function TeamSection({
               <button
                 type="button"
                 onClick={onCopyInviteLink}
-                className="flex-shrink-0 text-primary hover:text-primary/80"
+                className="flex-shrink-0 text-primary hover:text-primary/80 text-xs font-medium"
                 title={t.copyLink}
               >
-                <Copy className="w-3.5 h-3.5" />
+                {copySuccess ? t.linkCopied : <Copy className="w-3.5 h-3.5" />}
               </button>
             </div>
           </div>
@@ -904,26 +931,33 @@ function ActionSection({
       {actions.map((a) => (
         <Link
           key={a.label}
-          href={a.locked ? "/plans" : a.href}
+          href={a.locked ? "/agence" : a.href}
           target={a.external ? "_blank" : undefined}
-          className="flex items-center gap-3 px-6 py-3.5 border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+          className="flex items-start gap-3 px-6 py-3.5 border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
         >
           <span
-            className={a.locked ? "text-muted-foreground/40" : "text-primary"}
+            className={`mt-0.5 ${a.locked ? "text-muted-foreground/40" : "text-primary"}`}
           >
             {a.icon}
           </span>
-          <span
-            className={`flex-1 text-sm ${a.locked ? "text-muted-foreground/60" : ""}`}
-          >
-            {a.label}
+          <span className="flex-1 min-w-0">
+            <span
+              className={`block text-sm ${a.locked ? "text-muted-foreground/60" : ""}`}
+            >
+              {a.label}
+            </span>
+            {a.locked && (
+              <span className="block text-[10px] text-muted-foreground leading-snug mt-0.5">
+                {t.statsActionTeaser}
+              </span>
+            )}
           </span>
           {a.locked ? (
-            <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground border border-border rounded px-1.5 py-0.5">
-              <Lock className="w-2.5 h-2.5" /> {t.planAgence.replace(" →", "")}
+            <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground border border-border rounded px-1.5 py-0.5 shrink-0 mt-0.5">
+              <Lock className="w-2.5 h-2.5" /> Agence
             </span>
           ) : (
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground mt-0.5" />
           )}
         </Link>
       ))}
@@ -1182,6 +1216,14 @@ export default function EspaceAgencePage() {
   const agency = ownerProfile?.agency;
   if (!agency) return null;
 
+  // Build listing counts per agent from recentProperties (avoids relying on agent.properties)
+  const agentListingCounts: Record<string, number> = {};
+  for (const p of recentProperties) {
+    if (p.agent?.id) {
+      agentListingCounts[p.agent.id] = (agentListingCounts[p.agent.id] ?? 0) + 1;
+    }
+  }
+
   return (
     <div className="min-h-screen bg-muted">
       {/* Copy success toast */}
@@ -1196,12 +1238,15 @@ export default function EspaceAgencePage() {
         <div className="flex flex-col gap-5 lg:hidden">
           <AgencyHeader agency={agency} t={t} />
           <GracePeriodBar agency={agency} t={t} />
+          <UpgradeAgencyCard t={t} />
           <NotificationStrip agency={agency} teamAgents={teamAgents} t={t} />
           <KpiCards agency={agency} teamAgents={teamAgents} t={t} />
           <TeamSection
             agency={agency}
             teamAgents={teamAgents}
             onCopyInviteLink={handleCopyInviteLink}
+            copySuccess={copySuccess}
+            agentListingCounts={agentListingCounts}
             t={t}
           />
           <ActionSection agency={agency} t={t} />
@@ -1218,6 +1263,7 @@ export default function EspaceAgencePage() {
           <div className="flex flex-col gap-4 min-w-0">
             <AgencyHeader agency={agency} t={t} />
             <GracePeriodBar agency={agency} t={t} />
+            <UpgradeAgencyCard t={t} />
             <NotificationStrip agency={agency} teamAgents={teamAgents} t={t} />
           </div>
 
@@ -1228,11 +1274,10 @@ export default function EspaceAgencePage() {
               agency={agency}
               teamAgents={teamAgents}
               onCopyInviteLink={handleCopyInviteLink}
+              copySuccess={copySuccess}
+              agentListingCounts={agentListingCounts}
               t={t}
             />
-            <p className="text-center text-xs text-muted-foreground pb-2">
-              {t.comingSoon}
-            </p>
           </div>
 
           {/* RIGHT sidebar */}

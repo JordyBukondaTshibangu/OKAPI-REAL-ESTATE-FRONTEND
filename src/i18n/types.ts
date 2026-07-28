@@ -445,6 +445,109 @@ export type Messages = {
       planBannerGraceExpiring: string;
       planBannerGraceActive: string;
     };
+    pro: {
+      // Meta
+      metaTitle: string; metaDesc: string;
+      // Hero
+      heroBadge: string; heroTitle: string; heroSub: string; heroCta: string; heroCtaGhost: string;
+      // Stats bar
+      stat1Val: string; stat1Label: string;
+      stat2Val: string; stat2Label: string;
+      stat3Val: string; stat3Label: string;
+      stat4Val: string; stat4Label: string;
+      // Benefits
+      benefitsEyebrow: string; benefitsTitle: string; benefitsSub: string;
+      b1Title: string; b1Desc: string; b1Tag: string;
+      b2Title: string; b2Desc: string; b2Tag: string;
+      b3Title: string; b3Desc: string; b3Tag: string;
+      b4Title: string; b4Desc: string; b4Tag: string;
+      b5Title: string; b5Desc: string; b5Tag: string;
+      b6Title: string; b6Desc: string; b6Tag: string;
+      // Comparison table
+      compEyebrow: string; compTitle: string; compSub: string;
+      compColFeature: string; compColFree: string; compColPro: string;
+      row1: string; row1Free: string; row1Pro: string;
+      row2: string; row2Free: string; row2Pro: string;
+      row3: string; row3Free: string; row3Pro: string;
+      row4: string; row4Free: string; row4Pro: string;
+      row5: string; row6: string; row7: string;
+      row8: string; row9: string; row10: string; row11: string; row12: string; rowIncluded: string;
+      row13: string; row13Free: string; row13Pro: string;
+      row14: string; row14Free: string; row14Pro: string;
+      row15: string; row15Free: string; row15Pro: string;
+      row16: string; row16Free: string; row16Pro: string;
+      // Analytics section
+      analyticsEyebrow: string; analyticsTitle: string; analyticsSub: string;
+      analyticsItem1: string; analyticsItem2: string; analyticsItem3: string; analyticsItem4: string; analyticsItem5: string;
+      mockupTitle: string; mockupBadge: string; mockupListing: string;
+      mockupStat1Label: string; mockupStat1Val: string; mockupStat1Trend: string;
+      mockupStat2Label: string; mockupStat2Val: string; mockupStat2Trend: string;
+      mockupStat3Label: string; mockupStat3Val: string; mockupStat3Trend: string;
+      mockupRateLabel: string; mockupRateVal: string;
+      mockupChartTitle: string; mockupChartPeak: string;
+      mockupBoostLabel: string; mockupBoostTip: string;
+      // Testimonial
+      quoteText: string; quoteAuthor: string; quoteRole: string;
+      // Pricing
+      pricingEyebrow: string; pricingTitle: string; pricingSub: string;
+      freeLabel: string; freeName: string; freePrice: string; freePeriod: string;
+      freeFeat1: string; freeFeat2: string; freeFeat3: string; freeFeat4: string; freeFeat5: string; freeFeat6: string;
+      freeCta: string;
+      proLabel: string; proName: string; proPrice: string; proPeriod: string; proBadge: string;
+      proFeat1: string; proFeat2: string; proFeat3: string; proFeat4: string; proFeat5: string;
+      proFeat6: string; proFeat7: string; proFeat8: string; proFeat9: string;
+      proCta: string;
+      loginNote: string; loginCta: string;
+      // FAQ
+      faqEyebrow: string; faqTitle: string;
+      faq1Q: string; faq1A: string;
+      faq2Q: string; faq2A: string;
+      faq3Q: string; faq3A: string;
+      faq4Q: string; faq4A: string;
+      faq5Q: string; faq5A: string;
+      faq6Q: string; faq6A: string;
+      // Footer CTA
+      footerTitle: string; footerSub: string; footerCta: string; footerCtaGhost: string;
+    };
+    agence: {
+      // Meta
+      metaTitle: string; metaDesc: string;
+      // Hero
+      heroBadge: string; heroTitle: string; heroSub: string; heroCta: string; heroCtaGhost: string;
+      // Stats bar
+      stat1Val: string; stat1Label: string;
+      stat2Val: string; stat2Label: string;
+      stat3Val: string; stat3Label: string;
+      stat4Val: string; stat4Label: string;
+      // Benefits section
+      benefitsEyebrow: string; benefitsTitle: string;
+      b1Title: string; b1Body: string;
+      b2Title: string; b2Body: string;
+      b3Title: string; b3Body: string;
+      b4Title: string; b4Body: string;
+      b5Title: string; b5Body: string;
+      b6Title: string; b6Body: string;
+      // Comparison table
+      compareEyebrow: string; compareTitle: string;
+      compareFeature: string; compareGratuit: string; compareAgence: string;
+      cf1: string; cf2: string; cf3: string; cf4: string; cf5: string; cf6: string;
+      // Pricing
+      pricingEyebrow: string; pricingTitle: string;
+      priceLabel: string; priceUnit: string;
+      pricingCta: string;
+      pricingFeat1: string; pricingFeat2: string; pricingFeat3: string;
+      pricingFeat4: string; pricingFeat5: string; pricingFeat6: string;
+      // Testimonial
+      testimonialQuote: string; testimonialName: string; testimonialRole: string;
+      // FAQ
+      faqEyebrow: string; faqTitle: string;
+      faq1Q: string; faq1A: string;
+      faq2Q: string; faq2A: string;
+      faq3Q: string; faq3A: string;
+      faq4Q: string; faq4A: string;
+      // Footer CTA
+      footerTitle: string; footerSub: string; footerCta: string; footerCtaGhost: string;
+    };
   };
   userPending: {
     stepCreated: string; stepCreatedDesc: string;
@@ -623,6 +726,8 @@ export type Messages = {
     discoverAgents: string;
     supportPrompt: string;
     supportLink: string;
+    pendingProNote: string;
+    pendingProCta: string;
   };
   espaceAgent: {
     // Dashboard
@@ -670,6 +775,19 @@ export type Messages = {
     expiresOn: string;
     gracePeriodUpgrade: string;
     proCta: string;
+    // Pro upgrade prompts
+    lockedViewsTitle: string;
+    lockedViewsDesc: string;
+    hiddenListingWarn: string;
+    hiddenListingCta: string;
+    upgradeCardTitle: string;
+    upgradeCardBody: string;
+    upgradeCardBodyZero: string;
+    upgradeCardCta: string;
+    capBannerMedium: string;
+    capBannerStrong: string;
+    capBannerFull: string;
+    passAuPro: string;
     // Notification strip
     notifIncomplete: string;
     notifIncompleteLink: string;
@@ -683,6 +801,7 @@ export type Messages = {
     todoPendingStatus: string;
     // PendingPrompt
     pendingPromptTitle: string; pendingPromptBody: string; pendingPromptCta: string;
+    pendingProNote: string; pendingProCta: string;
     // Listing badge tooltip
     pendingBadgeTooltip: string;
     // Agent nav (Header)
@@ -843,6 +962,27 @@ export type Messages = {
     boostStatusPending: string; boostStatusConfirmed: string; boostStatusRejected: string; boostStatusExpired: string;
     boostActiveUntil: string; boostRejectedReason: string;
     boostDays: string; boostErrCreate: string; boostErrUpload: string;
+    // Subscriptions page
+    subTitle: string; subHeroDesc: string;
+    subStep1: string; subStep2: string; subStep3: string;
+    subPlanPro: string; subPlanAgency: string;
+    subPlanProPrice: string; subPlanAgencyPrice: string;
+    subPlanProFeature1: string; subPlanProFeature2: string; subPlanProFeature3: string;
+    subPlanAgencyFeature1: string; subPlanAgencyFeature2: string; subPlanAgencyFeature3: string;
+    subPaymentMethodLabel: string;
+    subContinueBtn: string;
+    subPayNumber: string; subPayName: string; subPayRef: string; subPayRefWarning: string;
+    subScreenshotLabel: string; subScreenshotOptional: string; subScreenshotChoose: string;
+    subScreenshotUploading: string; subScreenshotSuccess: string;
+    subSkipBtn: string; subPaidBtn: string;
+    subConfirmTitle: string; subConfirmDesc: string;
+    subSummaryPlan: string; subSummaryPayment: string; subSummaryRef: string;
+    subDoneBtn: string;
+    subTabPending: string; subTabActive: string; subTabHistory: string;
+    subEmpty: string; subEmptyDesc: string; subViewCapture: string;
+    subStatusPending: string; subStatusConfirmed: string; subStatusRejected: string; subStatusExpired: string;
+    subActiveUntil: string; subRejectedReason: string;
+    subMonthly: string; subErrCreate: string; subErrUpload: string;
   };
   espaceAgence: {
     // Dashboard
@@ -899,6 +1039,7 @@ export type Messages = {
     editProfileAction: string;
     viewPublicPage: string;
     statsAction: string;
+    statsActionTeaser: string;
     contactOkapi: string;
     recentListings: string;
     viewAll: string;
@@ -916,6 +1057,9 @@ export type Messages = {
     editBtn: string;
     boostBtn: string;
     comingSoon: string;
+    upgradeAgencyTitle: string;
+    upgradeAgencyBody: string;
+    upgradeAgencyCta: string;
     // Edit agency profile
     editAgencyTitle: string;
     sectionBasicInfo: string;

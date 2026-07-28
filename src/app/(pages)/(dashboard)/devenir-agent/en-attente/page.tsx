@@ -90,6 +90,15 @@ export default function AgentPendingPage() {
                 📝 Préparer mes annonces
               </Link>
             </Button>
+            {/* Pro discovery CTA */}
+            <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 px-4 py-3 text-sm text-center">
+              <p className="text-amber-800 dark:text-amber-300 mb-2">
+                {s.pendingProNote}
+              </p>
+              <Button asChild variant="outline" size="sm" className="border-amber-400 text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-950/40">
+                <Link href="/pro">{s.pendingProCta}</Link>
+              </Button>
+            </div>
             <Button asChild variant="outline" className="w-full">
               <Link href="/">{s.backToHome}</Link>
             </Button>

@@ -122,6 +122,7 @@ function useNavItems(): NavItem[] {
           title: t.nav.col_list,
           links: [
             { label: t.nav.sellYourProperty, href: "/vendre" },
+            { label: "⭐ Passer au Pro", href: "/pro" },
           ],
         },
         {

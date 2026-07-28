@@ -184,3 +184,75 @@ export async function presignBoostScreenshot(
   );
   return res.data;
 }
+
+// ── Subscription types & service functions ───────────────────────────────────
+
+export type SubscriptionTier = "PRO" | "AGENCY";
+export type SubscriptionStatus = "PENDING" | "CONFIRMED" | "REJECTED" | "EXPIRED";
+
+export type SubscriptionRequest = {
+  id: string;
+  agentId: string;
+  tier: SubscriptionTier;
+  amount: number;
+  currency: string;
+  paymentMethod: BoostPaymentMethod;
+  paymentReference: string | null;
+  screenshotUrl: string | null;
+  status: SubscriptionStatus;
+  rejectionReason: string | null;
+  confirmedAt: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+  createdAt: string;
+};
+
+export type CreateSubscriptionRequestPayload = {
+  tier: SubscriptionTier;
+  paymentMethod: BoostPaymentMethod;
+};
+
+export async function createSubscriptionRequest(
+  token: string,
+  data: CreateSubscriptionRequestPayload,
+): Promise<SubscriptionRequest> {
+  const res = await axios.post<SubscriptionRequest>(
+    `/api/proxy/subscriptions/request`,
+    data,
+    { headers: agentAuthHeader(token) },
+  );
+  return res.data;
+}
+
+export async function getMySubscriptions(token: string): Promise<SubscriptionRequest[]> {
+  const res = await axios.get<SubscriptionRequest[]>(`/api/proxy/subscriptions/mine`, {
+    headers: agentAuthHeader(token),
+  });
+  return res.data;
+}
+
+export async function updateSubscriptionScreenshot(
+  token: string,
+  subId: string,
+  screenshotUrl: string,
+): Promise<SubscriptionRequest> {
+  const res = await axios.patch<SubscriptionRequest>(
+    `/api/proxy/subscriptions/${subId}/screenshot`,
+    { screenshotUrl },
+    { headers: agentAuthHeader(token) },
+  );
+  return res.data;
+}
+
+export async function presignSubscriptionScreenshot(
+  token: string,
+  filename: string,
+  contentType: string,
+): Promise<{ key: string; url: string }> {
+  const res = await axios.post<{ key: string; url: string }>(
+    `/api/proxy/uploads/presign-subscription-screenshot`,
+    { filename, contentType },
+    { headers: agentAuthHeader(token) },
+  );
+  return res.data;
+}

@@ -27,6 +27,7 @@ import {
   Warehouse,
   ShoppingBag,
   TreePine,
+  AlertTriangle,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
@@ -371,7 +372,7 @@ function GracePeriodBar({ profile, t }: { profile: AgentProfile; t: T }) {
           className="shrink-0 text-xs"
           asChild
         >
-          <Link href="/plans">{t.proCta}</Link>
+          <Link href="/pro">{t.proCta}</Link>
         </Button>
       </div>
 
@@ -408,6 +409,79 @@ function GracePeriodBar({ profile, t }: { profile: AgentProfile; t: T }) {
       <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
         {t.gracePeriodUpgrade}
       </p>
+    </div>
+  );
+}
+
+// Cap-scaled top banner — shown at ≥ 60% cap usage
+function CapBanner({ profile, t }: { profile: AgentProfile; t: T }) {
+  const isPro = profile.plan === "PRO" || profile.plan === "AGENCY";
+  if (isPro) return null;
+  const cap = profile.freeListingCap ?? 10;
+  const active = (profile.properties ?? []).filter((p) =>
+    ["open", "published", "active"].includes((p.status ?? "").toLowerCase()),
+  ).length;
+  const hidden = (profile.properties ?? []).filter((p) =>
+    (p.status ?? "").toLowerCase() === "hidden",
+  ).length;
+  const pct = cap > 0 ? active / cap : 0;
+
+  if (pct < 0.6 && hidden === 0) return null;
+
+  const isFull = active >= cap || hidden > 0;
+  const isStrong = pct >= 0.8 && !isFull;
+
+  const [bgClass, borderClass, textClass] = isFull
+    ? ["bg-destructive/10 dark:bg-destructive/20", "border-destructive/30", "text-destructive"]
+    : isStrong
+      ? ["bg-orange-50 dark:bg-orange-950/20", "border-orange-200 dark:border-orange-800", "text-orange-800 dark:text-orange-300"]
+      : ["bg-amber-50 dark:bg-amber-950/20", "border-amber-200 dark:border-amber-800", "text-amber-800 dark:text-amber-300"];
+  const message = isFull
+    ? t.capBannerFull
+    : isStrong
+      ? t.capBannerStrong.replace("{n}", String(active)).replace("{cap}", String(cap))
+      : t.capBannerMedium.replace("{n}", String(active)).replace("{cap}", String(cap));
+
+  return (
+    <div className={`rounded-xl border px-4 py-3 flex items-center gap-3 ${bgClass} ${borderClass}`}>
+      <AlertTriangle className={`w-4 h-4 shrink-0 ${textClass}`} />
+      <p className={`flex-1 text-sm font-medium ${textClass}`}>{message}</p>
+      <Link href="/pro" className={`text-xs font-bold whitespace-nowrap hover:underline ${textClass}`}>
+        {t.upgradeCardCta}
+      </Link>
+    </div>
+  );
+}
+
+// Dedicated upgrade prompt card — shown below GracePeriodBar for non-Pro agents
+function UpgradePromptCard({ profile, t }: { profile: AgentProfile; t: T }) {
+  const isPro = profile.plan === "PRO" || profile.plan === "AGENCY";
+  if (isPro) return null;
+
+  const hiddenCount = (profile.properties ?? []).filter((p) =>
+    (p.status ?? "").toLowerCase() === "hidden",
+  ).length;
+  const body = hiddenCount > 0
+    ? t.upgradeCardBody.replace("{n}", String(hiddenCount))
+    : t.upgradeCardBodyZero;
+
+  return (
+    <div className="bg-gradient-to-br from-[#0B1D3A] to-[#0F2848] rounded-xl p-4 border border-[#C9A84C]/25">
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-full bg-[#C9A84C]/15 flex items-center justify-center shrink-0 mt-0.5">
+          <Star className="w-4 h-4 text-[#C9A84C]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-white mb-1">{t.upgradeCardTitle}</p>
+          <p className="text-xs text-[#A0B0C8] leading-relaxed mb-3">{body}</p>
+          <Link
+            href="/pro"
+            className="inline-block bg-[#C9A84C] text-[#0B1D3A] text-xs font-bold px-3.5 py-2 rounded-lg hover:bg-[#D4B558] transition"
+          >
+            {t.upgradeCardCta}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
@@ -450,7 +524,7 @@ function TodoCard({ profile, t }: { profile: AgentProfile; t: T }) {
       items.push({
         text: t.notifGraceEnding.replace("{days}", String(daysLeft)),
         ctaLabel: t.notifGraceEndingCta,
-        ctaHref: "/plans",
+        ctaHref: "/pro",
         warn: true,
       });
     }
@@ -566,7 +640,7 @@ function KpiCards({ profile, t }: { profile: AgentProfile; t: T }) {
       {cards.map((card, i) => (
         <div
           key={i}
-          className="bg-card rounded-xl shadow-sm p-4 text-center relative"
+          className={`bg-card rounded-xl shadow-sm p-4 relative ${card.locked ? "text-left" : "text-center"}`}
         >
           {card.locked && (
             <div className="absolute top-2 right-2">
@@ -575,11 +649,15 @@ function KpiCards({ profile, t }: { profile: AgentProfile; t: T }) {
               </span>
             </div>
           )}
-          <div className="flex justify-center mb-1.5 text-primary">
+          <div className={`mb-1.5 text-primary ${card.locked ? "flex" : "flex justify-center"}`}>
             {card.icon}
           </div>
           {card.locked ? (
-            <p className="text-xl font-semibold text-muted-foreground/40">—</p>
+            <Link href="/pro" className="block group">
+              <p className="text-xs font-semibold text-foreground leading-tight mb-0.5 pr-8">{t.lockedViewsTitle}</p>
+              <p className="text-[10px] text-muted-foreground leading-snug line-clamp-3">{t.lockedViewsDesc}</p>
+              <span className="inline-block mt-1.5 text-[10px] font-bold text-primary group-hover:underline">{t.passAuPro} →</span>
+            </Link>
           ) : card.listValue && card.listValue.length > 0 ? (
             <div className="space-y-0.5">
               {card.listValue.map((v) => (
@@ -612,7 +690,7 @@ function KpiCards({ profile, t }: { profile: AgentProfile; t: T }) {
   );
 }
 
-function ActionSection({ t }: { t: T }) {
+function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
   const actions = [
     {
       icon: <Home className="w-4 h-4" />,
@@ -642,7 +720,7 @@ function ActionSection({ t }: { t: T }) {
     {
       icon: <BarChart2 className="w-4 h-4" />,
       label: t.statsAction,
-      href: "/plans",
+      href: "/pro",
       locked: true,
     },
     {
@@ -677,7 +755,7 @@ function ActionSection({ t }: { t: T }) {
       {actions.map((a) => (
         <Link
           key={a.label}
-          href={a.locked ? "/plans" : a.href}
+          href={a.locked ? "/pro" : a.href}
           className="flex items-center gap-3 px-6 py-3.5 border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
         >
           <span
@@ -699,6 +777,20 @@ function ActionSection({ t }: { t: T }) {
           )}
         </Link>
       ))}
+
+      {/* ⭐ Upgrade row — always visible for non-Pro agents */}
+      {!isPro && (
+        <Link
+          href="/pro"
+          className="flex items-center gap-3 px-6 py-4 border-t-2 border-[#C9A84C]/20 hover:bg-[#C9A84C]/5 transition-colors bg-gradient-to-r from-[#0B1D3A]/4 to-transparent"
+        >
+          <span className="text-[#C9A84C]">
+            <Star className="w-4 h-4" />
+          </span>
+          <span className="flex-1 text-sm font-semibold text-[#C9A84C]">{t.passAuPro}</span>
+          <ChevronRight className="w-4 h-4 text-[#C9A84C]/50" />
+        </Link>
+      )}
     </div>
   );
 }
@@ -710,6 +802,7 @@ function ListingsSection({
   properties?: AgentProperty[];
   t: T;
 }) {
+
   const recent = (properties ?? []).slice(0, 5);
 
   const statusLabel: Record<string, { label: string; color: string }> = {
@@ -736,6 +829,10 @@ function ListingsSection({
     closed: {
       label: t.statusClosed,
       color: "text-muted-foreground bg-muted border-border",
+    },
+    hidden: {
+      label: "HIDDEN",
+      color: "text-rose-600 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/30 dark:border-rose-800",
     },
   };
 
@@ -772,7 +869,8 @@ function ListingsSection({
       ) : (
         <div className="divide-y divide-border">
           {recent.map((p) => {
-            const st = statusLabel[p.status] ?? {
+            const statusKey = (p.status ?? "").toLowerCase();
+            const st = statusLabel[statusKey] ?? {
               label: p.status,
               color: "text-muted-foreground bg-muted border-border",
             };
@@ -815,6 +913,18 @@ function ListingsSection({
                     </div>
                   </div>
                 </div>
+                {/* Inline nudge for hidden listings */}
+                {statusKey === "hidden" && (
+                  <div className="mt-2 pl-[68px]">
+                    <Link
+                      href="/pro"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline"
+                    >
+                      <AlertTriangle className="w-3 h-3 shrink-0" />
+                      {t.hiddenListingWarn}
+                    </Link>
+                  </div>
+                )}
                 <div className="flex gap-2 mt-3 pl-[68px]">
                   <Button
                     variant="outline"
@@ -901,20 +1011,24 @@ export default function EspaceAgentPage() {
     .slice(0, 2)
     .toUpperCase();
 
+  const isPro = agent.plan === "PRO" || agent.plan === "AGENCY";
+
   return (
     <div className="min-h-screen bg-muted overflow-x-hidden">
       <main className="w-full max-w-[1400px] mx-auto px-4 py-6">
         {/* ── Mobile: single column ── */}
         <div className="flex flex-col gap-5 md:hidden">
+          <CapBanner profile={agent} t={t} />
           <ProfileSection profile={agent} initials={initials} t={t} />
           <GracePeriodBar profile={agent} t={t} />
+          <UpgradePromptCard profile={agent} t={t} />
           <TodoCard profile={agent} t={t} />
           {agent.verificationTier === "NON_VERIFIE" ? (
             <PendingPrompt t={t} />
           ) : (
             <KpiCards profile={agent} t={t} />
           )}
-          <ActionSection t={t} />
+          <ActionSection t={t} isPro={isPro} />
           <ListingsSection properties={agent.properties} t={t} />
         </div>
 
@@ -925,11 +1039,13 @@ export default function EspaceAgentPage() {
           <div className="flex flex-col gap-4 min-w-0">
             <ProfileSection profile={agent} initials={initials} t={t} />
             <GracePeriodBar profile={agent} t={t} />
+            <UpgradePromptCard profile={agent} t={t} />
             <TodoCard profile={agent} t={t} />
           </div>
 
           {/* CENTER column */}
           <div className="flex flex-col gap-4 min-w-0">
+            <CapBanner profile={agent} t={t} />
             {agent.verificationTier === "NON_VERIFIE" ? (
               <PendingPrompt t={t} />
             ) : (
@@ -938,13 +1054,13 @@ export default function EspaceAgentPage() {
             <ListingsSection properties={agent.properties} t={t} />
             {/* ActionSection moves here on tablet (< lg) */}
             <div className="lg:hidden">
-              <ActionSection t={t} />
+              <ActionSection t={t} isPro={isPro} />
             </div>
           </div>
 
           {/* RIGHT sidebar — desktop only */}
           <div className="hidden lg:flex flex-col gap-4 min-w-0">
-            <ActionSection t={t} />
+            <ActionSection t={t} isPro={isPro} />
           </div>
         </div>
       </main>
