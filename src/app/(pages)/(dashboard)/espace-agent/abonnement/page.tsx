@@ -505,6 +505,9 @@ function EspaceAgentAbonnementPageInner() {
   ];
 
   const hasActiveSub = subs.some((s) => s.status === "CONFIRMED");
+  // Block new subscription when one is already pending review
+  const hasPendingSub = subs.some((s) => s.status === "PENDING");
+  const canSubscribe = !hasActiveSub && !hasPendingSub;
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-background">
@@ -532,7 +535,7 @@ function EspaceAgentAbonnementPageInner() {
             <p className="font-bold text-blue-900 dark:text-blue-300">{t.subTitle}</p>
             <p className="text-sm text-blue-700 dark:text-blue-400 mt-0.5">{t.subHeroDesc}</p>
           </div>
-          {!hasActiveSub && (
+          {canSubscribe ? (
             <Button
               onClick={() => setShowModal(true)}
               className="shrink-0 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-md"
@@ -540,7 +543,12 @@ function EspaceAgentAbonnementPageInner() {
               <Star className="w-4 h-4 mr-2" />
               S&apos;abonner
             </Button>
-          )}
+          ) : hasPendingSub ? (
+            <div className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm font-medium">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              En attente de validation
+            </div>
+          ) : null}
         </div>
 
         {/* Tabs */}

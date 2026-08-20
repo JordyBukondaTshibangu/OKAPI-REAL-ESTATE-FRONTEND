@@ -84,7 +84,11 @@ type NewPhoto = { file: File; preview: string };
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function urlToKey(url: string): string {
-  return url.startsWith(R2_BASE) ? url.slice(R2_BASE.length) : url;
+  // Strip ALL occurrences of the base URL prefix in case the stored value
+  // was double/triple-prefixed from a previous bug.
+  let result = url;
+  while (result.startsWith(R2_BASE)) result = result.slice(R2_BASE.length);
+  return result;
 }
 
 function deriveDurationType(
