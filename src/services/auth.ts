@@ -37,10 +37,10 @@ export async function forgotPassword(email: string) {
   return res.data;
 }
 
-export async function resetPassword(token: string, newPassword: string) {
+export async function resetPassword(token: string, password: string) {
   const res = await axios.post(`/api/auth/reset-password`, {
     token,
-    newPassword,
+    password,
   });
   return res.data;
 }

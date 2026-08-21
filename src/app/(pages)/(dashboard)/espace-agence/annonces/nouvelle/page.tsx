@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { KINSHASA_COMMUNES } from "@/constants/kinshasa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -62,6 +62,7 @@ export default function NouvelleAnnonceAgencePage() {
   const PERIODS = [{ value: "month", label: t.periodMonth }, { value: "year", label: t.periodYear }, { value: "day", label: t.periodDay }];
   const hydrated = useMounted();
   const [saving, setSaving] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [teamAgents, setTeamAgents] = useState<{ id: string; name: string }[]>([]);
 
@@ -104,12 +105,17 @@ export default function NouvelleAnnonceAgencePage() {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  async function handleSubmit() {
-    if (!token || !sessionAgent?.agencyId) return;
+  function handleReview() {
     setError(null);
     if (!form.title.trim()) { setError(t.errTitle); return; }
     if (!form.price || isNaN(Number(form.price))) { setError(t.errPrice); return; }
     if (!form.suburb) { setError(t.errCommune); return; }
+    setShowReview(true);
+  }
+
+  async function handleSubmit() {
+    if (!token || !sessionAgent?.agencyId) return;
+    setError(null);
 
     setSaving(true);
     try {
@@ -260,15 +266,82 @@ export default function NouvelleAnnonceAgencePage() {
             </section>
           </div>
 
-          <div className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">{t.photosNote}</p>
-            <div className="flex gap-3">
-              <Button variant="outline" size="sm" asChild><Link href="/espace-agence/annonces">{t.cancelBtn}</Link></Button>
-              <Button size="sm" onClick={handleSubmit} disabled={saving}>
-                {saving ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />{t.publishing}</> : t.publishBtn}
-              </Button>
+          {/* Review panel — shown instead of footer when showReview = true */}
+          {showReview && (() => {
+            const categoryLabel = form.category;
+            const typeLabel = form.listingType === "rent" ? t.typeRent : t.typeSale;
+            const assignedName = teamAgents.find((a) => a.id === form.agentId)?.name ?? "";
+            const PERIODS_MAP: Record<string, string> = { month: t.periodMonth, year: t.periodYear, day: t.periodDay };
+            function RRow({ label, value }: { label: string; value: string }) {
+              return (
+                <div className="flex items-center justify-between px-4 py-2.5 text-sm gap-4">
+                  <span className="text-muted-foreground shrink-0">{label}</span>
+                  <span className="font-medium text-right truncate">{value || t.reviewNone}</span>
+                </div>
+              );
+            }
+            function RSection({ title, children }: { title: string; children: React.ReactNode }) {
+              return (
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-1.5">{title}</p>
+                  <div className="rounded-xl border border-border bg-muted/30 divide-y divide-border mb-4">{children}</div>
+                </div>
+              );
+            }
+            return (
+              <div className="px-6 py-5 border-t border-border space-y-1">
+                <h2 className="text-base font-semibold mb-1">{t.reviewTitle}</h2>
+                <p className="text-sm text-muted-foreground mb-4">{t.reviewBody}</p>
+                <RSection title={t.sectionType}>
+                  <RRow label={t.reviewListingType} value={typeLabel} />
+                  <RRow label={t.labelCommune} value={categoryLabel} />
+                </RSection>
+                <RSection title={t.sectionPresentation}>
+                  <RRow label={t.labelTitle} value={form.title} />
+                  <RRow label={t.labelSubtitle} value={form.subtitle} />
+                  <RRow label={t.labelDescription} value={form.description ? form.description.slice(0, 90) + (form.description.length > 90 ? "…" : "") : ""} />
+                </RSection>
+                <RSection title={t.sectionPrice}>
+                  <RRow label={t.labelPrice} value={`${form.price} ${form.currency}${form.listingType === "rent" ? ` / ${PERIODS_MAP[form.period] ?? form.period}` : ""}`} />
+                </RSection>
+                <RSection title={t.sectionFeatures}>
+                  <RRow label={t.labelBedrooms} value={form.bedrooms} />
+                  <RRow label={t.labelBathrooms} value={form.bathrooms} />
+                  <RRow label={t.labelArea} value={form.areaSqm ? `${form.areaSqm} m²` : ""} />
+                </RSection>
+                <RSection title={t.sectionLocation}>
+                  <RRow label={t.labelCommune} value={form.suburb} />
+                  <RRow label={t.labelNeighborhood} value={form.neighborhood} />
+                  <RRow label={t.labelCity} value={form.city} />
+                </RSection>
+                {assignedName && (
+                  <RSection title={t.assignedAgent}>
+                    <RRow label={t.assignTo} value={assignedName} />
+                  </RSection>
+                )}
+                <div className="flex items-center justify-between pt-2 gap-3">
+                  <Button variant="outline" size="sm" onClick={() => setShowReview(false)} disabled={saving}>
+                    {t.reviewEditBtn}
+                  </Button>
+                  <Button size="sm" onClick={handleSubmit} disabled={saving}>
+                    {saving ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />{t.publishing}</> : t.reviewConfirmBtn}
+                  </Button>
+                </div>
+              </div>
+            );
+          })()}
+
+          {!showReview && (
+            <div className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">{t.photosNote}</p>
+              <div className="flex gap-3">
+                <Button variant="outline" size="sm" asChild><Link href="/espace-agence/annonces">{t.cancelBtn}</Link></Button>
+                <Button size="sm" onClick={handleReview} disabled={saving}>
+                  {t.publishBtn}
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>

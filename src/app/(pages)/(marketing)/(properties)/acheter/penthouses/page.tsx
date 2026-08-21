@@ -1,13 +1,8 @@
 import PropertyListingPage from "@/features/properties/components/PropertyListingPage";
-import {
-  getPropertiesByCategory,
-  filterProperties,
-  paginateProperties,
-  type PropertyFilters,
-} from "@/lib/properties";
+import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
 export const metadata = {
-  title: "Villas à vendre à Kinshasa — Okapi Real Estate",
+  title: "Penthouses à vendre à Kinshasa — Okapi Real Estate",
 };
 
 export default async function Page({
@@ -17,7 +12,7 @@ export default async function Page({
 }) {
   const { page, q, type, minPrice, maxPrice, beds } = await searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10));
-  const raw = await getPropertiesByCategory("sale", "villa");
+  const raw = await getPropertiesByCategory("sale", "penthouse");
   const _filters: PropertyFilters = {
     q: q || undefined,
     type: type || undefined,
@@ -31,21 +26,21 @@ export default async function Page({
 
   return (
     <PropertyListingPage
-      title="Villas à vendre à Kinshasa"
+      title="Penthouses à vendre à Kinshasa"
       totalListings={all.length}
       mode="buy"
-      crumbs={[{ label: "Acheter", href: "/acheter" }, { label: "Villas" }]}
+      crumbs={[{ label: "Acheter", href: "/acheter" }, { label: "Penthouses" }]}
       categories={[
         { label: "Appartements", count: 0, href: "/acheter/appartements" },
-        { label: "Villas", count: all.length, href: "/acheter/villas" },
+        { label: "Villas", count: 0, href: "/acheter/villas" },
         { label: "Maisons de ville", count: 0, href: "/acheter/maisons-ville" },
         { label: "Terrains", count: 0, href: "/acheter/terrains" },
-        { label: "Penthouses", count: 0, href: "/acheter/penthouses" },
+        { label: "Penthouses", count: all.length, href: "/acheter/penthouses" },
       ]}
       properties={items}
       currentPage={currentPage}
       totalPages={totalPages}
-    activeFilters={activeFilters}
+      activeFilters={activeFilters}
     />
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export type CategoryCount = { label: string; count: number; href?: string };
 
@@ -9,11 +10,14 @@ export default function PropertyTypeChips({
 }: {
   categories: CategoryCount[];
 }) {
+  const pathname = usePathname();
+
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {categories.map((c, idx) => {
+      {categories.map((c) => {
+        const isActive = c.href ? pathname === c.href : false;
         const chipClass = `inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm transition-colors bg-white dark:bg-card ${
-          idx === 0
+          isActive
             ? "border-primary text-foreground"
             : "border-border text-foreground/85 hover:border-primary/50"
         }`;

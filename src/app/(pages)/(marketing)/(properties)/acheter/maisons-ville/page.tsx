@@ -42,6 +42,7 @@ export default async function Page({
         { label: "Villas", count: 0, href: "/acheter/villas" },
         { label: "Maisons de ville", count: all.length, href: "/acheter/maisons-ville" },
         { label: "Terrains", count: 0, href: "/acheter/terrains" },
+        { label: "Penthouses", count: 0, href: "/acheter/penthouses" },
       ]}
       properties={items}
       currentPage={currentPage}

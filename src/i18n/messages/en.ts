@@ -26,6 +26,7 @@ const en: Messages = {
     townhouses: "Town houses",
     studios: "Studios",
     lands: "Lands",
+    penthouses: "Penthouses",
     offices: "Offices",
     warehouses: "Warehouses",
     stores: "Stores",
@@ -1146,6 +1147,14 @@ const en: Messages = {
     amenGuard: "Security guard", amenParking: "Parking", amenTerrace: "Terrace", amenKitchen: "Fitted kitchen",
     amenInternet: "Internet", amenPool: "Swimming pool", amenGarage: "Garage", amenSecurity: "24/7 Security",
     nextBtn: "Next", backBtn: "Back", savingBtn: "Saving…", submittingBtn: "Submitting…",
+    // Review / confirm step
+    stepReviewLabel: "Review", cardStep5: "Review your listing",
+    reviewListingType: "Listing type",
+    reviewBody: "Please review the details below before submitting your listing to the Okapi team for validation.",
+    reviewNone: "—", reviewFurnishedYes: "Yes", reviewFurnishedNo: "No",
+    reviewPhotosCount: "{n} photo(s) added",
+    reviewConfirmBody: "Once submitted, your listing will be reviewed by the Okapi team. You'll be notified when it's published or if any changes are needed.",
+    reviewConfirmBtn: "Confirm & Submit", reviewEditBtn: "Back and edit",
     // Boosts page
     boostsTitle: "My boosts", boostBadge: "Featured",
     boostVisibilityTitle: "✨ Boost your visibility",
@@ -1342,6 +1351,10 @@ const en: Messages = {
     errAreaRange: "Area must be between 1 and 100,000 m².",
     back: "Back",
     backToListings: "Back to Listings",
+    // Review before publish (espaceAgence)
+    reviewTitle: "Review your listing", reviewBody: "Check the information below before publishing.",
+    reviewListingType: "Listing type", reviewNone: "—",
+    reviewConfirmBtn: "Confirm & publish", reviewEditBtn: "Edit",
   },
   inscription: {
     subtitle: "Create your account for free in a few seconds.",

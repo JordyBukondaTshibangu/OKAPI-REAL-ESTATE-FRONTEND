@@ -85,7 +85,7 @@ export default async function AcheterPage({
         {
           label: "Penthouses",
           count: allSale.filter((p) => p.category === "penthouse").length,
-          href: "/acheter/appartements",
+          href: "/acheter/penthouses",
         },
       ]}
       properties={items}

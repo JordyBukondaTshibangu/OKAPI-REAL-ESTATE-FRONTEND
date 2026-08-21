@@ -26,6 +26,7 @@ const fr: Messages = {
     townhouses: "Maisons de ville",
     studios: "Studios",
     lands: "Terrains",
+    penthouses: "Penthouses",
     offices: "Bureaux",
     warehouses: "Entrepôts",
     stores: "Magasins",
@@ -1176,6 +1177,14 @@ const fr: Messages = {
     amenGuard: "Gardiennage", amenParking: "Parking", amenTerrace: "Terrasse", amenKitchen: "Cuisine équipée",
     amenInternet: "Internet", amenPool: "Piscine", amenGarage: "Garage", amenSecurity: "Sécurité 24h/24",
     nextBtn: "Suivant", backBtn: "Retour", savingBtn: "Enregistrement…", submittingBtn: "Envoi…",
+    // Review / confirm step
+    stepReviewLabel: "Confirmer", cardStep5: "Vérifiez votre annonce",
+    reviewListingType: "Type d'annonce",
+    reviewBody: "Vérifiez les informations ci-dessous avant de soumettre votre annonce à l'équipe Okapi pour validation.",
+    reviewNone: "—", reviewFurnishedYes: "Oui", reviewFurnishedNo: "Non",
+    reviewPhotosCount: "{n} photo(s) ajoutée(s)",
+    reviewConfirmBody: "Une fois soumise, votre annonce sera examinée par l'équipe Okapi. Vous serez informé(e) dès qu'elle sera publiée ou si des modifications sont nécessaires.",
+    reviewConfirmBtn: "Confirmer et soumettre", reviewEditBtn: "Retour et modifier",
     // Boosts page
     boostsTitle: "Mes boosts", boostBadge: "En vedette",
     boostVisibilityTitle: "✨ Boostez votre visibilité",
@@ -1372,6 +1381,10 @@ const fr: Messages = {
     errAreaRange: "La surface doit être comprise entre 1 et 100 000 m².",
     back: "Retour",
     backToListings: "Retour aux annonces",
+    // Review before publish (espaceAgence)
+    reviewTitle: "Vérifiez votre annonce", reviewBody: "Relisez les informations ci-dessous avant de publier.",
+    reviewListingType: "Type d'annonce", reviewNone: "—",
+    reviewConfirmBtn: "Confirmer et publier", reviewEditBtn: "Modifier",
   },
   inscription: {
     subtitle: "Créez votre compte gratuitement en quelques secondes.",

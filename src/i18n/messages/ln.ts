@@ -27,6 +27,7 @@ const ln: Messages = {
     townhouses: "Bandako ya mboka",
     studios: "Studios",
     lands: "Mabele",
+    penthouses: "Penthouses",
     offices: "Biuro",
     warehouses: "Bamazasini",
     stores: "Baboutik",
@@ -1147,6 +1148,14 @@ const ln: Messages = {
     amenGuard: "Bakengeli", amenParking: "Parking", amenTerrace: "Terrasse", amenKitchen: "Cosini ya bozaleli",
     amenInternet: "Internet", amenPool: "Bwete ya mayi", amenGarage: "Garage", amenSecurity: "Sécurité 24h/24",
     nextBtn: "Elabo", backBtn: "Zonga nsima", savingBtn: "Kobomba…", submittingBtn: "Kotinda…",
+    // Review / confirm step
+    stepReviewLabel: "Kotala", cardStep5: "Talela annonce na yo",
+    reviewListingType: "Ndenge ya annonce",
+    reviewBody: "Tala malamu makambo oyo owaki liboso ya kotinda annonce na yo epai ya ba admin ya Okapi.",
+    reviewNone: "—", reviewFurnishedYes: "Nde", reviewFurnishedNo: "Te",
+    reviewPhotosCount: "Bafoto {n} ebakisami",
+    reviewConfirmBody: "Soki otindi, ba admin ya Okapi bakoleka annonce na yo. Okoyekola nsima ya kolakisama to soki esengeli kobongola.",
+    reviewConfirmBtn: "Kolakisa mpe kotinda", reviewEditBtn: "Zonga kobongola",
     // Boosts page
     boostsTitle: "Boosts na ngai", boostBadge: "En vedette",
     boostVisibilityTitle: "✨ Bongisa kolakisama na yo",
@@ -1343,6 +1352,10 @@ const ln: Messages = {
     errAreaRange: "Eteni esengeli kozala kati ya 1 na 100 000 m².",
     back: "Zonga",
     backToListings: "Zonga na bomengo",
+    // Review before publish (espaceAgence)
+    reviewTitle: "Talela annonce na yo", reviewBody: "Tala makambo oyo liboso ya kolongola.",
+    reviewListingType: "Ndenge ya annonce", reviewNone: "—",
+    reviewConfirmBtn: "Kolakisa mpe kolongola", reviewEditBtn: "Kobongola",
   },
   inscription: {
     subtitle: "Sala compte na yo ofele na ntango moke.",

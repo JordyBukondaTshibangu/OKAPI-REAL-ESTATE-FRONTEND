@@ -196,7 +196,7 @@ function StepBar({
 
 // ─── Page ───────────────────────────────────────────────────────────────────────
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 export default function NouvelleAnnoncePage() {
   const router = useRouter();
@@ -223,8 +223,8 @@ export default function NouvelleAnnoncePage() {
     t.amenInternet, t.amenPool, t.amenGarage, t.amenSecurity,
   ];
 
-  const STEP_LABELS = [t.stepInfoLabel, t.stepLocationLabel, t.stepPriceLabel, t.stepPhotosLabel];
-  const CARD_HEADERS = [t.cardStep1, t.cardStep2, t.cardStep3, t.cardStep4];
+  const STEP_LABELS = [t.stepInfoLabel, t.stepLocationLabel, t.stepPriceLabel, t.stepPhotosLabel, t.stepReviewLabel];
+  const CARD_HEADERS = [t.cardStep1, t.cardStep2, t.cardStep3, t.cardStep4, t.cardStep5];
 
   const hydrated = useMounted();
   const [step, setStep] = useState(1);
@@ -379,6 +379,8 @@ export default function NouvelleAnnoncePage() {
   function handleNext() {
     const err = validateStep(step);
     if (err) { setError(err); return; }
+    // Require ≥3 photos before advancing to the review step
+    if (step === 4 && photos.length < 3) { setError(t.errMinPhotos); return; }
     setError(null);
     setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   }
@@ -831,6 +833,98 @@ export default function NouvelleAnnoncePage() {
           </div>
         );
 
+      // ─────────── STEP 5: Review & Confirm ───────────────────────────────────
+      case 5: {
+        const isRent = form.listingType === "rent";
+        const hasShortTerm = form.durationType === "shortterm" || form.durationType === "both";
+        const categoryLabel = CATEGORIES.find((c) => c.value === form.category)?.label ?? form.category;
+        const durationLabel: Record<string, string> = {
+          longterm: t.durationLong, shortterm: t.durationShort, both: t.durationBoth,
+        };
+        const periodLabel: Record<string, string> = {
+          month: t.periodMonth, year: t.periodYear, day: t.periodDay,
+        };
+
+        function ReviewSection({ title, children }: { title: string; children: React.ReactNode }) {
+          return (
+            <div>
+              <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2">{title}</p>
+              <div className="rounded-xl border border-border bg-muted/30 divide-y divide-border">{children}</div>
+            </div>
+          );
+        }
+        function ReviewRow({ label, value }: { label: string; value: string | number }) {
+          return (
+            <div className="flex items-center justify-between px-3.5 py-2.5 text-sm gap-4">
+              <span className="text-muted-foreground shrink-0">{label}</span>
+              <span className="font-medium text-right truncate">{String(value) || t.reviewNone}</span>
+            </div>
+          );
+        }
+
+        return (
+          <div className="space-y-5">
+            <p className="text-sm text-muted-foreground">{t.reviewBody}</p>
+
+            <ReviewSection title={t.sectionType}>
+              <ReviewRow label={t.reviewListingType} value={isRent ? t.typeRent : t.typeSale} />
+              <ReviewRow label={t.sectionCategory} value={categoryLabel} />
+              {isRent && <ReviewRow label={t.sectionDurationType} value={durationLabel[form.durationType] ?? form.durationType} />}
+            </ReviewSection>
+
+            <ReviewSection title={t.sectionPresentation}>
+              <ReviewRow label={t.labelTitle} value={form.title || t.reviewNone} />
+              <ReviewRow label={t.labelSubtitle} value={form.subtitle || t.reviewNone} />
+              <ReviewRow
+                label={t.labelDescription}
+                value={form.description ? form.description.slice(0, 90) + (form.description.length > 90 ? "…" : "") : t.reviewNone}
+              />
+            </ReviewSection>
+
+            <ReviewSection title={t.sectionLocation}>
+              <ReviewRow label={t.labelCommune} value={form.suburb || t.reviewNone} />
+              <ReviewRow label={t.labelNeighborhood} value={form.neighborhood || t.reviewNone} />
+              <ReviewRow label={t.labelLandmark} value={form.landmark || t.reviewNone} />
+            </ReviewSection>
+
+            <ReviewSection title={t.sectionFeatures}>
+              <ReviewRow label={t.labelBedrooms} value={form.bedrooms || t.reviewNone} />
+              <ReviewRow label={t.labelBathrooms} value={form.bathrooms || t.reviewNone} />
+              <ReviewRow label={t.labelArea} value={form.areaSqm ? `${form.areaSqm} m²` : t.reviewNone} />
+              <ReviewRow label={t.labelFurnished} value={form.isFurnished ? t.reviewFurnishedYes : t.reviewFurnishedNo} />
+              {form.availableFrom && <ReviewRow label={t.labelAvailableFrom} value={form.availableFrom} />}
+            </ReviewSection>
+
+            <ReviewSection title={t.sectionPrice}>
+              <ReviewRow
+                label={t.labelPrice}
+                value={`${form.price} ${form.currency}${isRent ? ` / ${periodLabel[form.period] ?? form.period}` : ""}`}
+              />
+              {hasShortTerm && form.pricePerNight && (
+                <ReviewRow label={t.labelPricePerNight} value={`${form.pricePerNight} ${form.currency} / ${t.periodDay}`} />
+              )}
+            </ReviewSection>
+
+            <ReviewSection title={t.sectionPhotosLabel}>
+              <ReviewRow
+                label={t.sectionPhotosLabel}
+                value={t.reviewPhotosCount.replace("{n}", String(photos.length))}
+              />
+            </ReviewSection>
+
+            {form.amenities.length > 0 && (
+              <ReviewSection title={t.sectionAmenities}>
+                <div className="px-3.5 py-2.5 text-sm">{form.amenities.join(" · ")}</div>
+              </ReviewSection>
+            )}
+
+            <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+              {t.reviewConfirmBody}
+            </div>
+          </div>
+        );
+      }
+
       default:
         return null;
     }
@@ -910,24 +1004,26 @@ export default function NouvelleAnnoncePage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleSaveDraft} disabled={busy}>
-                {savingDraft ? (
-                  <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.savingBtn}</>
-                ) : (
-                  <><Save className="w-3.5 h-3.5 mr-1.5" /> {t.saveDraftBtn}</>
-                )}
-              </Button>
+              {step < TOTAL_STEPS && (
+                <Button variant="outline" size="sm" onClick={handleSaveDraft} disabled={busy}>
+                  {savingDraft ? (
+                    <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.savingBtn}</>
+                  ) : (
+                    <><Save className="w-3.5 h-3.5 mr-1.5" /> {t.saveDraftBtn}</>
+                  )}
+                </Button>
+              )}
 
               {step < TOTAL_STEPS ? (
                 <Button size="sm" onClick={handleNext} disabled={busy}>
                   {t.nextBtn} <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                 </Button>
               ) : (
-                <Button size="sm" onClick={handleSubmit} disabled={busy}>
+                <Button size="sm" onClick={handleSubmit} disabled={busy} className="bg-primary">
                   {submitting ? (
                     <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.submittingBtn}</>
                   ) : (
-                    <><SendHorizontal className="w-3.5 h-3.5 mr-1.5" /> {t.submitBtn}</>
+                    <><SendHorizontal className="w-3.5 h-3.5 mr-1.5" /> {t.reviewConfirmBtn}</>
                   )}
                 </Button>
               )}

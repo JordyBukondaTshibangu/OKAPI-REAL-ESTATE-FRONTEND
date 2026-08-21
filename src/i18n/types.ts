@@ -22,6 +22,7 @@ export type Messages = {
     townhouses: string;
     studios: string;
     lands: string;
+    penthouses: string;
     offices: string;
     warehouses: string;
     stores: string;
@@ -947,6 +948,18 @@ export type Messages = {
     amenInternet: string; amenPool: string; amenGarage: string; amenSecurity: string;
     // Footer buttons
     nextBtn: string; backBtn: string; savingBtn: string; submittingBtn: string;
+    // Review / confirm step (step 5)
+    stepReviewLabel: string;
+    cardStep5: string;
+    reviewListingType: string;
+    reviewBody: string;
+    reviewNone: string;
+    reviewFurnishedYes: string;
+    reviewFurnishedNo: string;
+    reviewPhotosCount: string;
+    reviewConfirmBody: string;
+    reviewConfirmBtn: string;
+    reviewEditBtn: string;
     // Boosts page
     boostsTitle: string; boostBadge: string; boostVisibilityTitle: string; boostVisibilityDesc: string;
     boostModalTitle: string; boostStep1: string; boostStep2: string; boostStep3: string;
@@ -1196,5 +1209,12 @@ export type Messages = {
     errAreaRange: string;
     back: string;
     backToListings: string;
+    // Review / confirm before publish (espaceAgence)
+    reviewTitle: string;
+    reviewBody: string;
+    reviewListingType: string;
+    reviewNone: string;
+    reviewConfirmBtn: string;
+    reviewEditBtn: string;
   };
 };

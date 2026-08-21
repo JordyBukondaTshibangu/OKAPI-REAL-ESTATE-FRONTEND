@@ -50,6 +50,8 @@ function useNavItems(): NavItem[] {
             { label: t.nav.apartments, href: "/acheter/appartements" },
             { label: t.nav.villas, href: "/acheter/villas" },
             { label: t.nav.townhouses, href: "/acheter/maisons-ville" },
+            { label: t.nav.lands, href: "/acheter/terrains" },
+            { label: t.nav.penthouses, href: "/acheter/penthouses" },
           ],
         },
         {

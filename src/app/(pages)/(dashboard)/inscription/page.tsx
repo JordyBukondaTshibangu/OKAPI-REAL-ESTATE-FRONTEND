@@ -302,6 +302,7 @@ function AgentForm({ onSuccess }: { onSuccess: (path: string) => void }) {
   const [apiError, setApiError] = useState<string | null>(null);
   const { setSignup } = useAgentSignupStore();
   const { logout: clearUserSession } = useAuthStore();
+  const { setSession: setAgentSession } = useAgentSessionStore();
 
   const {
     register,
@@ -324,7 +325,18 @@ function AgentForm({ onSuccess }: { onSuccess: (path: string) => void }) {
         phoneNumber: data.phone,
         password: data.password,
       });
+      // Log out the current user session and log in immediately as the new agent.
       clearUserSession();
+      setAgentSession(result.access_token, {
+        id: result.agent.id,
+        name: result.agent.name,
+        email: result.agent.email,
+        verificationTier: result.agent.verificationTier,
+        emailVerified: result.agent.emailVerified,
+        agentType: result.agent.agentType ?? null,
+        agencyId: result.agent.agencyId ?? null,
+      });
+      // Also keep the signup store populated so the onboarding steps work.
       setSignup(result.access_token, result.agent.name, result.agent.email, data.phone);
       onSuccess("/devenir-agent/verification");
     } catch (err: unknown) {
