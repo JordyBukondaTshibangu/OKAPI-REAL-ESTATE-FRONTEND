@@ -5,6 +5,7 @@ import {
   paginateProperties,
   type PropertyFilters,
 } from "@/lib/properties";
+import { parseSearchQuery } from "@/lib/parseSearchQuery";
 
 export const metadata = {
   title: "Biens à louer à Kinshasa — Okapi Real Estate",
@@ -22,6 +23,7 @@ export default async function LouerPage({
     minPrice?: string;
     maxPrice?: string;
     beds?: string;
+    suburb?: string;
     isShortTerm?: string;
     rentalDuration?: string;
     minNightPrice?: string;
@@ -30,17 +32,21 @@ export default async function LouerPage({
     maxStay?: string;
   }>;
 }) {
-  const { page, q, type, minPrice, maxPrice, beds, isShortTerm, rentalDuration, minNightPrice, maxNightPrice, minStay, maxStay } = await searchParams;
+  const { page, q, type, minPrice, maxPrice, beds, isShortTerm, rentalDuration, minNightPrice, maxNightPrice, minStay, maxStay, suburb } = await searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10));
+
+  // Parse natural language from q to enrich structured filters
+  const parsed = q ? parseSearchQuery(q) : {};
 
   const allRent = await getPropertiesByListingType("rent");
 
   const filters: PropertyFilters = {
-    q: q || undefined,
-    type: type || undefined,
+    q: parsed.cleanQ || undefined,
+    type: type || parsed.category || undefined,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
-    beds: beds ? Number(beds) : undefined,
+    beds: beds ? Number(beds) : parsed.beds,
+    suburb: suburb || parsed.suburb || undefined,
     isShortTerm: isShortTerm === "true" ? true : undefined,
     rentalDuration: (rentalDuration as PropertyFilters["rentalDuration"]) || undefined,
     minNightPrice: minNightPrice ? Number(minNightPrice) : undefined,
@@ -49,7 +55,7 @@ export default async function LouerPage({
     maxStay: maxStay ? Number(maxStay) : undefined,
   };
   const filtered = filterProperties(allRent, filters);
-  const activeFilters = [q, type, minPrice, maxPrice, beds, isShortTerm, rentalDuration, minNightPrice, maxNightPrice, minStay, maxStay].filter(Boolean).length;
+  const activeFilters = [q, type, minPrice, maxPrice, beds, suburb, isShortTerm, rentalDuration, minNightPrice, maxNightPrice, minStay, maxStay].filter(Boolean).length;
   const { items, totalPages } = paginateProperties(filtered, currentPage);
 
   return (

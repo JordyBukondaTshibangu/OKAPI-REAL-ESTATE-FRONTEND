@@ -8,6 +8,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { ChevronDown, TrendingUp } from "lucide-react";
 import { useT } from "@/i18n/useT";
+import { parseSearchQuery } from "@/lib/parseSearchQuery";
 
 const TAB_ROUTES: Record<string, string> = {
   buy: "/acheter",
@@ -38,10 +39,30 @@ export default function Hero() {
   ];
 
   function handleSearch() {
-    const base = TAB_ROUTES[tab] ?? "/acheter";
+    const raw = query.trim();
+    if (!raw) {
+      router.push(TAB_ROUTES[tab] ?? "/acheter");
+      return;
+    }
+
+    const parsed = parseSearchQuery(raw);
+
+    // Determine destination route: prefer parsed listing type, fall back to selected tab
+    let destination = TAB_ROUTES[tab] ?? "/acheter";
+    if (parsed.listingType === "rent") destination = "/louer";
+    else if (parsed.listingType === "sale") destination = "/acheter";
+
     const params = new URLSearchParams();
-    if (query.trim()) params.set("q", query.trim());
-    router.push(params.toString() ? `${base}?${params}` : base);
+
+    // Pass a clean query only if there are leftover meaningful words
+    if (parsed.cleanQ) params.set("q", parsed.cleanQ);
+
+    // Add structured params extracted from the natural language query
+    if (parsed.category) params.set("type", parsed.category);
+    if (parsed.beds) params.set("beds", String(parsed.beds));
+    if (parsed.suburb) params.set("suburb", parsed.suburb);
+
+    router.push(params.toString() ? `${destination}?${params}` : destination);
   }
 
   return (

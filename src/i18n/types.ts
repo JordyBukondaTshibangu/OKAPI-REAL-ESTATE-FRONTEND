@@ -175,7 +175,7 @@ export type Messages = {
     typePlaceholder: string; allTypes: string;
     bedsPlaceholder: string; allBeds: string;
     pricePlaceholder: string; allPrices: string;
-    offPlan: string; ready: string; map: string; clearAll: string;
+    communeFilterLabel: string; allCommunes: string; map: string; clearAll: string;
     exitMap: string; viewProperty: string;
     priceFrom: string; priceUpTo: string;
     ariaSortBtn: string; ariaAlertsBtn: string;
@@ -218,6 +218,7 @@ export type Messages = {
     loadingAgents: string; noAgents: string;
     agencyCount: string; loadingAgencies: string; noAgencies: string;
     transactionSale: string; transactionRent: string; transactionAll: string;
+    createAgentAccount: string;
   };
   agenciesPage: {
     heroBadge: string; heroHeading: string; heroSubtitle: string;
@@ -983,6 +984,60 @@ export type Messages = {
     subStatusPending: string; subStatusConfirmed: string; subStatusRejected: string; subStatusExpired: string;
     subActiveUntil: string; subRejectedReason: string;
     subMonthly: string; subErrCreate: string; subErrUpload: string;
+  };
+  inscription: {
+    subtitle: string;
+    title: string;
+    tabUser: string;
+    tabAgent: string;
+    // User form
+    firstNameLabel: string;
+    firstNamePlaceholder: string;
+    lastNameLabel: string;
+    lastNamePlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    passwordLabel: string;
+    passwordPlaceholder: string;
+    confirmPasswordLabel: string;
+    confirmPasswordPlaceholder: string;
+    // Agent form extras
+    agentNameLabel: string;
+    agentNamePlaceholder: string;
+    agentPhoneLabel: string;
+    agentBannerTitle: string;
+    agentBannerBody: string;
+    // Terms
+    termsAccept: string;
+    termsLink: string;
+    termsAnd: string;
+    privacyLink: string;
+    // Buttons
+    createAccountBtn: string;
+    creatingAccountBtn: string;
+    createProfessionalBtn: string;
+    // Bottom links
+    alreadyHaveAccount: string;
+    signInLink: string;
+    areYouAgent: string;
+    createProfessionalLink: string;
+    // Validation errors
+    errFirstNameRequired: string;
+    errLastNameRequired: string;
+    errNameRequired: string;
+    errEmailInvalid: string;
+    errPhoneInvalid: string;
+    errPasswordMismatch: string;
+    errTermsRequired: string;
+    errEmailTaken: string;
+    errGeneric: string;
+    // Password strength checks
+    pwdMin8: string;
+    pwdUppercase: string;
+    pwdLowercase: string;
+    pwdSpecial: string;
   };
   espaceAgence: {
     // Dashboard

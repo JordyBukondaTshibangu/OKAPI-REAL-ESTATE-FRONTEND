@@ -12,7 +12,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/shared/components/ui/button";
 import { useAgenciesStore } from "@/store/useAgenciesStore";
 import { useAgentsStore } from "@/store/useAgentsStore";
-import { ChevronDown, Search, Sparkles, X } from "lucide-react";
+import { Briefcase, ChevronDown, Search, Sparkles, X } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -166,6 +167,17 @@ export default function AgentsListClient() {
           <p className="mt-3 text-white/80 max-w-2xl mx-auto">
             {t.agentsPage.heroSubtitle}
           </p>
+          <div className="mt-8 flex justify-center">
+            <Link href="/inscription?type=agent">
+              <Button
+                variant="outlineGold"
+                className="gap-2 px-6 h-11 text-sm font-semibold"
+              >
+                <Briefcase className="w-4 h-4" />
+                {t.agentsPage.createAgentAccount}
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Search panel */}

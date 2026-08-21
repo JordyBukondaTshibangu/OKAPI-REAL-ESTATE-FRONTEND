@@ -5,6 +5,7 @@ import {
   paginateProperties,
   type PropertyFilters,
 } from "@/lib/properties";
+import { parseSearchQuery } from "@/lib/parseSearchQuery";
 
 export const metadata = {
   title: "Biens à acheter à Kinshasa — Okapi Real Estate",
@@ -30,15 +31,20 @@ export default async function AcheterPage({
   const { page, q, type, minPrice, maxPrice, beds, suburb, city, isShortTerm } = await searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10));
 
+  // Parse natural language from q to enrich structured filters
+  const parsed = q ? parseSearchQuery(q) : {};
+
   const allSale = await getPropertiesByListingType("sale");
 
   const filters: PropertyFilters = {
-    q: q || undefined,
-    type: type || undefined,
+    // Use clean remaining words (not structural keywords) for text matching
+    q: parsed.cleanQ || undefined,
+    // Explicit URL param takes precedence over parsed; fall back to parsed
+    type: type || parsed.category || undefined,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
-    beds: beds ? Number(beds) : undefined,
-    suburb: suburb || undefined,
+    beds: beds ? Number(beds) : parsed.beds,
+    suburb: suburb || parsed.suburb || undefined,
     city: city || undefined,
     isShortTerm: isShortTerm === "true" ? true : undefined,
   };
@@ -86,7 +92,6 @@ export default async function AcheterPage({
       currentPage={currentPage}
       totalPages={totalPages}
       activeFilters={activeFilters}
-      showOffPlanReady
     />
   );
 }

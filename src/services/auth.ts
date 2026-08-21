@@ -319,3 +319,28 @@ export async function getEnquiriesForProperty(propertyId: string): Promise<Enqui
   );
   return res.data;
 }
+
+// ── Reports ───────────────────────────────────────────────────────────────────
+
+export type ReportReason =
+  | "FAKE_LISTING"
+  | "WRONG_PRICE"
+  | "STOLEN_PHOTOS"
+  | "ALREADY_RENTED"
+  | "SCAM"
+  | "INAPPROPRIATE"
+  | "OTHER";
+
+export async function reportProperty(
+  token: string,
+  propertyId: string,
+  reason: ReportReason,
+  description?: string,
+) {
+  const res = await axios.post(
+    `${BASE}/api/user/reports`,
+    { propertyId, reason, description },
+    { headers: authHeader(token) },
+  );
+  return res.data;
+}

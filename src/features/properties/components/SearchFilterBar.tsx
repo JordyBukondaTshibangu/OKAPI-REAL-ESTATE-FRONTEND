@@ -590,11 +590,19 @@ export default function SearchFilterBar({
     { value: 5, label: t.filters.bed5 },
   ];
 
+  const KINSHASA_COMMUNES = [
+    "Barumbu", "Bumbu", "Gombe", "Kalamu", "Kasa-Vubu", "Kimbanseke",
+    "Kinshasa", "Kintambo", "Kisenso", "Lemba", "Limete", "Lingwala",
+    "Makala", "Maluku", "Masina", "Matete", "Mont-Ngafula", "Ndjili",
+    "Ngaba", "Ngaliema", "Ngiri-Ngiri", "Nsele", "Selembao",
+  ];
+
   const currentQ = searchParams.get("q") ?? "";
   const currentType = searchParams.get("type") ?? "";
   const currentMinPrice = searchParams.get("minPrice") ?? "";
   const currentMaxPrice = searchParams.get("maxPrice") ?? "";
   const currentBeds = searchParams.get("beds") ?? "";
+  const currentSuburb = searchParams.get("suburb") ?? "";
   const currentIsShortTerm = searchParams.get("isShortTerm") === "true"; // legacy
 
   const [localQ, setLocalQ] = useState(currentQ);
@@ -637,6 +645,7 @@ export default function SearchFilterBar({
     currentMaxPrice ||
     currentBeds ||
     currentQ ||
+    currentSuburb ||
     currentIsShortTerm ||
     searchParams.get("rentalDuration") ||
     searchParams.get("minNightPrice") ||
@@ -806,22 +815,30 @@ export default function SearchFilterBar({
           />
         )}
 
-        {showOffPlanReady && (
-          <>
+        {/* Commune */}
+        <DropdownPill
+          label={currentSuburb || t.filters.communeFilterLabel}
+          active={!!currentSuburb}
+          onClear={() => setFilter("suburb", null)}
+        >
+          <button
+            className="w-full text-left px-4 py-2.5 text-sm hover:bg-accent text-muted-foreground"
+            onClick={() => setFilter("suburb", null)}
+          >
+            {t.filters.allCommunes}
+          </button>
+          {KINSHASA_COMMUNES.map((commune) => (
             <button
-              type="button"
-              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white dark:bg-card hover:border-primary/50"
+              key={commune}
+              className={`w-full text-left px-4 py-2.5 text-sm hover:bg-accent ${
+                currentSuburb === commune ? "bg-accent text-primary font-semibold" : ""
+              }`}
+              onClick={() => setFilter("suburb", commune)}
             >
-              {t.filters.offPlan} <ChevronDown className="w-3.5 h-3.5" />
+              {commune}
             </button>
-            <button
-              type="button"
-              className="inline-flex items-center gap-1 rounded-full border border-border px-4 h-10 text-sm bg-white dark:bg-card hover:border-primary/50"
-            >
-              {t.filters.ready} <ChevronDown className="w-3.5 h-3.5" />
-            </button>
-          </>
-        )}
+          ))}
+        </DropdownPill>
 
         {/* Divider */}
         <span className="hidden lg:inline-block w-px h-6 bg-border mx-1" />

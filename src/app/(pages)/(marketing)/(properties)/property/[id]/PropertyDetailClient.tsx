@@ -22,6 +22,7 @@ import { formatPrice, formatListedAgo, categoryLabel } from "@/lib/properties";
 import { getR2ImageUrl } from "@/shared/utils/utils";
 import { Property, PropertyDetail, PropertyPerformance } from "@/features/properties/types/property";
 import { useT } from "@/i18n/useT";
+import ReportModal from "@/features/properties/components/ReportModal";
 
 /* ─── helpers ───────────────────────────────────────────────────────────── */
 
@@ -221,6 +222,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
   const [enquirySending, setEnquirySending] = useState(false);
   const [enquirySubmitted, setEnquirySubmitted] = useState(false);
   const [enquiryError, setEnquiryError] = useState<string | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
   const { token, isAuthenticated } = useAuthStore();
   const { isAuthenticated: isAgentAuth } = useAgentSessionStore();
   const router = useRouter();
@@ -307,7 +309,7 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
                 </button>
               )}
               <ShareButton title={detail.title} onShare={handleShared} iconOnly />
-              <button className="inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted text-foreground/80">
+              <button onClick={() => setReportOpen(true)} className="inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted text-foreground/80">
                 <Flag className="w-4 h-4 shrink-0" />
                 <span className="hidden md:inline">{dp.reportBtn}</span>
               </button>
@@ -326,6 +328,9 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
       )}
       {sliderOpen && gallery.length > 0 && (
         <ImageSlider images={gallery} initialIndex={sliderIndex} onClose={() => setSliderOpen(false)} />
+      )}
+      {reportOpen && (
+        <ReportModal propertyId={id} onClose={() => setReportOpen(false)} />
       )}
 
       <div className="max-w-6xl mx-auto px-6 pt-6">
