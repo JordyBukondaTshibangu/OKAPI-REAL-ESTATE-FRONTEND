@@ -46,6 +46,8 @@ type AgentProperty = {
   neighborhood?: string;
   city?: string;
   viewCount?: number;
+  whatsappClicks?: number;
+  shareCount?: number;
   price?: number;
   currency?: string;
   listingType?: string;
@@ -601,6 +603,8 @@ function KpiCards({ profile, t }: { profile: AgentProfile; t: T }) {
   const activeListings = profile.properties?.length ?? 0;
   const totalViews =
     profile.properties?.reduce((s, p) => s + (p.viewCount ?? 0), 0) ?? 0;
+  const totalWhatsappClicks =
+    profile.properties?.reduce((s, p) => s + (p.whatsappClicks ?? 0), 0) ?? 0;
   const communes = profile.communes ?? [];
 
   const cards = [
@@ -613,7 +617,7 @@ function KpiCards({ profile, t }: { profile: AgentProfile; t: T }) {
     },
     {
       icon: <MessageCircle className="w-4 h-4 text-green-600" />,
-      value: 0,
+      value: totalWhatsappClicks,
       label: t.kpiWhatsapp,
       sub: t.kpiThisMonth,
       locked: false,
@@ -720,8 +724,8 @@ function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
     {
       icon: <BarChart2 className="w-4 h-4" />,
       label: t.statsAction,
-      href: "/pro",
-      locked: true,
+      href: "/espace-agent/statistiques",
+      locked: !isPro,
     },
     {
       icon: <MessageCircle className="w-4 h-4" />,

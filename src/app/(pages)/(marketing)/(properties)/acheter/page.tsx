@@ -65,27 +65,32 @@ export default async function AcheterPage({
         {
           label: "Appartements",
           count: allSale.filter((p) => p.category === "apartment").length,
-          href: "/acheter/appartements",
+          href: "/acheter",
+          typeValue: "apartment",
         },
         {
           label: "Villas",
           count: allSale.filter((p) => p.category === "villa").length,
-          href: "/acheter/villas",
+          href: "/acheter",
+          typeValue: "villa",
         },
         {
           label: "Maisons de ville",
           count: allSale.filter((p) => p.category === "townhouse").length,
-          href: "/acheter/maisons-ville",
+          href: "/acheter",
+          typeValue: "townhouse",
         },
         {
           label: "Terrains",
           count: allSale.filter((p) => p.category === "land").length,
-          href: "/acheter/terrains",
+          href: "/acheter",
+          typeValue: "land",
         },
         {
           label: "Penthouses",
           count: allSale.filter((p) => p.category === "penthouse").length,
-          href: "/acheter/penthouses",
+          href: "/acheter",
+          typeValue: "penthouse",
         },
       ]}
       properties={items}

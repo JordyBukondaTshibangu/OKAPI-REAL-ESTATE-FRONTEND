@@ -21,8 +21,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         const status = error?.response?.status;
         const url: string = error?.config?.url ?? "";
 
-        // Only act on 401s from our authenticated user routes
-        if (status === 401 && url.includes("/api/user")) {
+        // Log out on 401 from any of our authenticated API routes.
+        // Exclude public auth endpoints (login / register / forgot / reset)
+        // so a wrong password doesn't kick the user out.
+        const isPublicAuthRoute =
+          url.includes("/api/auth/login") ||
+          url.includes("/api/auth/register") ||
+          url.includes("/api/auth/forgot") ||
+          url.includes("/api/auth/reset") ||
+          url.includes("/api/proxy/auth/login") ||
+          url.includes("/api/proxy/auth/register");
+
+        if (status === 401 && url.includes("/api/") && !isPublicAuthRoute) {
           logout();
           router.replace("/connexion");
         }

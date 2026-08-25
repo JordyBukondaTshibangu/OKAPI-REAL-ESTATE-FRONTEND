@@ -41,14 +41,14 @@ function PremiumChip({ label }: { label: string }) {
   );
 }
 
-function GalleryImg({ src, alt, className = "", badge, onClick, photoCount, viewPhotosLabel, category, gradient }: {
+function GalleryImg({ src, alt, className = "", badge, onClick, photoCount, viewPhotosLabel, category, gradient, priority }: {
   src: string; alt: string; className?: string; badge?: React.ReactNode;
   onClick?: () => void; photoCount?: number; viewPhotosLabel?: string;
-  category?: string; gradient?: string;
+  category?: string; gradient?: string; priority?: boolean;
 }) {
   return (
     <div className={`relative overflow-hidden rounded-xl bg-muted ${className} ${onClick ? "cursor-pointer" : ""}`} onClick={onClick}>
-      <PropertyImage src={src} alt={alt} category={category} gradient={gradient} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 800px" />
+      <PropertyImage src={src} alt={alt} category={category} gradient={gradient} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 800px" priority={priority} />
       {badge}
       {typeof photoCount === "number" && (
         <button onClick={onClick} className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 bg-black/60 hover:bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg transition-colors">
@@ -257,7 +257,13 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
         setSaved(false);
         setPerf((p) => ({ ...p, saved: Math.max(0, p.saved - 1) }));
       } else {
-        await addFavourite(token, id);
+        try {
+          await addFavourite(token, id);
+        } catch (err: unknown) {
+          // 409 = already in favourites — treat as success
+          const status = (err as { response?: { status?: number } })?.response?.status;
+          if (status !== 409) throw err;
+        }
         setSaved(true);
         setPerf((p) => ({ ...p, saved: p.saved + 1 }));
       }
@@ -700,7 +706,7 @@ function Gallery({ images, title, active, onActive, onOpenSlider, verified, isPr
     <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-3">
       <GalleryImg src={mainSrc} alt={title} className="aspect-[16/10] md:aspect-[16/11]"
         onClick={() => onOpenSlider(active)} photoCount={images.length} viewPhotosLabel={viewPhotosLabel}
-        category={category} gradient={gradient}
+        category={category} gradient={gradient} priority
         badge={
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
             {verified && <VerifiedChip label={verifiedLabel} />}

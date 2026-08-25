@@ -146,7 +146,7 @@ export default function ReportModal({ propertyId, onClose }: ReportModalProps) {
                 size="sm"
                 disabled={!reason || sending}
                 onClick={handleSubmit}
-                className="flex-1"
+                className="flex-1 whitespace-nowrap"
               >
                 {sending ? "Envoi…" : "Envoyer le signalement →"}
               </Button>

@@ -444,6 +444,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
               width={100}
               height={46}
               className="h-12 w-auto"
+              priority
             />
           </Link>
           <button

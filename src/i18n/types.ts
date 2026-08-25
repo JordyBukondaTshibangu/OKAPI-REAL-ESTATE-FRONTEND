@@ -997,6 +997,25 @@ export type Messages = {
     subStatusPending: string; subStatusConfirmed: string; subStatusRejected: string; subStatusExpired: string;
     subActiveUntil: string; subRejectedReason: string;
     subMonthly: string; subErrCreate: string; subErrUpload: string;
+    // Statistics page
+    statsPageTitle: string;
+    statsTotalViews: string;
+    statsTotalWhatsapp: string;
+    statsTotalShares: string;
+    statsActiveListings: string;
+    statsAllListings: string;
+    statsConversionTitle: string;
+    statsConversionDesc: string;
+    statsTopTitle: string;
+    statsNoData: string;
+    statsNoDataBody: string;
+    statsPublishCta: string;
+    statsDetailTitle: string;
+    statsDetailSub: string;
+    statsViews: string;
+    statsWhatsapp: string;
+    statsShares: string;
+    statsAllListingsSub: string;
   };
   inscription: {
     subtitle: string;
