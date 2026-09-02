@@ -142,7 +142,11 @@ function SubscriptionModal({ token, t, onClose, onSuccess }: {
     setScreenshotUploading(true); setError("");
     try {
       const { key, url } = await presignSubscriptionScreenshot(token, file.name, file.type);
-      await fetch(url, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
+      await fetch("/api/proxy/uploads/put-r2", {
+        method: "POST",
+        body: file,
+        headers: { "Content-Type": file.type, "X-Presigned-Url": url },
+      });
       const publicUrl = resolveUrl(key);
       await updateSubscriptionScreenshot(token, subId, publicUrl);
       setScreenshotUrl(publicUrl);

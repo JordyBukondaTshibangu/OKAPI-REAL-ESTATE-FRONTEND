@@ -329,10 +329,13 @@ export default function NouvelleAnnoncePage() {
         { url }: { key: string; url: string },
         i: number
       ) => {
-        await fetch(url, {
-          method: "PUT",
+        await fetch("/api/proxy/uploads/put-r2", {
+          method: "POST",
           body: photos[i].file,
-          headers: { "Content-Type": photos[i].file.type || "image/jpeg" },
+          headers: {
+            "Content-Type": photos[i].file.type || "image/jpeg",
+            "X-Presigned-Url": url,
+          },
         });
         setUploadProgress(Math.round(((i + 1) / presigned.length) * 100));
       })

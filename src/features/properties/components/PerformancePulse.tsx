@@ -179,34 +179,43 @@ export function PerformancePanel({ perf }: { perf: PropertyPerformance }) {
 
 export function CardPerformanceStrip({
   perf,
+  variant = "inline",
 }: {
   perf?: PropertyPerformance | null;
+  /** "inline" — inside card body (dark text on white).
+   *  "overlay" — on top of a photo (white text, dark pill background). */
+  variant?: "inline" | "overlay";
 }) {
   const t = useT();
   if (!perf || (perf.viewed === 0 && perf.shared === 0 && perf.saved === 0)) {
     return null;
   }
+
+  if (variant === "overlay") {
+    return (
+      <span className="inline-flex items-center gap-2.5 text-xs text-white font-medium bg-black/55 backdrop-blur-sm px-2.5 py-1 rounded-full">
+        <span className="inline-flex items-center gap-1" title={t.cards.viewsLabel}>
+          <Eye className="w-3 h-3" /> {formatCompactCount(perf.viewed)}
+        </span>
+        <span className="inline-flex items-center gap-1" title={t.cards.savesLabel}>
+          <Heart className="w-3 h-3" /> {formatCompactCount(perf.saved)}
+        </span>
+        <span className="inline-flex items-center gap-1" title={t.cards.sharesLabel}>
+          <Share2 className="w-3 h-3" /> {formatCompactCount(perf.shared)}
+        </span>
+      </span>
+    );
+  }
+
   return (
-    <span className="inline-flex items-center gap-3 text-xs text-muted-foreground">
-      <span
-        className="inline-flex items-center gap-1"
-        title={t.cards.viewsLabel}
-        aria-label={`${perf.viewed} ${t.cards.viewsLabel}`}
-      >
+    <span className="inline-flex items-center gap-3 text-xs text-foreground/60 font-medium">
+      <span className="inline-flex items-center gap-1" title={t.cards.viewsLabel} aria-label={`${perf.viewed} ${t.cards.viewsLabel}`}>
         <Eye className="w-3.5 h-3.5" /> {formatCompactCount(perf.viewed)}
       </span>
-      <span
-        className="inline-flex items-center gap-1"
-        title={t.cards.savesLabel}
-        aria-label={`${perf.saved} ${t.cards.savesLabel}`}
-      >
+      <span className="inline-flex items-center gap-1" title={t.cards.savesLabel} aria-label={`${perf.saved} ${t.cards.savesLabel}`}>
         <Heart className="w-3.5 h-3.5" /> {formatCompactCount(perf.saved)}
       </span>
-      <span
-        className="inline-flex items-center gap-1"
-        title={t.cards.sharesLabel}
-        aria-label={`${perf.shared} ${t.cards.sharesLabel}`}
-      >
+      <span className="inline-flex items-center gap-1" title={t.cards.sharesLabel} aria-label={`${perf.shared} ${t.cards.sharesLabel}`}>
         <Share2 className="w-3.5 h-3.5" /> {formatCompactCount(perf.shared)}
       </span>
     </span>

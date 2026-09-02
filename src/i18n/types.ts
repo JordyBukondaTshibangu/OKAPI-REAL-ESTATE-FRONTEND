@@ -73,6 +73,10 @@ export type Messages = {
     trendProperties: string;
     trendAvgPrice: string;
     trendNewToday: string;
+    trustBadge: string;
+    verifiedLabel: string;
+    verifiedBadge: string;
+    seeProperty: string;
   };
   footer: {
     tagline: string;
@@ -141,6 +145,7 @@ export type Messages = {
       tabRent: string;
       tabSale: string;
       viewAll: string;
+      verifiedCount: string;
     };
     discover: {
       heading: string; headingHighlight: string;

@@ -166,7 +166,11 @@ function BoostModal({ modal, token, t, onClose, onSuccess }: {
     setScreenshotUploading(true); setError("");
     try {
       const { key, url } = await presignBoostScreenshot(token, file.name, file.type);
-      await fetch(url, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
+      await fetch("/api/proxy/uploads/put-r2", {
+        method: "POST",
+        body: file,
+        headers: { "Content-Type": file.type, "X-Presigned-Url": url },
+      });
       const publicUrl = resolveUrl(key);
       await updateBoostScreenshot(token, boostId, publicUrl);
       setScreenshotUrl(publicUrl);

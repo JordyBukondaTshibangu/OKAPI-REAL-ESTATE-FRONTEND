@@ -358,10 +358,13 @@ export default function ModifierAnnoncePage() {
 
     await Promise.all(
       presigned.map(async ({ url }: { key: string; url: string }, i: number) => {
-        await fetch(url, {
-          method: "PUT",
+        await fetch("/api/proxy/uploads/put-r2", {
+          method: "POST",
           body: newPhotos[i].file,
-          headers: { "Content-Type": newPhotos[i].file.type || "image/jpeg" },
+          headers: {
+            "Content-Type": newPhotos[i].file.type || "image/jpeg",
+            "X-Presigned-Url": url,
+          },
         });
         setUploadProgress(Math.round(((i + 1) / presigned.length) * 100));
       })

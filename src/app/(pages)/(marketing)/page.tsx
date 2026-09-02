@@ -10,16 +10,17 @@ import { getPropertyStats } from "@/lib/api";
 import { getPropertiesByListingType } from "@/lib/properties";
 
 export default async function Home() {
-  // Both fetches run in parallel — server-side, zero cost to the user's bandwidth
   const [initialRent, stats] = await Promise.all([
     getPropertiesByListingType("rent").then((p) => p.slice(0, 6)),
     getPropertyStats(),
   ]);
 
+  const totalCount = stats.total || initialRent.length;
+
   return (
     <>
-      <Hero />
-      <SectionReveal><LatestListings initialRent={initialRent} /></SectionReveal>
+      <Hero previewProperties={initialRent.slice(0, 2)} totalCount={totalCount} />
+      <SectionReveal><LatestListings initialRent={initialRent} totalCount={totalCount} /></SectionReveal>
       <SectionReveal><Regions stats={stats} /></SectionReveal>
       <SectionReveal><Discover /></SectionReveal>
       <SectionReveal><ContentSections /></SectionReveal>

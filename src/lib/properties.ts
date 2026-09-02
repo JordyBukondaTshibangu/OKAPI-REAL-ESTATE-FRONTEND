@@ -117,15 +117,24 @@ export function paginateProperties(
   return { items: items.slice(start, start + perPage), totalPages };
 }
 
+/** Approximate fixed rate used only for display normalisation. */
+const CDF_TO_USD = 2800;
+
 export function formatPrice(
   price: number,
   currency: string,
   period: string | null,
 ): string {
-  const formatted = price.toLocaleString("fr-FR");
-  const curr = currency === "USD" ? "$" : currency;
+  // Always display in USD — convert CDF automatically.
+  let usdPrice = price;
+  let approx = false;
+  if (currency === "CDF") {
+    usdPrice = Math.round(price / CDF_TO_USD);
+    approx = true;
+  }
+  const formatted = usdPrice.toLocaleString("fr-FR");
   const per = period === "monthly" ? "/mois" : period === "yearly" ? "/an" : "";
-  return `${formatted} ${curr}${per}`;
+  return `${approx ? "≈" : ""}${formatted} $${per}`;
 }
 
 /** 1 234 → "1,2k", 1 200 000 → "1,2M" — compact display for engagement counters. */

@@ -81,6 +81,10 @@ const en: Messages = {
     trendAvgPrice: "Avg. price · Gombe",
     trendNewToday: "New listings today",
     filterBedrooms: "Bedrooms",
+    trustBadge: "verified listings available in Kinshasa",
+    verifiedLabel: "Okapi verified listings",
+    verifiedBadge: "✓ Verified",
+    seeProperty: "View →",
   },
 
   footer: {
@@ -151,6 +155,7 @@ const en: Messages = {
       tabRent: "For Rent",
       tabSale: "For Sale",
       viewAll: "View all properties",
+      verifiedCount: "verified listings available",
     },
     discover: {
       heading: "Discover everything about real estate",

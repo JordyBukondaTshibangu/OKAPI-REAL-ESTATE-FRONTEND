@@ -57,7 +57,13 @@ function CardSkeleton() {
  * (all categories, rent) renders instantly with no client XHR.
  * Any other combination fetches client-side via React Query (cached).
  */
-export default function LatestListings({ initialRent }: { initialRent: Property[] }) {
+export default function LatestListings({
+  initialRent,
+  totalCount = 0,
+}: {
+  initialRent: Property[];
+  totalCount?: number;
+}) {
   const t = useT();
   const [tab, setTab]           = useState<"rent" | "sale">("rent");
   const [category, setCategory] = useState<string | null>(null);
@@ -123,6 +129,17 @@ export default function LatestListings({ initialRent }: { initialRent: Property[
             <p className="text-sm text-muted-foreground">
               {t.home.latestListings.subheading}
             </p>
+            {totalCount > 0 && (
+              <p className="text-xs text-muted-foreground/70 mt-0.5">
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                  <strong className="font-semibold text-foreground/60">
+                    {totalCount.toLocaleString("fr-FR")}
+                  </strong>
+                  {" "}{t.home.latestListings.verifiedCount}
+                </span>
+              </p>
+            )}
           </div>
 
           <Tabs value={tab} onValueChange={(v) => { setTab(v as "rent" | "sale"); }}>
@@ -150,7 +167,14 @@ export default function LatestListings({ initialRent }: { initialRent: Property[
                 <CardSkeleton key={i} />
               ))
             : properties.map((property, i) => (
-                <PropertyCard key={property.id} property={property} priority={i === 0} />
+                <div
+                  key={property.id}
+                  style={{
+                    animation: `fade-in-up 0.55s ease-out ${i * 90}ms both`,
+                  }}
+                >
+                  <PropertyCard property={property} priority={i === 0} />
+                </div>
               ))}
         </div>
 

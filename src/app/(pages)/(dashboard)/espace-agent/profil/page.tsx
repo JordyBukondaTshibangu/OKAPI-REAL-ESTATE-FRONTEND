@@ -236,8 +236,15 @@ export default function EditProfilePage() {
         { filename: file.name, contentType: file.type },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      // 2. Upload directly to R2
-      await axios.put(url, file, { headers: { "Content-Type": file.type } });
+      // 2. Upload via server-side proxy (avoids R2 CORS issues)
+      await fetch("/api/proxy/uploads/put-r2", {
+        method: "POST",
+        body: file,
+        headers: {
+          "Content-Type": file.type,
+          "X-Presigned-Url": url,
+        },
+      });
       // 3. Save the key to the agent profile
       await axios.patch(
         "/api/proxy/agents/me/photo",

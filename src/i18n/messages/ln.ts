@@ -82,6 +82,10 @@ const ln: Messages = {
     trendAvgPrice: "Ntalo moy. · Gombe",
     trendNewToday: "Bandako ya sika lelo",
     filterBedrooms: "Bambeto",
+    trustBadge: "bandako ya vérifiées ezali na Kinshasa",
+    verifiedLabel: "Bandako vérifiées ya Okapi",
+    verifiedBadge: "✓ Vérifiée",
+    seeProperty: "Tala →",
   },
 
   footer: {
@@ -152,6 +156,7 @@ const ln: Messages = {
       tabRent: "Ya funga",
       tabSale: "Ya koteka",
       viewAll: "Tala bandako nyonso",
+      verifiedCount: "bandako ya vérifiées ezali",
     },
     discover: {
       heading: "Yeba makambo nyonso ya ndako",

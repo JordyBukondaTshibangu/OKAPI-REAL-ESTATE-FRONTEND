@@ -309,8 +309,12 @@ export default function PropertyDetailClient({ id, detail, recommended }: {
             <div className="flex items-center gap-0.5 text-sm shrink-0">
               {!isAgentAuth && (
                 <button onClick={handleToggleFavourite} disabled={saving}
-                  className={`inline-flex items-center gap-1.5 px-2.5 md:px-3 h-9 rounded-md hover:bg-muted transition-colors disabled:opacity-60 ${saved ? "text-secondary" : "text-foreground/80"}`}>
-                  <Heart className={`w-4 h-4 shrink-0 ${saved ? "fill-current" : ""}`} />
+                  className={`inline-flex items-center gap-1.5 px-3 md:px-4 h-9 rounded-full font-medium text-sm transition-all duration-200 active:scale-95 disabled:opacity-60 shadow-sm ${
+                    saved
+                      ? "bg-secondary text-white hover:bg-secondary/90"
+                      : "bg-muted text-foreground/80 hover:bg-secondary/10 hover:text-secondary border border-border"
+                  }`}>
+                  <Heart className={`w-4 h-4 shrink-0 transition-transform duration-200 ${saved ? "fill-current scale-110" : ""}`} />
                   <span className="hidden md:inline">{saved ? dp.saved : dp.saveBtn}</span>
                 </button>
               )}

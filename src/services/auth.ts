@@ -80,11 +80,14 @@ export async function uploadAvatar(token: string, file: File) {
     { headers: authHeader(token) }
   );
 
-  // Step 2: PUT file binary directly to R2
-  await fetch(url, {
-    method: "PUT",
+  // Step 2: PUT file via server-side proxy (avoids R2 CORS issues)
+  await fetch("/api/proxy/uploads/put-r2", {
+    method: "POST",
     body: file,
-    headers: { "Content-Type": file.type },
+    headers: {
+      "Content-Type": file.type,
+      "X-Presigned-Url": url,
+    },
   });
 
   // Step 3: promote tmp key → users/{userId}/ and update user record
@@ -203,12 +206,18 @@ export async function getFavourites(token: string): Promise<Favourite[]> {
 }
 
 export async function addFavourite(token: string, propertyId: string) {
-  const res = await axios.post(
-    `${BASE}/api/user/favorites`,
-    { propertyId },
-    { headers: authHeader(token) }
-  );
-  return res.data;
+  try {
+    const res = await axios.post(
+      `${BASE}/api/user/favorites`,
+      { propertyId },
+      { headers: authHeader(token) }
+    );
+    return res.data;
+  } catch (err: unknown) {
+    // 409 = already in favorites — treat as success
+    if (axios.isAxiosError(err) && err.response?.status === 409) return;
+    throw err;
+  }
 }
 
 export async function removeFavourite(token: string, propertyId: string) {

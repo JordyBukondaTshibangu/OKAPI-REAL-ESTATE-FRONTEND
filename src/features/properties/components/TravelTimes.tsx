@@ -43,9 +43,14 @@ export type TravelTimesProps = {
   properties?: Property[];
   /** Called with the list of property ids within range, or null when no filter is active. */
   onFilter?: (ids: string[] | null) => void;
+  /**
+   * When true, renders as a plain scrollable div (no card shell, no sticky, no heading row).
+   * Used when TravelTimes is a tab inside FilterSidebar.
+   */
+  embedded?: boolean;
 };
 
-export default function TravelTimes({ properties, onFilter }: TravelTimesProps) {
+export default function TravelTimes({ properties, onFilter, embedded }: TravelTimesProps) {
   const t = useT();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<NamedLocation | null>(null);
@@ -103,23 +108,55 @@ export default function TravelTimes({ properties, onFilter }: TravelTimesProps) 
     onFilter(matches.map((p) => p.id));
   }
 
-  return (
-    <aside className="bg-white dark:bg-card rounded-xl border border-border shadow-sm p-5 sticky top-28">
-      <div className="flex items-start justify-between mb-5">
-        <div className="flex items-center gap-2">
-          <ClockIcon className="w-5 h-5 text-foreground" />
-          <h3 className="font-semibold text-foreground">{t.travelTimes.heading}</h3>
-          <span className="text-[9px] font-bold uppercase bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded">
-            {t.travelTimes.newBadge}
-          </span>
+  const content = (
+    <>
+      {/* Heading row — hidden in embedded mode (tab bar is the title) */}
+      {!embedded && (
+        <div className="flex items-start justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <ClockIcon className="w-5 h-5 text-foreground" />
+            <h3 className="font-semibold text-foreground">{t.travelTimes.heading}</h3>
+            <span className="text-[9px] font-bold uppercase bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded">
+              {t.travelTimes.newBadge}
+            </span>
+          </div>
+          <button
+            aria-label={t.travelTimes.collapse}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </button>
         </div>
-        <button
-          aria-label={t.travelTimes.collapse}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <ChevronDown className="w-4 h-4" />
-        </button>
-      </div>
+      )}
+
+      {/* Quick-select landmarks */}
+      {!selected && (
+        <div className="mb-4">
+          <p className="text-xs text-muted-foreground mb-2 font-medium">Lieux fréquents</p>
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { label: "Centre-ville Gombe", key: "gombe" },
+              { label: "Aéroport N'Djili", key: "n'djili" },
+              { label: "Univ. de Kinshasa", key: "lemba" },
+              { label: "Limete", key: "limete" },
+              { label: "Ngaliema", key: "ngaliema" },
+            ].map((lm) => {
+              const loc = NAMED_LOCATIONS.find((l) => l.key === lm.key);
+              if (!loc) return null;
+              return (
+                <button
+                  key={lm.key}
+                  type="button"
+                  onClick={() => handleSelect({ ...loc, label: lm.label })}
+                  className="px-2.5 py-1 rounded-full border border-border text-xs text-foreground hover:border-primary/50 hover:text-primary transition-colors bg-muted/30"
+                >
+                  {lm.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Selected location */}
       <div className="mb-5 relative">
@@ -244,6 +281,16 @@ export default function TravelTimes({ properties, onFilter }: TravelTimesProps) 
           {t.travelTimes.resultsCount.replace("{n}", String(matchCount))}
         </p>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return <div className="overflow-y-auto flex-1 p-5 space-y-5">{content}</div>;
+  }
+
+  return (
+    <aside className="bg-white dark:bg-card rounded-xl border border-border shadow-sm p-5 sticky top-28">
+      {content}
     </aside>
   );
 }

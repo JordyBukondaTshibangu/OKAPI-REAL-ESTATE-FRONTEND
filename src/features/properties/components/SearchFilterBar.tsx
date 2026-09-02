@@ -34,11 +34,13 @@ function DropdownPill({
   active,
   onClear,
   children,
+  fullWidth,
 }: {
   label: string;
   active?: boolean;
   onClear?: () => void;
   children: React.ReactNode;
+  fullWidth?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -46,11 +48,11 @@ function DropdownPill({
   useOutsideClick(ref, close);
 
   return (
-    <div ref={ref} className={`relative ${open ? "z-100" : ""}`}>
+    <div ref={ref} className={`relative ${open ? "z-100" : ""} ${fullWidth ? "w-full" : ""}`}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${
+        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${fullWidth ? "w-full justify-between" : ""} ${
           active
             ? "border-primary text-primary bg-accent font-medium"
             : "border-border text-foreground/80 hover:border-primary/50 bg-white dark:bg-card"
@@ -100,6 +102,7 @@ function PriceDropdown({
   onClear,
   onSelectRange,
   onApplyCustom,
+  fullWidth,
 }: {
   label: string;
   active: boolean;
@@ -110,6 +113,7 @@ function PriceDropdown({
   onClear: () => void;
   onSelectRange: (min?: number, max?: number) => void;
   onApplyCustom: (min: string, max: string) => void;
+  fullWidth?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [customMin, setCustomMin] = useState("");
@@ -119,11 +123,11 @@ function PriceDropdown({
   useOutsideClick(ref, close);
 
   return (
-    <div ref={ref} className={`relative ${open ? "z-100" : ""}`}>
+    <div ref={ref} className={`relative ${open ? "z-100" : ""} ${fullWidth ? "w-full" : ""}`}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${
+        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${fullWidth ? "w-full justify-between" : ""} ${
           active
             ? "border-primary text-primary bg-accent font-medium"
             : "border-border text-foreground/80 hover:border-primary/50 bg-white dark:bg-card"
@@ -217,6 +221,7 @@ function BedsDropdown({
   allLabel,
   onClear,
   onSelect,
+  fullWidth,
 }: {
   label: string;
   active: boolean;
@@ -225,6 +230,7 @@ function BedsDropdown({
   allLabel: string;
   onClear: () => void;
   onSelect: (v: string) => void;
+  fullWidth?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [customVal, setCustomVal] = useState("");
@@ -233,11 +239,11 @@ function BedsDropdown({
   useOutsideClick(ref, close);
 
   return (
-    <div ref={ref} className={`relative ${open ? "z-100" : ""}`}>
+    <div ref={ref} className={`relative ${open ? "z-100" : ""} ${fullWidth ? "w-full" : ""}`}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${
+        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${fullWidth ? "w-full justify-between" : ""} ${
           active
             ? "border-primary text-primary bg-accent font-medium"
             : "border-border text-foreground/80 hover:border-primary/50 bg-white dark:bg-card"
@@ -317,6 +323,7 @@ function DuréeDropdown({
   onApply,
   onClear,
   t,
+  fullWidth,
 }: {
   currentDuration: string;
   currentMinNightPrice: string;
@@ -332,6 +339,7 @@ function DuréeDropdown({
   }) => void;
   onClear: () => void;
   t: ReturnType<typeof useT>;
+  fullWidth?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [localDuration, setLocalDuration] = useState(currentDuration);
@@ -373,11 +381,11 @@ function DuréeDropdown({
   }
 
   return (
-    <div ref={ref} className={`relative ${open ? "z-100" : ""}`}>
+    <div ref={ref} className={`relative ${open ? "z-100" : ""} ${fullWidth ? "w-full" : ""}`}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${
+        className={`inline-flex items-center gap-1.5 rounded-full border px-4 h-10 text-sm transition-colors ${fullWidth ? "w-full justify-between" : ""} ${
           isActive
             ? "border-primary text-primary bg-accent font-medium"
             : "border-border text-foreground/80 hover:border-primary/50 bg-white dark:bg-card"
@@ -504,13 +512,17 @@ export type SearchFilterBarProps = {
   /** Maps a type value (e.g. "villa") to a base route (e.g. "/louer/villas").
    *  When set, selecting a type navigates to that route instead of appending ?type=. */
   typeRoutes?: Record<string, string>;
+  /** "sidebar" stacks filters vertically for use in a left panel */
+  layout?: "sidebar";
 };
 
 export default function SearchFilterBar({
   mode,
   showOffPlanReady,
   typeRoutes,
+  layout,
 }: SearchFilterBarProps) {
+  const isSidebar = layout === "sidebar";
   const t = useT();
   const router = useRouter();
   const pathname = usePathname();
@@ -681,7 +693,7 @@ export default function SearchFilterBar({
           e.preventDefault();
           setFilter("q", localQ.trim() || null);
         }}
-        className="flex items-center gap-2 border border-border rounded-full px-5 h-12 bg-white dark:bg-card"
+        className={`flex items-center gap-2 border border-border rounded-full px-5 h-12 bg-white dark:bg-card ${isSidebar ? "w-full" : ""}`}
       >
         <Search className="w-4 h-4 text-muted-foreground shrink-0" />
         <input
@@ -711,12 +723,13 @@ export default function SearchFilterBar({
       </form>
 
       {/* Filter pills row */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className={isSidebar ? "flex flex-col gap-1.5" : "flex flex-wrap items-center gap-2"}>
         {/* Type de bien */}
         <DropdownPill
           label={typeLabel ?? t.filters.typePlaceholder}
           active={!!currentType}
           onClear={() => setFilter("type", null)}
+          fullWidth={isSidebar}
         >
           <button
             className="w-full text-left px-4 py-2.5 text-sm hover:bg-accent text-muted-foreground"
@@ -749,6 +762,7 @@ export default function SearchFilterBar({
             allLabel={t.filters.allBeds}
             onClear={() => setFilter("beds", null)}
             onSelect={(v) => setFilter("beds", v)}
+            fullWidth={isSidebar}
           />
         )}
 
@@ -777,6 +791,7 @@ export default function SearchFilterBar({
               }),
             )
           }
+          fullWidth={isSidebar}
         />
 
         {/* Durée dropdown */}
@@ -796,7 +811,7 @@ export default function SearchFilterBar({
                   maxNightPrice: maxNightPrice || null,
                   minStay: minStay || null,
                   maxStay: maxStay || null,
-                  isShortTerm: null, // clear legacy param
+                  isShortTerm: null,
                 }),
               )
             }
@@ -812,6 +827,7 @@ export default function SearchFilterBar({
                 }),
               )
             }
+            fullWidth={isSidebar}
           />
         )}
 
@@ -820,6 +836,7 @@ export default function SearchFilterBar({
           label={currentSuburb || t.filters.communeFilterLabel}
           active={!!currentSuburb}
           onClear={() => setFilter("suburb", null)}
+          fullWidth={isSidebar}
         >
           <button
             className="w-full text-left px-4 py-2.5 text-sm hover:bg-accent text-muted-foreground"
@@ -840,30 +857,32 @@ export default function SearchFilterBar({
           ))}
         </DropdownPill>
 
-        {/* Divider */}
-        <span className="hidden lg:inline-block w-px h-6 bg-border mx-1" />
-
-        <button
-          aria-label={t.filters.ariaSortBtn}
-          className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
-        >
-          <SlidersHorizontal className="w-4 h-4" />
-        </button>
-        <button
-          aria-label={t.filters.ariaAlertsBtn}
-          className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
-        >
-          <Bell className="w-4 h-4" />
-        </button>
-
-        <Button
-          variant="navy"
-          size="sm"
-          className="gap-2 ml-auto h-10 shrink-0"
-          onClick={() => setFilter("map", "1")}
-        >
-          <Map className="w-4 h-4" /> {t.filters.map}
-        </Button>
+        {/* Divider + map/sort/alert buttons — hidden in sidebar mode */}
+        {!isSidebar && (
+          <>
+            <span className="hidden lg:inline-block w-px h-6 bg-border mx-1" />
+            <button
+              aria-label={t.filters.ariaSortBtn}
+              className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+            </button>
+            <button
+              aria-label={t.filters.ariaAlertsBtn}
+              className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
+            >
+              <Bell className="w-4 h-4" />
+            </button>
+            <Button
+              variant="navy"
+              size="sm"
+              className="gap-2 ml-auto h-10 shrink-0"
+              onClick={() => setFilter("map", "1")}
+            >
+              <Map className="w-4 h-4" /> {t.filters.map}
+            </Button>
+          </>
+        )}
 
         {hasFilters && (
           <button

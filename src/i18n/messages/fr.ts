@@ -81,6 +81,10 @@ const fr: Messages = {
     trendAvgPrice: "Prix moy. · Gombe",
     trendNewToday: "Nouvelles annonces",
     filterBedrooms: "Chambres",
+    trustBadge: "annonces vérifiées disponibles à Kinshasa",
+    verifiedLabel: "Annonces vérifiées Okapi",
+    verifiedBadge: "✓ Vérifié",
+    seeProperty: "Voir →",
   },
 
   footer: {
@@ -151,6 +155,7 @@ const fr: Messages = {
       tabRent: "À louer",
       tabSale: "À vendre",
       viewAll: "Voir toutes les annonces",
+      verifiedCount: "annonces vérifiées disponibles",
     },
     discover: {
       heading: "Découvrez tout sur l'immobilier",
