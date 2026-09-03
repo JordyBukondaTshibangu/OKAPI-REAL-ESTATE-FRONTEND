@@ -916,6 +916,7 @@ const ln: Messages = {
     errEmailTaken: "Adresse email oyo ezali kaka kosalema.",
     errPhoneTaken: "Nimero ya telefone oyo ezali kaka kosalema.",
     errGeneric: "Likambo elekaki. Samba lisusu.",
+    complianceNotice: "Agent nyonso na Okapi ateyamaka na cédule ya État.\n\nMosala nyonso ya kokamwa (kobeta kopi ya annonce, kotambola mpe moto ya agent mosusu) ekokisa kolongwa mbala moko mpe seko na compte.",
     // OTP verification page
     verifyTitle: "Tala email na yo",
     verifySentTo: "Code ya miango 6 etindamaki na",

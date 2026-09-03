@@ -702,6 +702,7 @@ export type Messages = {
     errEmailTaken: string;
     errPhoneTaken: string;
     errGeneric: string;
+    complianceNotice: string;
     verifyTitle: string;
     verifySentTo: string;
     verifyEmailFallback: string;

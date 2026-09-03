@@ -3,7 +3,7 @@
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ShieldAlert } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -201,6 +201,14 @@ export default function AgentRegisterPage() {
               {errors.confirmPassword && (
                 <p className="text-xs text-destructive mt-1">{errors.confirmPassword.message}</p>
               )}
+            </div>
+
+            {/* Compliance notice */}
+            <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950/20 p-4 mt-2">
+              <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+              <p className="text-xs text-red-800 dark:text-red-300 leading-relaxed whitespace-pre-line">
+                {s.complianceNotice}
+              </p>
             </div>
 
             <Button type="submit" className="w-full mt-2" disabled={isSubmitting}>

@@ -915,6 +915,7 @@ const en: Messages = {
     errEmailTaken: "This email address is already in use.",
     errPhoneTaken: "This phone number is already in use.",
     errGeneric: "An error occurred. Please try again.",
+    complianceNotice: "Every agent on Okapi is verified with a government-issued ID.\n\nAny act of unfair competition (copying a listing, directly contacting another agent's landlord or seller) results in the immediate and permanent suspension of the account.",
     // OTP verification page
     verifyTitle: "Verify your email",
     verifySentTo: "A 6-digit code was sent to",

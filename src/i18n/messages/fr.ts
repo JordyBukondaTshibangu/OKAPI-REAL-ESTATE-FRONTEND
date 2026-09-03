@@ -941,6 +941,7 @@ const fr: Messages = {
     errEmailTaken: "Cette adresse e-mail est déjà utilisée.",
     errPhoneTaken: "Ce numéro de téléphone est déjà utilisé.",
     errGeneric: "Une erreur est survenue. Veuillez réessayer.",
+    complianceNotice: "Chaque agent sur Okapi est vérifié avec une pièce d'identité.\n\nTout acte de concurrence déloyale (copie d'annonce, contact direct avec le propriétaire d'un autre agent) entraîne la suspension immédiate et permanente du compte.",
     // OTP verification page
     verifyTitle: "Vérifiez votre e-mail",
     verifySentTo: "Un code à 6 chiffres a été envoyé à",
