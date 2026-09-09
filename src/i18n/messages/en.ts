@@ -134,7 +134,7 @@ const en: Messages = {
     save: "Save",
     delete: "Delete",
     close: "Close",
-    share: "Share",
+    share: "Share", linkCopied: "Link copied!",
     report: "Report",
     readMore: "Read more",
     reduce: "Collapse",

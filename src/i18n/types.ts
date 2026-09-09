@@ -125,6 +125,7 @@ export type Messages = {
     delete: string;
     close: string;
     share: string;
+    linkCopied: string;
     report: string;
     readMore: string;
     reduce: string;

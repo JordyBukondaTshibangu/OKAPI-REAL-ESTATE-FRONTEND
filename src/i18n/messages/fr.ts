@@ -134,7 +134,7 @@ const fr: Messages = {
     save: "Sauvegarder",
     delete: "Supprimer",
     close: "Fermer",
-    share: "Partager",
+    share: "Partager", linkCopied: "Lien copié !",
     report: "Signaler",
     readMore: "Lire plus",
     reduce: "Réduire",
@@ -313,6 +313,7 @@ const fr: Messages = {
     nationality: "Nationalité :", languages: "Langues :", forSale: "Vente :", forRent: "Location :",
     since: "Depuis {year}", agent: "agent", agents: "agents", transactions: "transactions",
     viewsLabel: "vues", savesLabel: "favoris", sharesLabel: "partages", hotLabel: "Très demandé",
+    verifiedBadge: "Vérifié", newBadge: "Nouveau", freshUpdated: "Mis à jour il y a {days}j", staleWarning: "Non mis à jour depuis {days} jours",
   },
   agentsPage: {
     heroHeading: "Trouvez votre agent pour trouver votre bien",

@@ -135,7 +135,7 @@ const ln: Messages = {
     save: "Bomba",
     delete: "Boma",
     close: "Ziba",
-    share: "Pesa",
+    share: "Pesa", linkCopied: "Link ekopiwaki!",
     report: "Bwaka lokumu",
     readMore: "Tanga makambu mosusu",
     reduce: "Kokitisa",
