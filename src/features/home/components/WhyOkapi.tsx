@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function WhyOkapi() {
   const t = useT();
-  const p = t.sell;
+  const p = t.pages.sell;
 
   return (
     <section className="bg-background border-b border-border">
