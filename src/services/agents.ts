@@ -6,6 +6,11 @@ export type AgentParams = {
   name?: string;
   language?: string;
   nationality?: string;
+  commune?: string;
+  propertyType?: string;
+  minRating?: number;
+  agentType?: string;
+  title?: string;
 };
 
 export type AgentsMeta = {
@@ -24,6 +29,11 @@ export async function fetchAgents(
   if (params.name) query.set("name", params.name);
   if (params.language) query.set("language", params.language);
   if (params.nationality) query.set("nationality", params.nationality);
+  if (params.commune) query.set("commune", params.commune);
+  if (params.propertyType) query.set("propertyType", params.propertyType);
+  if (params.minRating != null) query.set("minRating", String(params.minRating));
+  if (params.agentType) query.set("agentType", params.agentType);
+  if (params.title) query.set("title", params.title);
   const res = await fetch(`/api/listings/agents?${query.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch agents");
   return res.json();

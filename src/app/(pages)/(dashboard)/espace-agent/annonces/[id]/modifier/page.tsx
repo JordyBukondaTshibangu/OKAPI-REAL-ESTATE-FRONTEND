@@ -177,7 +177,7 @@ function Toggle({ label, value, onChange }: {
   );
 }
 
-function StepBar({ step, total }: { step: number; total: number }) {
+function StepBar({ step }: { step: number; total: number }) {
   const labels = ["Informations", "Localisation", "Prix", "Photos"];
   return (
     <div className="flex items-center gap-1 mb-6">
@@ -457,8 +457,9 @@ export default function ModifierAnnoncePage() {
       });
 
       router.push("/espace-agent/annonces");
-    } catch (e: any) {
-      const msg = e?.response?.data?.message;
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string | string[] } } })
+        ?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
     } finally {
       setSaving(false);

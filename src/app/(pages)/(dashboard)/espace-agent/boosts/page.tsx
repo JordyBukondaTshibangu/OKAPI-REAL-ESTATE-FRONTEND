@@ -4,7 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft, Briefcase, Building2, Check, ChevronRight, Clock, Copy,
-  CreditCard, AlertCircle, Calendar, ExternalLink, Hash, Home,
+  CreditCard, AlertCircle, Calendar, Hash, Home,
   Loader2, Rocket, ShoppingBag, TreePine, Upload, Warehouse, X, ZoomIn,
   type LucideIcon,
 } from "lucide-react";
@@ -155,8 +155,10 @@ function BoostModal({ modal, token, t, onClose, onSuccess }: {
       setBoostId(req.id);
       setReference(req.paymentReference ?? "");
       setStep(2);
-    } catch (err: any) {
-      setError(err?.response?.data?.message ?? t.boostErrCreate);
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
+      setError(message ?? t.boostErrCreate);
     } finally {
       setSubmitting(false);
     }
@@ -175,8 +177,10 @@ function BoostModal({ modal, token, t, onClose, onSuccess }: {
       await updateBoostScreenshot(token, boostId, publicUrl);
       setScreenshotUrl(publicUrl);
       setStep(3);
-    } catch (err: any) {
-      setError(err?.response?.data?.message ?? t.boostErrUpload);
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
+      setError(message ?? t.boostErrUpload);
     } finally {
       setScreenshotUploading(false);
     }

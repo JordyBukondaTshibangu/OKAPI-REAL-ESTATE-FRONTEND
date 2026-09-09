@@ -31,7 +31,7 @@ export default function AgencesPage() {
     language: language || undefined,
   });
 
-  const agencies = data?.data ?? [];
+  const agencies = useMemo(() => data?.data ?? [], [data]);
   const meta = data?.meta ?? { total: 0, page: 1, limit: LIMIT, totalPages: 0 };
 
   const languageOptions = useMemo(() => {
@@ -51,7 +51,7 @@ export default function AgencesPage() {
               "radial-gradient(circle at 25% 35%, rgba(212,175,55,0.5), transparent 35%), radial-gradient(circle at 75% 65%, rgba(30,99,181,0.5), transparent 40%)",
           }}
         />
-        <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 text-center">
+        <div className="relative max-w-7xl mx-auto px-6 pt-16 pb-20 text-center">
           <p className="text-xs font-semibold tracking-[0.2em] text-secondary uppercase mb-4">
             {t.agenciesPage.heroBadge}
           </p>
@@ -78,7 +78,7 @@ export default function AgencesPage() {
 
       {/* Stats bar */}
       <section className="bg-white dark:bg-card border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
+        <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
           {[
             { label: t.agenciesPage.statPartners, value: meta.total },
             { label: t.agenciesPage.statAgents, value: agencies.reduce((s, a) => s + (a.agentCount ?? 0), 0) },
@@ -96,7 +96,7 @@ export default function AgencesPage() {
       </section>
 
       {/* Filters */}
-      <section className="max-w-6xl mx-auto px-6 pt-8">
+      <section className="max-w-7xl mx-auto px-6 pt-8">
         <div className="bg-white dark:bg-card rounded-2xl shadow-sm border border-border p-5 flex flex-col sm:flex-row gap-3">
           <label className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -127,7 +127,7 @@ export default function AgencesPage() {
       </section>
 
       {/* Agency grid */}
-      <section id="agences" className="max-w-6xl mx-auto px-6 py-10 pb-16">
+      <section id="agences" className="max-w-7xl mx-auto px-6 py-10 pb-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-xl font-semibold text-foreground">
             {t.agenciesPage.allAgencies}

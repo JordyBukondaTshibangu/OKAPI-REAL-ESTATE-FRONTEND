@@ -167,7 +167,8 @@ export default function EditProfilePage() {
       return;
     }
     getMyAgentProfile(token)
-      .then((p: any) => {
+      .then((raw_p: unknown) => {
+        const p = raw_p as Partial<FormState> & { photo?: string; photoUrl?: string };
         const raw = p.photo || p.photoUrl || "";
         setAvatarSrc(
           raw.startsWith("https://") && raw.length > 30 ? raw : null,
@@ -253,8 +254,9 @@ export default function EditProfilePage() {
       );
       // 4. Show preview immediately (CDN URL loads on next profile fetch)
       setAvatarSrc(URL.createObjectURL(file));
-    } catch (err: any) {
-      const msg = err?.response?.data?.message;
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string | string[] } } })
+        ?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : (msg ?? "Impossible de mettre à jour la photo."));
     } finally {
       setUploadingPhoto(false);
@@ -283,8 +285,9 @@ export default function EditProfilePage() {
         setSuccess(false);
         router.push("/espace-agent");
       }, 1500);
-    } catch (e: any) {
-      const msg = e?.response?.data?.message;
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string | string[] } } })
+        ?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : (msg ?? t.errSave));
     } finally {
       setSaving(false);

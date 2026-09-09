@@ -44,6 +44,8 @@ export type Messages = {
     freeEstimation: string;
     agentProducts: string;
     commercialNews: string;
+    findProperty: string;
+    agentListCta: string;
   };
   auth: {
     login: string;
@@ -77,6 +79,9 @@ export type Messages = {
     verifiedLabel: string;
     verifiedBadge: string;
     seeProperty: string;
+    titlePart1: string;
+    titleVerified: string;
+    titlePart2: string;
   };
   footer: {
     tagline: string;
@@ -124,7 +129,7 @@ export type Messages = {
     readMore: string;
     reduce: string;
     publishReview: string;
-    sendEnquiry: string;
+    sendEnquiry: string; notFoundTitle: string; notFoundDesc: string; backHome: string; seeListings: string; reportSend: string; reportSending: string;
     loginToSend: string;
     loginToReview: string;
     sendingReview: string;
@@ -175,7 +180,8 @@ export type Messages = {
     };
     mobileApp: { badge: string; heading: string; headingHighlight: string; body: string; downloadOn: string; availableOn: string; feature1: string; feature2: string; feature3: string; notification: string; };
   };
-  listing: { foundWithFilters: string; noResults: string; noResultsHint: string; };
+  listing: { foundWithFilters: string; noResults: string; noResultsHint: string; viewGrid: string; viewList: string; };
+  report: { title: string; prompt: string; descLabel: string; descPlaceholder: string; successTitle: string; successDesc: string; send: string; sending: string; error: string; reasonFake: string; reasonWrongPrice: string; reasonPhotos: string; reasonAlreadyRented: string; reasonScam: string; reasonInappropriate: string; reasonOther: string; };
   filters: {
     searchPlaceholder: string; searchBtn: string;
     typePlaceholder: string; allTypes: string;
@@ -194,6 +200,37 @@ export type Messages = {
     rentPrice1: string; rentPrice2: string; rentPrice3: string; rentPrice4: string;
     commPrice1: string; commPrice2: string; commPrice3: string; commPrice4: string; commPrice5: string;
     filterApply: string;
+    sidebarTitle: string;
+    sidebarResults: string;
+    sidebarActive: string;
+    sidebarActivePlural: string;
+    sidebarReset: string;
+    sidebarApply: string;
+    sidebarPropType: string;
+    sidebarLocation: string;
+    sidebarCity: string;
+    sidebarCommune: string;
+    sidebarAllCommunes: string;
+    sidebarBedrooms: string;
+    sidebarAllBedrooms: string;
+    sidebarBed1: string;
+    sidebarBed2: string;
+    sidebarBed3: string;
+    sidebarBed4: string;
+    sidebarBed5: string;
+    sidebarBudget: string;
+    sidebarMin: string;
+    sidebarMax: string;
+    sidebarAmenities: string;
+    sidebarTravel: string;
+    amenityFurnished: string;
+    amenityAC: string;
+    amenitySecurity: string;
+    amenityRooftop: string;
+    amenityGarden: string;
+    amenityOutdoorToilet: string;
+    amenityWifi: string;
+    amenityParking: string;
     durationPlaceholder: string;
     durationTypeSection: string;
     durationAll: string;
@@ -212,12 +249,22 @@ export type Messages = {
     nationality: string; languages: string; forSale: string; forRent: string;
     since: string; agent: string; agents: string; transactions: string;
     viewsLabel: string; savesLabel: string; sharesLabel: string; hotLabel: string;
+    verifiedBadge: string; newBadge: string;
+    freshUpdated: string; staleWarning: string;
   };
   agentsPage: {
     heroHeading: string; heroSubtitle: string;
     tabAgents: string; tabAgencies: string;
     agentSearchPlaceholder: string; agencySearchPlaceholder: string;
     filterTransaction: string; filterLanguage: string; filterNationality: string; filterAll: string;
+    filterCommune: string; filterAllCommunes: string;
+    filterPropertyType: string; filterRating: string; filterAllRatings: string;
+    filterSpecialization: string; filterTeamSize: string; filterAllSizes: string;
+    filterClearBtn: string;
+    rentalFocusAll: string; rentalFocusLong: string; rentalFocusShort: string; rentalFocusBoth: string;
+    propTypeApartments: string; propTypeVillas: string; propTypeStudios: string;
+    propTypeLand: string; propTypeOffices: string; propTypeWarehouses: string;
+    minAgents2: string; minAgents5: string; minAgents10: string;
     searchBtn: string; resetFilters: string;
     superAgentBadge: string; superAgentHeading: string; superAgentSubtitle: string; findSuperAgent: string;
     agentCount: string; sortBy: string; sortRelevance: string; sortByTitle: string;
@@ -242,7 +289,7 @@ export type Messages = {
       bedroom: string; bedrooms: string; bathroom: string;
       viewOnMap: string; initialCosts: string; rentOrBuy: string;
       toRent: string; toSell: string;
-      descHeading: string; availableFrom: string; amenitiesHeading: string;
+      descHeading: string; availableFrom: string; availableImmediate: string; amenitiesHeading: string;
       locationHeading: string; viewOnMapBtn: string;
       buildingTab: string; neighborhoodTab: string;
       aboutBuildingTitle: string; buildingActiveListings: string; priceRange: string; learnMore: string;
@@ -416,6 +463,11 @@ export type Messages = {
       bannerBullet1: string; bannerBullet2: string; bannerBullet3: string; bannerCta: string;
       // Page header
       heading: string; subheading: string;
+      // Why Okapi value prop
+      whyTitle: string;
+      why1Title: string; why1Desc: string;
+      why2Title: string; why2Desc: string;
+      why3Title: string; why3Desc: string;
       // Shared feature strings
       featWhatsApp: string; featDirectContact: string; featUnlimited: string; featAnalytics: string;
       // Tier 1 — Gratuit

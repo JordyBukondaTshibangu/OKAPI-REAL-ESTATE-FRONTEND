@@ -49,7 +49,6 @@ export default function AgentRegisterPage() {
           message: s.errPasswordMismatch,
           path: ["confirmPassword"],
         }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [s],
   );
 

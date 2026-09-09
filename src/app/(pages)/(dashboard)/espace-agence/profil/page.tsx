@@ -152,8 +152,8 @@ export default function EditAgencyProfilePage() {
     }
 
     getMyAgentProfile(token)
-      .then((p: any) => {
-        const a = p?.agency ?? {};
+      .then((p: unknown) => {
+        const a = (p as { agency?: Partial<FormState> })?.agency ?? {};
         setForm({
           name: a.name ?? "",
           phone: a.phone ?? "",
@@ -204,8 +204,9 @@ export default function EditAgencyProfilePage() {
         setSuccess(false);
         router.push("/espace-agence");
       }, 1500);
-    } catch (e: any) {
-      const msg = e?.response?.data?.message;
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string | string[] } } })
+        ?.response?.data?.message;
       setError(
         Array.isArray(msg)
           ? msg.join(", ")

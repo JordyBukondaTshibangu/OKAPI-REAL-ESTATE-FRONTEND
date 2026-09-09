@@ -82,6 +82,11 @@ type T = ReturnType<typeof useT>["espaceAgent"];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+// Captured once per page load (module scope, not during render) — day-level
+// precision is fine here and this keeps components pure for React's
+// render-purity rules.
+const pageLoadTime = Date.now();
+
 function formatGracePeriod(
   graceEndsAt: string,
   t: T,
@@ -520,7 +525,7 @@ function TodoCard({ profile, t }: { profile: AgentProfile; t: T }) {
 
   if (profile.graceEndsAt) {
     const daysLeft = Math.floor(
-      (new Date(profile.graceEndsAt).getTime() - Date.now()) / 86400000,
+      (new Date(profile.graceEndsAt).getTime() - pageLoadTime) / 86400000,
     );
     if (daysLeft > 0 && daysLeft <= 30) {
       items.push({

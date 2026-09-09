@@ -17,7 +17,8 @@ import CategoryIcon from "@/shared/components/ui/icons/CategoryIcon";
 import HeartIcon from "@/shared/components/ui/icons/HeartIcon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import FreshnessIndicator from "./badges/FreshnessIndicator";
 import NewBadge from "./badges/NewBadge";
 import PremiumBadge from "./badges/PremiumBadge";
@@ -27,6 +28,109 @@ import {
   HotBadge,
   isHotProperty,
 } from "./PerformancePulse";
+
+/* ── Carousel ──────────────────────────────────────────────────────────────── */
+function CardCarousel({
+  images,
+  alt,
+  category,
+  gradient,
+  sizes,
+  priority,
+  children,
+}: {
+  images: string[];
+  alt: string;
+  category: Property["category"];
+  gradient?: string;
+  sizes: string;
+  priority?: boolean;
+  /** Overlays: badges, heart, etc. */
+  children?: React.ReactNode;
+}) {
+  const [index, setIndex] = useState(0);
+  const total = images.length;
+
+  const prev = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIndex((i) => (i - 1 + total) % total);
+  }, [total]);
+
+  const next = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIndex((i) => (i + 1) % total);
+  }, [total]);
+
+  return (
+    <div className="relative w-full h-full group/carousel overflow-hidden">
+      {/* Images — slide via transform */}
+      <div
+        className="flex h-full transition-transform duration-300 ease-in-out"
+        style={{ transform: `translateX(-${index * 100}%)`, width: `${total * 100}%` }}
+      >
+        {images.map((src, i) => (
+          <div key={i} className="relative h-full shrink-0" style={{ width: `${100 / total}%` }}>
+            <PropertyImage
+              src={src}
+              alt={`${alt} ${i + 1}`}
+              category={category}
+              gradient={gradient}
+              sizes={sizes}
+              priority={priority && i === 0}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Prev / Next arrows — visible on hover when multiple images */}
+      {total > 1 && (
+        <>
+          <button
+            onClick={prev}
+            aria-label="Photo précédente"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-opacity hover:bg-black/70 active:scale-90"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={next}
+            aria-label="Photo suivante"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-opacity hover:bg-black/70 active:scale-90"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+
+          {/* Dot indicators (≤6 photos) or counter (>6) */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1">
+            {total <= 6 ? (
+              images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIndex(i); }}
+                  aria-label={`Photo ${i + 1}`}
+                  className={`rounded-full transition-all ${
+                    i === index
+                      ? "bg-white w-4 h-1.5"
+                      : "bg-white/50 w-1.5 h-1.5 hover:bg-white/80"
+                  }`}
+                />
+              ))
+            ) : (
+              <span className="bg-black/55 text-white text-[10px] px-2 py-0.5 rounded-md">
+                {index + 1} / {total}
+              </span>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Slot for badges, heart, etc. */}
+      {children}
+    </div>
+  );
+}
 
 interface PropertyCardProps {
   property: Property;
@@ -64,66 +168,51 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
   }
 
   const detailHref = `/property/${property.id}`;
-  const cover = getR2ImageUrl(property.gallery[0]);
 
   /* ── GRID VARIANT ─────────────────────────────────────────────── */
   if (variant === "grid") {
     return (
-      <article className="bg-white dark:bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:shadow-lg hover:border-primary/20 transition-all duration-200 hover:-translate-y-0.5 flex flex-col">
-        {/* Photo — dominant */}
+      <article className="isolate bg-white dark:bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:shadow-lg hover:border-primary/20 transition-all duration-200 hover:-translate-y-0.5 flex flex-col">
+        {/* Photo — dominant, with carousel */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted shrink-0">
-          <PropertyImage
-            src={cover}
+          <CardCarousel
+            images={property.gallery.map(getR2ImageUrl).filter(Boolean) as string[]}
             alt={property.title}
             category={property.category}
             gradient={property.imageGradient}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             priority={priority}
-          />
-          <Link href={detailHref} aria-label={`Voir ${property.title}`} className="absolute inset-0 z-10" />
+          >
+            <Link href={detailHref} aria-label={`Voir ${property.title}`} className="absolute inset-0 z-10" />
 
-          {/* Badges */}
-          <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
-            {property.isBoosted && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/90 text-white shadow-sm backdrop-blur-sm">
-                ✨ En vedette
-              </span>
-            )}
-            {property.verified && <VerifiedBadge />}
-            {property.isNew && <NewBadge />}
-            {isHotProperty(property.performance) && <HotBadge label={t.cards.hotLabel} />}
-          </div>
-
-          {/* Heart */}
-          {!isAgentAuth && (
-            <button
-              onClick={handleToggleFavourite}
-              aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
-              disabled={saving}
-              className={`absolute top-3 right-3 z-20 w-9 h-9 rounded-full shadow-md flex items-center justify-center transition-all duration-200 active:scale-90 disabled:opacity-60 ${
-                saved
-                  ? "bg-secondary text-white scale-105"
-                  : "bg-white/95 dark:bg-card/95 text-foreground/60 hover:text-secondary hover:scale-110"
-              }`}
-            >
-              <HeartIcon className="w-4.5 h-4.5" filled={saved} />
-            </button>
-          )}
-
-          {/* Photo count */}
-          {property.gallery.length > 1 && (
-            <div className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-1 bg-black/55 text-white text-xs px-2 py-1 rounded-md">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
-                <path d="M21 19V7a2 2 0 0 0-2-2h-3.17l-1.84-2H10v2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-9-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z" />
-              </svg>
-              {property.gallery.length}
+            {/* Badges */}
+            <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
+              {property.verified && <VerifiedBadge />}
+              {property.isNew && <NewBadge />}
+              {isHotProperty(property.performance) && <HotBadge label={t.cards.hotLabel} />}
             </div>
-          )}
 
-          {/* Performance strip — overlay pill on image */}
-          <div className="absolute bottom-3 left-3 z-20">
-            <CardPerformanceStrip perf={property.performance} variant="overlay" />
-          </div>
+            {/* Heart */}
+            {!isAgentAuth && (
+              <button
+                onClick={handleToggleFavourite}
+                aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
+                disabled={saving}
+                className={`absolute top-3 right-3 z-20 w-9 h-9 rounded-full shadow-md flex items-center justify-center transition-all duration-200 active:scale-90 disabled:opacity-60 ${
+                  saved
+                    ? "bg-secondary text-white scale-105"
+                    : "bg-white/95 dark:bg-card/95 text-foreground/60 hover:text-secondary hover:scale-110"
+                }`}
+              >
+                <HeartIcon className="w-4.5 h-4.5" filled={saved} />
+              </button>
+            )}
+
+            {/* Performance strip */}
+            <div className="absolute bottom-10 left-3 z-20">
+              <CardPerformanceStrip perf={property.performance} variant="overlay" />
+            </div>
+          </CardCarousel>
         </div>
 
         {/* Details */}
@@ -191,54 +280,46 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
 
   /* ── LIST VARIANT (default) ────────────────────────────────────── */
   return (
-    <article className="bg-white dark:bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md hover:border-primary/20 transition-all duration-200">
+    <article className="isolate bg-white dark:bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md hover:border-primary/20 transition-all duration-200">
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]">
-        {/* Image */}
+        {/* Image — with carousel */}
         <div className="relative aspect-4/3 md:aspect-auto overflow-hidden bg-muted">
-          <PropertyImage
-            src={cover}
+          <CardCarousel
+            images={property.gallery.map(getR2ImageUrl).filter(Boolean) as string[]}
             alt={property.title}
             category={property.category}
             gradient={property.imageGradient}
             sizes="(max-width: 768px) 100vw, 280px"
             priority={priority}
-          />
-          <Link href={detailHref} aria-label={`Voir ${property.title}`} className="absolute inset-0 z-10" />
+          >
+            <Link href={detailHref} aria-label={`Voir ${property.title}`} className="absolute inset-0 z-10" />
 
-          <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
-            {property.isBoosted && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/90 text-white shadow-sm backdrop-blur-sm">
-                ✨ En vedette
-              </span>
-            )}
-            {property.verified && <VerifiedBadge />}
-            {property.isNew && <NewBadge />}
-            {isHotProperty(property.performance) && <HotBadge label={t.cards.hotLabel} />}
-          </div>
-
-          {!isAgentAuth && (
-            <button
-              onClick={handleToggleFavourite}
-              aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
-              disabled={saving}
-              className={`absolute top-3 right-3 z-20 w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-all duration-200 active:scale-90 disabled:opacity-60 ${
-                saved
-                  ? "bg-secondary text-white scale-105"
-                  : "bg-white dark:bg-card/95 text-foreground/60 hover:text-secondary hover:scale-110"
-              }`}
-            >
-              <HeartIcon className="w-5 h-5" filled={saved} />
-            </button>
-          )}
-
-          {property.gallery.length > 1 && (
-            <div className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-1 bg-black/55 text-white text-xs px-2 py-1 rounded-md">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                <path d="M21 19V7a2 2 0 0 0-2-2h-3.17l-1.84-2H10v2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-9-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z" />
-              </svg>
-              {property.gallery.length}
+            <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
+              {property.isBoosted && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/90 text-white shadow-sm backdrop-blur-sm">
+                  ✨ En vedette
+                </span>
+              )}
+              {property.verified && <VerifiedBadge />}
+              {property.isNew && <NewBadge />}
+              {isHotProperty(property.performance) && <HotBadge label={t.cards.hotLabel} />}
             </div>
-          )}
+
+            {!isAgentAuth && (
+              <button
+                onClick={handleToggleFavourite}
+                aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
+                disabled={saving}
+                className={`absolute top-3 right-3 z-20 w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-all duration-200 active:scale-90 disabled:opacity-60 ${
+                  saved
+                    ? "bg-secondary text-white scale-105"
+                    : "bg-white dark:bg-card/95 text-foreground/60 hover:text-secondary hover:scale-110"
+                }`}
+              >
+                <HeartIcon className="w-5 h-5" filled={saved} />
+              </button>
+            )}
+          </CardCarousel>
         </div>
 
         {/* Body */}

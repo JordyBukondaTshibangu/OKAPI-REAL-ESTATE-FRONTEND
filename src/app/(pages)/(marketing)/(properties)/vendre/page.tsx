@@ -395,6 +395,45 @@ export default function VendrePage() {
   return (
     <div className="bg-background-alt">
 
+      {/* ── Stats / Why ── */}
+      <section className="bg-background-alt border-b border-border">
+        <div className="max-w-5xl mx-auto px-6 py-14 text-center">
+          <h2 className="text-2xl md:text-3xl font-light text-foreground">{p.whyHeading}</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-muted-foreground text-sm">{p.whyPara}</p>
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { value: p.stat1Value, label: p.stat1Label },
+              { value: p.stat2Value, label: p.stat2Label },
+              { value: p.stat3Value, label: p.stat3Label },
+            ].map(({ value, label }) => (
+              <div key={value} className="rounded-xl bg-card border border-border p-8">
+                <p className="text-4xl font-semibold text-primary">{value}</p>
+                <p className="mt-3 text-sm text-muted-foreground">{label}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10">
+            {!isAgentAuth ? (
+              <Link
+                href="/devenir-agent"
+                className="inline-flex items-center gap-2 rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-colors"
+              >
+                {p.startNow}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <Link
+                href="/espace-agent"
+                className="inline-flex items-center gap-2 rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-colors"
+              >
+                {p.ctaAgentPortal}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* ── Launch banner — hidden for signed-in agents ── */}
       {!isAgentAuth && (
         <div className="bg-emerald-50 border-b border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800">
@@ -430,6 +469,28 @@ export default function VendrePage() {
         </h1>
         <p className="mt-3 text-muted-foreground text-base">{p.subheading}</p>
       </section>
+
+      {/* ── Why Okapi value prop (guests only) ── */}
+      {!isAgentAuth && (
+        <section className="max-w-5xl mx-auto px-6 pb-2">
+          <p className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-6">{p.whyTitle}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { emoji: "✅", title: p.why1Title, desc: p.why1Desc },
+              { emoji: "🔒", title: p.why2Title, desc: p.why2Desc },
+              { emoji: "🎯", title: p.why3Title, desc: p.why3Desc },
+            ].map(({ emoji, title, desc }) => (
+              <div key={title} className="flex gap-3 bg-card rounded-xl border border-border px-5 py-4">
+                <span className="text-xl shrink-0 mt-0.5">{emoji}</span>
+                <div>
+                  <p className="text-sm font-semibold text-foreground mb-1">{title}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Plan status banner (agents only) ── */}
       {isAgentAuth && agentProfile && (
@@ -517,45 +578,6 @@ export default function VendrePage() {
                 </footer>
               </blockquote>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Stats / Why ── */}
-      <section className="bg-background-alt border-t border-border">
-        <div className="max-w-5xl mx-auto px-6 py-14 text-center">
-          <h2 className="text-2xl md:text-3xl font-light text-foreground">{p.whyHeading}</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-muted-foreground text-sm">{p.whyPara}</p>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { value: p.stat1Value, label: p.stat1Label },
-              { value: p.stat2Value, label: p.stat2Label },
-              { value: p.stat3Value, label: p.stat3Label },
-            ].map(({ value, label }) => (
-              <div key={value} className="rounded-xl bg-card border border-border p-8">
-                <p className="text-4xl font-semibold text-primary">{value}</p>
-                <p className="mt-3 text-sm text-muted-foreground">{label}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-10">
-            {!isAgentAuth ? (
-              <Link
-                href="/devenir-agent"
-                className="inline-flex items-center gap-2 rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-colors"
-              >
-                {p.startNow}
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            ) : (
-              <Link
-                href="/espace-agent"
-                className="inline-flex items-center gap-2 rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-colors"
-              >
-                {p.ctaAgentPortal}
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            )}
           </div>
         </div>
       </section>

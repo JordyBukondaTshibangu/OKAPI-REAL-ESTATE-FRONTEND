@@ -4,6 +4,32 @@ import { useT } from "@/i18n/useT";
 import { Button } from "@/shared/components/ui/button";
 import { Home, MapPin, Shield, Users } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
+interface PlatformStats {
+  properties: number | null;
+  agents: number | null;
+  agencies: number | null;
+  users: number | null;
+}
+
+function formatStat(n: number | null, fallback: string): string {
+  if (n === null) return fallback;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")}M+`;
+  if (n >= 1_000) return `${Math.floor(n / 1_000)} ${String(Math.floor(n / 1_000)).length > 0 ? "000" : ""}+`.replace(/(\d) 000/, "$1 000");
+  return `${n}+`;
+}
+
+function fmtCount(n: number | null, fallback: string): string {
+  if (n === null) return fallback;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")}M+`;
+  if (n >= 1_000) {
+    const k = Math.floor(n / 1000);
+    const r = n % 1000;
+    return r > 0 ? `${k} ${String(r).padStart(3, "0")}+` : `${k} 000+`;
+  }
+  return `${n}+`;
+}
 
 function GoldWord({ text, highlight }: { text: string; highlight: string }) {
   const parts = text.split(highlight);
@@ -19,12 +45,18 @@ function GoldWord({ text, highlight }: { text: string; highlight: string }) {
 
 export default function AboutSection() {
   const t = useT();
+  const [stats, setStats] = useState<PlatformStats>({ properties: null, agents: null, agencies: null, users: null });
 
-  const stats = [
-    { value: t.home.about.stat1Value, label: t.home.about.stat1Label, icon: Home,   gold: false },
-    { value: t.home.about.stat2Value, label: t.home.about.stat2Label, icon: Users,  gold: false },
-    { value: t.home.about.stat3Value, label: t.home.about.stat3Label, icon: Shield, gold: true  },
-  ];
+  useEffect(() => {
+    fetch("/api/listings/stats")
+      .then((r) => r.json())
+      .then((d: PlatformStats) => setStats(d))
+      .catch(() => {/* keep nulls — fallback to i18n values */});
+  }, []);
+
+  const stat1 = fmtCount(stats.properties, t.home.about.stat1Value);
+  const stat2 = fmtCount(stats.users,      t.home.about.stat2Value);
+  const stat3 = fmtCount(stats.agents,     t.home.about.stat3Value);
 
   return (
     <section className="bg-navy text-white py-20 px-6">
@@ -39,7 +71,7 @@ export default function AboutSection() {
               <div className="w-9 h-9 rounded-xl bg-secondary/15 border border-secondary/25 flex items-center justify-center mb-4">
                 <Home className="w-4 h-4 text-secondary" />
               </div>
-              <p className="text-4xl font-bold text-foreground dark:text-white leading-none">{t.home.about.stat1Value}</p>
+              <p className="text-4xl font-bold text-foreground dark:text-white leading-none">{stat1}</p>
               <p className="text-sm text-muted-foreground dark:text-white/55 mt-1.5">{t.home.about.stat1Label}</p>
 
               {/* Mini neighbourhood activity bars */}
@@ -63,7 +95,7 @@ export default function AboutSection() {
             <div className="bg-white dark:bg-card/5 border border-white/10 rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
               <Users className="w-5 h-5 text-secondary/80" />
               <div>
-                <p className="text-2xl font-bold text-foreground dark:text-white leading-none">{t.home.about.stat2Value}</p>
+                <p className="text-2xl font-bold text-foreground dark:text-white leading-none">{stat2}</p>
                 <p className="text-xs text-muted-foreground dark:text-white/55 mt-1">{t.home.about.stat2Label}</p>
               </div>
             </div>
@@ -72,7 +104,7 @@ export default function AboutSection() {
             <div className="bg-gradient-to-br from-secondary/15 to-secondary/5 border border-secondary/30 rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
               <Shield className="w-5 h-5 text-secondary" />
               <div>
-                <p className="text-2xl font-bold text-secondary leading-none">{t.home.about.stat3Value}</p>
+                <p className="text-2xl font-bold text-secondary leading-none">{stat3}</p>
                 <p className="text-xs text-muted-foreground dark:text-white/55 mt-1">{t.home.about.stat3Label}</p>
               </div>
             </div>

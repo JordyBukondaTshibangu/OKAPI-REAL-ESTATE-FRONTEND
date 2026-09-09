@@ -59,7 +59,7 @@ export default function AlertsPage() {
       .then(setAlerts)
       .catch(() => setError(t.dashboard.errLoadAlerts))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, t.dashboard.errLoadAlerts]);
 
   async function onSubmit(data: AlertForm) {
     if (!token) return;

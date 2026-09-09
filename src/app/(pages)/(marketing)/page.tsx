@@ -2,6 +2,7 @@ import AboutSection from "@/features/home/components/AboutSection";
 import ContentSections from "@/features/home/components/ContentSections";
 import Discover from "@/features/home/components/Discover";
 import Hero from "@/features/home/components/Hero";
+import HeroStats from "@/features/home/components/HeroStats";
 import LatestListings from "@/features/home/components/LatestListings";
 import MobileApp from "@/features/home/components/MobileApp";
 import Regions from "@/features/home/components/Regions";
@@ -20,6 +21,7 @@ export default async function Home() {
   return (
     <>
       <Hero previewProperties={initialRent.slice(0, 2)} totalCount={totalCount} />
+      <HeroStats totalCount={totalCount} />
       <SectionReveal><LatestListings initialRent={initialRent} totalCount={totalCount} /></SectionReveal>
       <SectionReveal><Regions stats={stats} /></SectionReveal>
       <SectionReveal><Discover /></SectionReveal>

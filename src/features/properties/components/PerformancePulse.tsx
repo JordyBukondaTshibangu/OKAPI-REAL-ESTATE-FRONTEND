@@ -101,6 +101,9 @@ function StatTile({
 export function PerformancePanel({ perf }: { perf: PropertyPerformance }) {
   const t = useT();
   const dp = t.detail.property;
+
+  // Only show when there's meaningful social proof (20+ views AND 3+ WhatsApp clicks)
+  if (!perf || perf.viewed < 20 || (perf.whatsappClicks ?? 0) < 3) return null;
   const score = demandScore(perf);
   const pct = Math.min(100, score);
   const hot = score >= 50;

@@ -6,16 +6,7 @@ import { Button } from "@/shared/components/ui/button";
 import { reportProperty, type ReportReason } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
-
-const REASONS: { value: ReportReason; label: string }[] = [
-  { value: "FAKE_LISTING",   label: "Annonce fausse ou inexistante" },
-  { value: "WRONG_PRICE",    label: "Prix différent de celui affiché" },
-  { value: "STOLEN_PHOTOS",  label: "Photos volées ou trompeuses" },
-  { value: "ALREADY_RENTED", label: "Bien déjà loué ou vendu" },
-  { value: "SCAM",           label: "Arnaque suspectée" },
-  { value: "INAPPROPRIATE",  label: "Contenu inapproprié" },
-  { value: "OTHER",          label: "Autre" },
-];
+import { useT } from "@/i18n/useT";
 
 interface ReportModalProps {
   propertyId: string;
@@ -23,6 +14,7 @@ interface ReportModalProps {
 }
 
 export default function ReportModal({ propertyId, onClose }: ReportModalProps) {
+  const t = useT();
   const { token, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [reason, setReason] = useState<ReportReason | "">("");
@@ -30,6 +22,16 @@ export default function ReportModal({ propertyId, onClose }: ReportModalProps) {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const REASONS: { value: ReportReason; label: string }[] = [
+    { value: "FAKE_LISTING",   label: t.report.reasonFake },
+    { value: "WRONG_PRICE",    label: t.report.reasonWrongPrice },
+    { value: "STOLEN_PHOTOS",  label: t.report.reasonPhotos },
+    { value: "ALREADY_RENTED", label: t.report.reasonAlreadyRented },
+    { value: "SCAM",           label: t.report.reasonScam },
+    { value: "INAPPROPRIATE",  label: t.report.reasonInappropriate },
+    { value: "OTHER",          label: t.report.reasonOther },
+  ];
 
   async function handleSubmit() {
     if (!reason) return;
@@ -44,7 +46,7 @@ export default function ReportModal({ propertyId, onClose }: ReportModalProps) {
       await reportProperty(token, propertyId, reason, description.trim() || undefined);
       setSent(true);
     } catch {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+      setError(t.report.error);
     } finally {
       setSending(false);
     }
@@ -58,7 +60,7 @@ export default function ReportModal({ propertyId, onClose }: ReportModalProps) {
           <div className="flex items-center gap-2">
             <Flag className="w-4 h-4 text-destructive" />
             <span className="text-sm font-semibold text-foreground">
-              Signaler cette annonce
+              {t.report.title}
             </span>
           </div>
           <button
@@ -71,27 +73,20 @@ export default function ReportModal({ propertyId, onClose }: ReportModalProps) {
         </div>
 
         {sent ? (
-          /* Success state */
           <div className="px-6 py-8 text-center">
             <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="text-sm font-semibold text-foreground mb-1">Signalement envoyé</p>
-            <p className="text-xs text-muted-foreground mb-6">
-              Merci pour votre contribution. Notre équipe examinera cette annonce sous 24h.
-            </p>
-            <Button onClick={onClose} variant="outline" size="sm">Fermer</Button>
+            <p className="text-sm font-semibold text-foreground mb-1">{t.report.successTitle}</p>
+            <p className="text-xs text-muted-foreground mb-6">{t.report.successDesc}</p>
+            <Button onClick={onClose} variant="outline" size="sm">{t.common.close}</Button>
           </div>
         ) : (
-          /* Form */
           <div className="px-6 py-5 space-y-4">
-            <p className="text-sm text-foreground/80">
-              Pourquoi signalez-vous cette annonce ?
-            </p>
+            <p className="text-sm text-foreground/80">{t.report.prompt}</p>
 
-            {/* Reason radio list */}
             <div className="space-y-2">
               {REASONS.map(({ value, label }) => (
                 <label
@@ -111,35 +106,25 @@ export default function ReportModal({ propertyId, onClose }: ReportModalProps) {
               ))}
             </div>
 
-            {/* Optional description */}
             <div>
               <label className="text-xs font-medium text-muted-foreground block mb-1.5">
-                Description (optionnel)
+                {t.report.descLabel}
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Précisez le problème…"
+                placeholder={t.report.descPlaceholder}
                 rows={3}
                 maxLength={1000}
                 className="w-full text-sm border border-border rounded-lg px-3 py-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white dark:bg-card"
               />
             </div>
 
-            {error && (
-              <p className="text-xs text-destructive">{error}</p>
-            )}
+            {error && <p className="text-xs text-destructive">{error}</p>}
 
-            {/* Actions */}
             <div className="flex gap-3 pt-1">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={onClose}
-                className="flex-1"
-              >
-                Annuler
+              <Button type="button" variant="outline" size="sm" onClick={onClose} className="flex-1">
+                {t.common.cancel}
               </Button>
               <Button
                 type="button"
@@ -148,7 +133,7 @@ export default function ReportModal({ propertyId, onClose }: ReportModalProps) {
                 onClick={handleSubmit}
                 className="flex-1 whitespace-nowrap"
               >
-                {sending ? "Envoi…" : "Envoyer le signalement →"}
+                {sending ? t.report.sending : t.report.send}
               </Button>
             </div>
           </div>

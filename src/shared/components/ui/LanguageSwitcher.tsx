@@ -15,8 +15,6 @@ export default function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0];
-
   function handleSelect(code: Locale) {
     setLocale(code);
     setOpen(false);
@@ -30,8 +28,6 @@ export default function LanguageSwitcher() {
         aria-label="Changer de langue / Change language"
       >
         <Globe className="w-4 h-4" />
-        <span className="hidden sm:inline">{current.flag} {current.code.toUpperCase()}</span>
-        <span className="sm:hidden">{current.flag}</span>
       </button>
 
       {open && (

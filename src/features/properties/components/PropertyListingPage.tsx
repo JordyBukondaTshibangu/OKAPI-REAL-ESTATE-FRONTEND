@@ -8,7 +8,7 @@ import { Crumb } from "./Breadcrumbs";
 import ListingHero from "./ListingHero";
 import MapOverlay from "./MapOverlay";
 import Pagination from "./Pagination";
-import AlertSubscriptionBanner from "./AlertSubscriptionBanner";
+import AlertSubscriptionBanner, { type Mode as AlertMode } from "./AlertSubscriptionBanner";
 import PropertyCard from "./PropertyCard";
 import PropertyTypeChips, { CategoryCount } from "./PropertyTypeChips";
 import FilterSidebar from "./FilterSidebar";
@@ -41,7 +41,6 @@ export default function PropertyListingPage({
   showOffPlanReady,
   currentPage = 1,
   totalPages,
-  activeFilters = 0,
   typeRoutes,
 }: PropertyListingPageProps) {
   const t = useT();
@@ -117,7 +116,6 @@ export default function PropertyListingPage({
                 minWidth: showFilterSidebar ? 360 : 0,
                 opacity: showFilterSidebar ? 1 : 0,
                 pointerEvents: showFilterSidebar ? "auto" : "none",
-                transition: "width 300ms ease, min-width 300ms ease, opacity 220ms ease",
                 maxHeight: "calc(100vh - 10rem)",
               }}
             >
@@ -160,10 +158,11 @@ function ViewToggle({
   viewMode: "grid" | "list";
   onChange: (v: "grid" | "list") => void;
 }) {
+  const t = useT();
   return (
     <div className="flex items-center gap-1 bg-white dark:bg-card border border-border rounded-lg p-1 shrink-0">
       <button
-        aria-label="Vue grille"
+        aria-label={t.listing.viewGrid}
         onClick={() => onChange("grid")}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
           viewMode === "grid"
@@ -177,10 +176,10 @@ function ViewToggle({
           <rect x="1" y="9" width="6" height="6" rx="1" />
           <rect x="9" y="9" width="6" height="6" rx="1" />
         </svg>
-        Grille
+        {t.listing.viewGrid}
       </button>
       <button
-        aria-label="Vue liste"
+        aria-label={t.listing.viewList}
         onClick={() => onChange("list")}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
           viewMode === "list"
@@ -193,7 +192,7 @@ function ViewToggle({
           <rect x="1" y="7" width="14" height="2" rx="1" />
           <rect x="1" y="12" width="14" height="2" rx="1" />
         </svg>
-        Liste
+        {t.listing.viewList}
       </button>
     </div>
   );
@@ -217,7 +216,7 @@ function PropertyGrid({
     <div className="rounded-2xl border border-dashed border-border bg-white dark:bg-card p-12 text-center col-span-full">
       <p className="text-muted-foreground text-sm mb-2">{t.listing.noResults}</p>
       <p className="text-xs text-muted-foreground">{t.listing.noResultsHint}</p>
-      <AlertSubscriptionBanner mode={mode as any} />
+      <AlertSubscriptionBanner mode={mode as AlertMode} />
     </div>
   );
 

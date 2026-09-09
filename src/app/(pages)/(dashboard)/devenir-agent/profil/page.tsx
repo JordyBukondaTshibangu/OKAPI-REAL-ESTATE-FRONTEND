@@ -182,7 +182,7 @@ export default function AgentProfileStepPage() {
             {/* Communes */}
             <fieldset>
               <legend className="text-sm font-semibold mb-2">
-                Communes d'intervention <span className="text-destructive">*</span>
+                Communes d&apos;intervention <span className="text-destructive">*</span>
               </legend>
               <div className="flex flex-wrap gap-2">
                 {COMMUNES.map((c) => (
@@ -203,7 +203,7 @@ export default function AgentProfileStepPage() {
             {/* Années d'expérience */}
             <div>
               <label className="text-sm font-semibold block mb-1.5">
-                Années d'expérience <span className="text-destructive">*</span>
+                Années d&apos;expérience <span className="text-destructive">*</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {YEARS_EXP.map((y) => (
@@ -295,7 +295,7 @@ export default function AgentProfileStepPage() {
           </form>
 
           <p className="text-xs text-muted-foreground text-center mt-4">
-            Vous pourrez compléter votre profil (photo, pièce d'identité) depuis votre espace agent après approbation.
+            Vous pourrez compléter votre profil (photo, pièce d&apos;identité) depuis votre espace agent après approbation.
           </p>
         </div>
       </div>

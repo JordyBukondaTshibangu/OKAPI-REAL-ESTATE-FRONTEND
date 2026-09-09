@@ -34,7 +34,7 @@ export default function EnquiriesPage() {
       .then(setEnquiries)
       .catch(() => setError(t.dashboard.errLoadEnquiries))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, t.dashboard.errLoadEnquiries]);
 
   async function handleDelete(id: string) {
     if (!token) return;

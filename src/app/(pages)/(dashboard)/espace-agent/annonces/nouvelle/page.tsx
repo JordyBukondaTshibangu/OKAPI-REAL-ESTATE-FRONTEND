@@ -437,8 +437,9 @@ export default function NouvelleAnnoncePage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       router.push("/espace-agent/annonces");
-    } catch (e: any) {
-      const msg = e?.response?.data?.message;
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string | string[] } } })
+        ?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
     } finally {
       setSavingDraft(false);
@@ -467,8 +468,9 @@ export default function NouvelleAnnoncePage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       router.push("/espace-agent/annonces");
-    } catch (e: any) {
-      const msg = e?.response?.data?.message;
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string | string[] } } })
+        ?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
     } finally {
       setSubmitting(false);

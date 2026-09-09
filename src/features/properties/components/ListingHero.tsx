@@ -9,7 +9,6 @@ import { useT } from "@/i18n/useT";
 type Mode = "rent" | "sale" | "buy" | "commercial";
 
 export default function ListingHero({
-  title: _title,
   totalListings,
   crumbs,
   mode,
@@ -100,7 +99,7 @@ export default function ListingHero({
         </svg>
       </div>
 
-      <div className="relative max-w-6xl mx-auto">
+      <div className="relative max-w-7xl mx-auto">
         <div className="mb-5">
           <Breadcrumbs items={crumbs.map((c, i) => i === crumbs.length - 1 ? { ...c, label: title } : c)} />
         </div>

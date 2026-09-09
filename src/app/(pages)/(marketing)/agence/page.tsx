@@ -8,7 +8,6 @@ import {
   BarChart2,
   ShieldCheck,
   Building2,
-  MessageCircle,
   Minus,
   Headphones,
 } from "lucide-react";
@@ -253,7 +252,7 @@ export default function AgencePage() {
       <section className="py-20 px-4 bg-[#F9F8F5] dark:bg-[#080F1A]">
         <div className="max-w-2xl mx-auto text-center">
           <p className="text-xl md:text-2xl font-semibold italic text-[#0B1D3A] dark:text-white leading-relaxed mb-6">
-            "{p.testimonialQuote}"
+            &quot;{p.testimonialQuote}&quot;
           </p>
           <div>
             <p className="font-bold text-[#0B1D3A] dark:text-white">{p.testimonialName}</p>

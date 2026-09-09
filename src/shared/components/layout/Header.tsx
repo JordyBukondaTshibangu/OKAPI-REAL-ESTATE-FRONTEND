@@ -41,7 +41,7 @@ function useNavItems(): NavItem[] {
   const t = useT();
   return [
     {
-      label: t.nav.buy,
+      label: t.nav.findProperty,
       href: "/acheter",
       columns: [
         {
@@ -55,31 +55,6 @@ function useNavItems(): NavItem[] {
           ],
         },
         {
-          title: t.nav.col_tips_buy,
-          links: [
-            { label: t.nav.buyerGuide, href: "/conseils/guide-acheteur" },
-            { label: t.nav.neighborhoods, href: "/conseils/quartiers" },
-            { label: t.nav.communities, href: "/conseils/communautes" },
-            { label: t.nav.toursResidences, href: "/conseils/tours-residences" },
-            { label: t.nav.schoolsUniversities, href: "/conseils/ecoles-universites" },
-          ],
-        },
-        {
-          title: t.nav.col_services,
-          links: [
-            { label: t.nav.buyResidential, href: "/acheter/villas" },
-            { label: t.nav.buyCommercial, href: "/commercial/magasins" },
-            { label: t.nav.findAgent, href: "/agents" },
-            { label: t.nav.findAgency, href: "/agences" },
-          ],
-        },
-      ],
-    },
-    {
-      label: t.nav.rent,
-      href: "/louer",
-      columns: [
-        {
           title: t.nav.col_residential_rent,
           links: [
             { label: t.nav.apartments, href: "/louer/appartements" },
@@ -89,20 +64,23 @@ function useNavItems(): NavItem[] {
           ],
         },
         {
-          title: t.nav.col_tips_rent,
-          links: [
-            { label: t.nav.renterGuide, href: "/conseils/guide-locataire" },
-            { label: t.nav.neighborhoods, href: "/conseils/quartiers" },
-            { label: t.nav.communities, href: "/conseils/communautes" },
-            { label: t.nav.toursResidences, href: "/conseils/tours-residences" },
-            { label: t.nav.schoolsUniversities, href: "/conseils/ecoles-universites" },
-          ],
-        },
-        {
           title: t.nav.col_services,
           links: [
-            { label: t.nav.rentResidential, href: "/louer/villas" },
-            { label: t.nav.rentCommercial, href: "/commercial/magasins" },
+            { label: t.nav.buyerGuide, href: "/conseils/guide-acheteur" },
+            { label: t.nav.renterGuide, href: "/conseils/guide-locataire" },
+            { label: t.nav.neighborhoods, href: "/conseils/quartiers" },
+            { label: t.nav.findAgent, href: "/agents" },
+          ],
+        },
+      ],
+    },
+    {
+      label: t.nav.findAgent,
+      href: "/agents",
+      columns: [
+        {
+          title: t.nav.col_find,
+          links: [
             { label: t.nav.findAgent, href: "/agents" },
             { label: t.nav.findAgency, href: "/agences" },
           ],
@@ -136,51 +114,6 @@ function useNavItems(): NavItem[] {
         },
       ],
     },
-    {
-      label: t.nav.agents,
-      href: "/agents",
-      columns: [
-        {
-          title: t.nav.col_find,
-          links: [
-            { label: t.nav.findAgent, href: "/agents" },
-            { label: t.nav.findAgency, href: "/agences" },
-            { label: t.footer.becomeAgent, href: "/devenir-agent" },
-          ],
-        },
-      ],
-    },
-    {
-      label: t.nav.commercial,
-      href: "/commercial",
-      columns: [
-        {
-          title: t.nav.col_buy_commercial,
-          links: [
-            { label: t.nav.offices, href: "/commercial/bureaux" },
-            { label: t.nav.stores, href: "/commercial/magasins" },
-            { label: t.nav.warehouses, href: "/commercial/entrepots" },
-            { label: t.nav.lands, href: "/commercial/terrains" },
-          ],
-        },
-        {
-          title: t.nav.col_rent_commercial,
-          links: [
-            { label: t.nav.offices, href: "/commercial/location/bureaux" },
-            { label: t.nav.stores, href: "/commercial/location/magasins" },
-            { label: t.nav.warehouses, href: "/commercial/location/entrepots" },
-          ],
-        },
-        {
-          title: t.nav.col_services,
-          links: [
-            { label: t.nav.findCommercialAgent, href: "/agents" },
-            { label: t.nav.findAgency, href: "/agences" },
-            { label: t.nav.commercialNews, href: "/commercial/actualites" },
-          ],
-        },
-      ],
-    },
   ];
 }
 
@@ -188,7 +121,6 @@ function UtilityCluster() {
   return (
     <div className="flex items-center gap-0.5 rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-card/5 px-1 py-0.5">
       <LanguageSwitcher />
-      <ThemeToggle />
     </div>
   );
 }
@@ -200,7 +132,11 @@ function ProfileMenu() {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { agent: agentSession, isAuthenticated: isAgentAuth, logout: agentLogout } = useAgentSessionStore();
+  const {
+    agent: agentSession,
+    isAuthenticated: isAgentAuth,
+    logout: agentLogout,
+  } = useAgentSessionStore();
   const t = useT();
 
   const profileMenuItems = [
@@ -238,8 +174,13 @@ function ProfileMenu() {
       <div className="flex items-center gap-2">
         <UtilityCluster />
         <div className="w-px h-5 bg-white dark:bg-card/20" />
-        <Button variant="gold" size="sm" asChild className="hidden xl:flex font-semibold">
-          <Link href="/inscription">{t.auth.register}</Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className="hidden xl:flex text-white/80 hover:text-white hover:bg-white/10"
+        >
+          <Link href="/connexion">{t.auth.login}</Link>
         </Button>
       </div>
     );
@@ -248,11 +189,20 @@ function ProfileMenu() {
   // ── Agent session pill (checked before user auth so it doesn't fall through) ─
   if (isAgentAuth && agentSession) {
     const initials = agentSession.name
-      .split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
-    const isAgencyOwner = agentSession.agentType === "AGENCY_OWNER" && !!agentSession.agencyId;
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+    const isAgencyOwner =
+      agentSession.agentType === "AGENCY_OWNER" && !!agentSession.agencyId;
     const portalHref = isAgencyOwner ? "/espace-agence" : "/espace-agent";
-    const portalLabel = isAgencyOwner ? t.espaceAgent.agencyPortalLabel : t.espaceAgent.agentPortalLabel;
-    const portalLinkLabel = isAgencyOwner ? t.espaceAgent.myAgencyPortalLink : t.espaceAgent.myAgentPortalLink;
+    const portalLabel = isAgencyOwner
+      ? t.espaceAgent.agencyPortalLabel
+      : t.espaceAgent.agentPortalLabel;
+    const portalLinkLabel = isAgencyOwner
+      ? t.espaceAgent.myAgencyPortalLink
+      : t.espaceAgent.myAgentPortalLink;
     return (
       <div className="flex items-center gap-2">
         <UtilityCluster />
@@ -260,7 +210,10 @@ function ProfileMenu() {
         <div className="relative" ref={ref}>
           <button
             onClick={() => setOpen((v) => !v)}
-            style={{ boxShadow: "0 0 0 2px hsl(var(--navy)), 0 0 0 4px hsl(var(--secondary))" }}
+            style={{
+              boxShadow:
+                "0 0 0 2px hsl(var(--navy)), 0 0 0 4px hsl(var(--secondary))",
+            }}
             className="w-9 h-9 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none"
             aria-label="Menu agent"
           >
@@ -269,9 +222,15 @@ function ProfileMenu() {
           {open && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-card rounded-xl shadow-lg border border-border py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="px-4 py-3 border-b border-border mb-1">
-                <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-0.5">{portalLabel}</p>
-                <p className="text-sm font-semibold text-foreground">{agentSession.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{agentSession.email}</p>
+                <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-0.5">
+                  {portalLabel}
+                </p>
+                <p className="text-sm font-semibold text-foreground">
+                  {agentSession.name}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {agentSession.email}
+                </p>
               </div>
               <Link
                 href={portalHref}
@@ -303,11 +262,13 @@ function ProfileMenu() {
       <div className="flex items-center gap-2">
         <UtilityCluster />
         <div className="w-px h-5 bg-white dark:bg-card/20" />
-        <Button variant="ghost" size="sm" asChild className="hidden xl:flex text-white/80 hover:text-white hover:bg-white/10">
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className="hidden xl:flex text-white/80 hover:text-white hover:bg-white/10"
+        >
           <Link href="/connexion">{t.auth.login}</Link>
-        </Button>
-        <Button variant="gold" size="sm" asChild className="hidden xl:flex font-semibold">
-          <Link href="/inscription">{t.auth.register}</Link>
         </Button>
       </div>
     );
@@ -322,7 +283,10 @@ function ProfileMenu() {
       <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen((v) => !v)}
-          style={{ boxShadow: "0 0 0 2px hsl(var(--navy)), 0 0 0 4px hsl(var(--secondary))" }}
+          style={{
+            boxShadow:
+              "0 0 0 2px hsl(var(--navy)), 0 0 0 4px hsl(var(--secondary))",
+          }}
           className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none relative"
           aria-label="Menu profil"
         >
@@ -347,7 +311,9 @@ function ProfileMenu() {
               <p className="text-sm font-semibold text-foreground">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user.email}
+              </p>
             </div>
 
             {profileMenuItems.map(({ label, href, icon: Icon }) => (
@@ -380,24 +346,38 @@ function ProfileMenu() {
 
 /* ─── Mobile Drawer ──────────────────────────────────────────────────────── */
 
-function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+function MobileDrawer({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const t = useT();
   const navItems = useNavItems();
   const pathname = usePathname();
   const router = useRouter();
   const mounted = useMounted();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { agent: agentSession, isAuthenticated: isAgentAuth, logout: agentLogout } = useAgentSessionStore();
+  const {
+    agent: agentSession,
+    isAuthenticated: isAgentAuth,
+    logout: agentLogout,
+  } = useAgentSessionStore();
   const [expanded, setExpanded] = useState<string | null>(null);
 
   // Close on route change
-  useEffect(() => { onClose(); }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    onClose();
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Lock body scroll
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   function handleLogout() {
@@ -458,21 +438,35 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto">
-
           {/* Auth strip */}
           {isAgentAuth && agentSession ? (
             <div className="flex items-center gap-3 px-5 py-4 bg-primary/5 border-b border-border">
               <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-sm select-none shrink-0">
-                {agentSession.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+                {agentSession.name
+                  .split(" ")
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-primary uppercase tracking-wide">
-                  {agentSession.agentType === "AGENCY_OWNER" && agentSession.agencyId ? t.espaceAgent.agencyPortalLabel : t.espaceAgent.agentPortalLabel}
+                  {agentSession.agentType === "AGENCY_OWNER" &&
+                  agentSession.agencyId
+                    ? t.espaceAgent.agencyPortalLabel
+                    : t.espaceAgent.agentPortalLabel}
                 </p>
-                <p className="text-sm font-semibold text-foreground truncate">{agentSession.name}</p>
+                <p className="text-sm font-semibold text-foreground truncate">
+                  {agentSession.name}
+                </p>
               </div>
               <Link
-                href={agentSession.agentType === "AGENCY_OWNER" && agentSession.agencyId ? "/espace-agence" : "/espace-agent"}
+                href={
+                  agentSession.agentType === "AGENCY_OWNER" &&
+                  agentSession.agencyId
+                    ? "/espace-agence"
+                    : "/espace-agent"
+                }
                 onClick={onClose}
                 className="text-xs text-primary hover:underline shrink-0"
               >
@@ -483,23 +477,32 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
             <div className="flex items-center gap-3 px-5 py-4 bg-primary/5 border-b border-border">
               <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground font-semibold text-sm select-none overflow-hidden relative shrink-0">
                 {user.profileImage?.startsWith("https://") ? (
-                  <Image src={user.profileImage} alt={user.firstName} fill className="object-cover" sizes="40px" />
+                  <Image
+                    src={user.profileImage}
+                    alt={user.firstName}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
                 ) : (
                   user.firstName[0].toUpperCase()
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{user.firstName} {user.lastName}</p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <p className="text-sm font-semibold text-foreground truncate">
+                  {user.firstName} {user.lastName}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user.email}
+                </p>
               </div>
             </div>
           ) : (
             <div className="flex gap-2 px-5 py-4 border-b border-border">
               <Button variant="outline" size="sm" className="flex-1" asChild>
-                <Link href="/connexion" onClick={onClose}>{t.auth.login}</Link>
-              </Button>
-              <Button variant="gold" size="sm" className="flex-1 font-semibold" asChild>
-                <Link href="/inscription" onClick={onClose}>{t.auth.register}</Link>
+                <Link href="/connexion" onClick={onClose}>
+                  {t.auth.login}
+                </Link>
               </Button>
             </div>
           )}
@@ -536,10 +539,26 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
           {isAgentAuth ? (
             <>
               {[
-                { label: t.espaceAgent.agentNavSearch, href: "/acheter", icon: Home },
-                { label: t.espaceAgent.agentNavListings, href: "/espace-agent/annonces", icon: Home },
-                { label: t.espaceAgent.agentNavBoosts, href: "/espace-agent/boosts", icon: Star },
-                { label: t.espaceAgent.agentNavPortal, href: "/espace-agent", icon: User },
+                {
+                  label: t.espaceAgent.agentNavSearch,
+                  href: "/acheter",
+                  icon: Home,
+                },
+                {
+                  label: t.espaceAgent.agentNavListings,
+                  href: "/espace-agent/annonces",
+                  icon: Home,
+                },
+                {
+                  label: t.espaceAgent.agentNavBoosts,
+                  href: "/espace-agent/boosts",
+                  icon: Star,
+                },
+                {
+                  label: t.espaceAgent.agentNavPortal,
+                  href: "/espace-agent",
+                  icon: User,
+                },
               ].map(({ label, href, icon: Icon }) => (
                 <Link
                   key={href}
@@ -574,14 +593,20 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
                     <button
                       type="button"
                       onClick={() => {
-                        if (!item.columns) { router.push(item.href); onClose(); return; }
+                        if (!item.columns) {
+                          router.push(item.href);
+                          onClose();
+                          return;
+                        }
                         setExpanded(isOpen ? null : item.label);
                       }}
                       className={`w-full flex items-center justify-between px-5 py-3.5 text-sm font-medium transition-colors ${isActive ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-primary hover:bg-muted"}`}
                     >
                       <span>{item.label}</span>
                       {item.columns ? (
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                        <ChevronDown
+                          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                        />
                       ) : (
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       )}
@@ -625,14 +650,14 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
                 );
               })}
 
-              {/* List your property CTA */}
+              {/* Agent CTA */}
               <div className="px-5 py-4 border-b border-border">
                 <Link
-                  href="/vendre"
+                  href="/devenir-agent"
                   onClick={onClose}
                   className="flex items-center justify-center gap-2 w-full rounded-full bg-secondary text-secondary-foreground px-5 py-3 text-sm font-semibold hover:bg-secondary/90 transition-colors"
                 >
-                  {t.nav.list}
+                  {t.nav.agentListCta}
                 </Link>
               </div>
             </>
@@ -649,12 +674,13 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
             </button>
           )}
 
-          {/* Language + theme — inside scroll area so the chat button never covers it */}
+          {/* Language — inside scroll area */}
           <div className="flex items-center justify-between px-5 py-5">
-            <span className="text-xs text-muted-foreground font-medium">Langue & thème</span>
+            <span className="text-xs text-muted-foreground font-medium">
+              Langue
+            </span>
             <div className="flex items-center gap-1 rounded-lg border border-border bg-card px-1 py-0.5">
               <LanguageSwitcher />
-              <ThemeToggle />
             </div>
           </div>
 
@@ -670,9 +696,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
 
 function AgentDesktopNav({ pathname }: { pathname: string }) {
   const { espaceAgent: p } = useT();
-  const agentLinks = [
-    { label: p.agentNavSearch, href: "/acheter" },
-  ];
+  const agentLinks = [{ label: p.agentNavSearch, href: "/acheter" }];
   const agentActions = [
     { label: p.agentNavListings, href: "/espace-agent/annonces" },
     { label: p.agentNavBoosts, href: "/espace-agent/boosts" },
@@ -739,15 +763,18 @@ export default function Header() {
       }`}
       onMouseLeave={() => setOpenMenu(null)}
     >
-      <div className="max-w-6xl mx-auto px-6 h-28 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto h-20 flex items-center justify-between">
         <div className="w-full flex items-center justify-between gap-8">
-          <Link href={mounted && isAgentAuth ? "/espace-agent" : "/"} className="flex items-center shrink-0">
+          <Link
+            href={mounted && isAgentAuth ? "/espace-agent" : "/"}
+            className="flex items-center shrink-0"
+          >
             <Image
               src="/assets/images/company-logo.png"
               alt="Okapi Real Estate"
-              width={140}
-              height={64}
-              className="h-20 w-auto"
+              width={150}
+              height={65}
+              className="h-18 w-auto"
               priority
             />
           </Link>
@@ -777,7 +804,9 @@ export default function Header() {
                       {item.columns && (
                         <ChevronDown
                           className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                            isHighlighted ? "rotate-180" : "group-hover:rotate-180"
+                            isHighlighted
+                              ? "rotate-180"
+                              : "group-hover:rotate-180"
                           }`}
                         />
                       )}
@@ -785,7 +814,7 @@ export default function Header() {
                   </div>
                 );
               })}
-              <NavListButton navItems={navItems} setOpenMenu={setOpenMenu} />
+              <NavListButton setOpenMenu={setOpenMenu} />
             </nav>
           )}
 
@@ -809,13 +838,16 @@ export default function Header() {
       {/* Mobile drawer */}
       <MobileDrawer open={mobileOpen} onClose={() => setMobileOpen(false)} />
 
+      {/* Floating dark/light toggle — bottom-left of viewport */}
+      <FloatingThemeToggle />
+
       {/* Mega Menu Dropdown — public only */}
       {showMegaMenu && (
         <div
           className="absolute left-0 right-0 top-full bg-background border-b border-border shadow-lg animate-in fade-in slide-in-from-top-2 duration-150"
           onMouseEnter={() => setOpenMenu(openMenu)}
         >
-          <div className="max-w-6xl mx-auto px-6 py-10">
+          <div className="max-w-[1440px] mx-auto px-8 py-10">
             {navItems
               .filter((item) => item.label === openMenu && item.columns)
               .map((item) => (
@@ -855,21 +887,26 @@ export default function Header() {
 }
 
 function NavListButton({
-  navItems,
   setOpenMenu,
 }: {
-  navItems: NavItem[];
   setOpenMenu: (v: string | null) => void;
 }) {
   const t = useT();
-  const sellItem = navItems.find((n) => n.href === "/vendre");
   return (
     <Link
-      href="/vendre"
-      onMouseEnter={() => setOpenMenu(sellItem?.label ?? null)}
-      className="hidden xl:inline-flex ml-3 items-center rounded-full bg-secondary text-secondary-foreground px-5 h-9 text-sm font-semibold hover:bg-secondary/90 transition-colors duration-200"
+      href="/devenir-agent"
+      onMouseEnter={() => setOpenMenu(null)}
+      className="hidden xl:inline-flex ml-4 items-center rounded-full bg-secondary text-secondary-foreground px-5 h-9 text-sm font-semibold hover:bg-secondary/90 transition-colors duration-200 whitespace-nowrap"
     >
-      {t.nav.list}
+      {t.nav.agentListCta}
     </Link>
+  );
+}
+
+function FloatingThemeToggle() {
+  return (
+    <div className="fixed bottom-1 left-12 z-60">
+      <ThemeToggle />
+    </div>
   );
 }

@@ -131,8 +131,10 @@ function SubscriptionModal({ token, t, onClose, onSuccess }: {
       setSubId(req.id);
       setReference(req.paymentReference ?? "");
       setStep(2);
-    } catch (err: any) {
-      setError(err?.response?.data?.message ?? t.subErrCreate);
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
+      setError(message ?? t.subErrCreate);
     } finally {
       setSubmitting(false);
     }
@@ -150,8 +152,10 @@ function SubscriptionModal({ token, t, onClose, onSuccess }: {
       const publicUrl = resolveUrl(key);
       await updateSubscriptionScreenshot(token, subId, publicUrl);
       setScreenshotUrl(publicUrl);
-    } catch (err: any) {
-      setError(err?.response?.data?.message ?? t.subErrUpload);
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
+      setError(message ?? t.subErrUpload);
     } finally {
       setScreenshotUploading(false);
     }
@@ -159,7 +163,6 @@ function SubscriptionModal({ token, t, onClose, onSuccess }: {
 
   const STEPS = [t.subStep1, t.subStep2, t.subStep3];
 
-  const selectedPlan = PLANS.find((p) => p.id === selectedTier);
   const planPrice = selectedTier === "PRO" ? t.subPlanProPrice : t.subPlanAgencyPrice;
   const planLabel = selectedTier === "PRO" ? t.subPlanPro : t.subPlanAgency;
 
@@ -490,7 +493,9 @@ function EspaceAgentAbonnementPageInner() {
   useEffect(() => {
     if (!mounted) return;
     if (!isAuthenticated || !token) { router.replace("/connexion?agent=1"); return; }
-    loadSubs();
+    // Defer to a microtask so the fetch's setState calls don't run
+    // synchronously within the effect body.
+    Promise.resolve().then(loadSubs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isAuthenticated]);
 

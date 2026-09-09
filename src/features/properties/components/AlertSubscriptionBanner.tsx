@@ -8,7 +8,7 @@ import { createAlert } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 
-type Mode = "rent" | "sale" | "buy" | "commercial";
+export type Mode = "rent" | "sale" | "buy" | "commercial";
 
 const CATEGORY_LABELS: Record<string, string> = {
   apartment: "Appartements",

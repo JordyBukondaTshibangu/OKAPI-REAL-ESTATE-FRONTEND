@@ -17,7 +17,6 @@ import {
   Lock,
   Eye,
   Home,
-  Star,
   PlusCircle,
   Settings,
   BarChart2,
@@ -84,6 +83,11 @@ type AgencyProperty = {
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// Captured once per page load (module scope, not during render) — day-level
+// precision is fine here and this keeps components pure for React's
+// render-purity rules.
+const pageLoadTime = Date.now();
 
 function formatGracePeriod(graceEndsAt: string): {
   label: string;
@@ -455,7 +459,7 @@ function NotificationStrip({
   // Grace period ending
   if (agency.gracePeriodEndsAt) {
     const daysLeft = Math.floor(
-      (new Date(agency.gracePeriodEndsAt).getTime() - Date.now()) / 86400000,
+      (new Date(agency.gracePeriodEndsAt).getTime() - pageLoadTime) / 86400000,
     );
     if (daysLeft > 0 && daysLeft <= 30) {
       notices.push({
@@ -688,12 +692,7 @@ function TeamSection({
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold border border-border">
-                          {agent.name
-                            .split(" ")
-                            .map((w: string) => w[0])
-                            .join("")
-                            .slice(0, 2)
-                            .toUpperCase()}
+                          {initials}
                         </div>
                       )}
                     </div>

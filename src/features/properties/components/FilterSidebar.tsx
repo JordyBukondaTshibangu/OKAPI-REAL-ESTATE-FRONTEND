@@ -6,6 +6,7 @@ import { KINSHASA_COMMUNES } from "@/constants/kinshasa";
 import { SlidersHorizontal } from "lucide-react";
 import type { Property } from "@/features/properties/types/property";
 import TravelTimes from "./TravelTimes";
+import { useT } from "@/i18n/useT";
 
 type Mode = "rent" | "sale" | "buy" | "commercial";
 
@@ -18,57 +19,6 @@ interface FilterSidebarProps {
   onFilter?: (ids: string[] | null) => void;
 }
 
-const RENT_TYPES = [
-  { label: "Tous", value: "" },
-  { label: "Appartement", value: "apartment" },
-  { label: "Studio", value: "studio" },
-  { label: "Villa", value: "villa" },
-  { label: "Maison de ville", value: "townhouse" },
-  { label: "Duplex", value: "duplex" },
-  { label: "Bureau", value: "office" },
-  { label: "Commerce", value: "retail" },
-];
-
-const BUY_TYPES = [
-  { label: "Tous", value: "" },
-  { label: "Appartement", value: "apartment" },
-  { label: "Villa", value: "villa" },
-  { label: "Maison de ville", value: "townhouse" },
-  { label: "Studio", value: "studio" },
-  { label: "Duplex", value: "duplex" },
-  { label: "Penthouse", value: "penthouse" },
-  { label: "Terrain", value: "land" },
-];
-
-const COMMERCIAL_TYPES = [
-  { label: "Tous", value: "" },
-  { label: "Bureau", value: "office" },
-  { label: "Commerce", value: "retail" },
-  { label: "Entrepôt", value: "warehouse" },
-  { label: "Terrain", value: "land" },
-];
-
-const BEDS_OPTIONS = [
-  { label: "Toutes les chambres", value: "" },
-  { label: "1 chambre", value: "1" },
-  { label: "2 chambres", value: "2" },
-  { label: "3 chambres", value: "3" },
-  { label: "4 chambres", value: "4" },
-  { label: "5+ chambres", value: "5" },
-];
-
-const AMENITIES = [
-  { key: "furnished", label: "Meublés" },
-  { key: "ac", label: "Climatisation" },
-  { key: "security", label: "Agents de sécurité" },
-  { key: "rooftop", label: "Toiture/terrasse" },
-  { key: "garden", label: "Jardin" },
-  { key: "outdoor_toilet", label: "Toilette extérieure" },
-  { key: "wifi", label: "Wi-Fi" },
-  { key: "parking", label: "Parking" },
-];
-
-type Tab = "filters" | "travel";
 
 export default function FilterSidebar({
   mode,
@@ -79,12 +29,63 @@ export default function FilterSidebar({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { filters: tf } = useT();
+
+  const RENT_TYPES = [
+    { label: tf.allTypes, value: "" },
+    { label: tf.apartment, value: "apartment" },
+    { label: tf.studio, value: "studio" },
+    { label: tf.villa, value: "villa" },
+    { label: tf.townhouse, value: "townhouse" },
+    { label: tf.duplex, value: "duplex" },
+    { label: tf.office, value: "office" },
+    { label: tf.retail, value: "retail" },
+  ];
+
+  const BUY_TYPES = [
+    { label: tf.allTypes, value: "" },
+    { label: tf.apartment, value: "apartment" },
+    { label: tf.villa, value: "villa" },
+    { label: tf.townhouse, value: "townhouse" },
+    { label: tf.studio, value: "studio" },
+    { label: tf.duplex, value: "duplex" },
+    { label: tf.penthouse, value: "penthouse" },
+    { label: tf.land, value: "land" },
+  ];
+
+  const COMMERCIAL_TYPES = [
+    { label: tf.allTypes, value: "" },
+    { label: tf.office, value: "office" },
+    { label: tf.retail, value: "retail" },
+    { label: tf.warehouse, value: "warehouse" },
+    { label: tf.land, value: "land" },
+  ];
+
+  const BEDS_OPTIONS = [
+    { label: tf.sidebarAllBedrooms, value: "" },
+    { label: tf.sidebarBed1, value: "1" },
+    { label: tf.sidebarBed2, value: "2" },
+    { label: tf.sidebarBed3, value: "3" },
+    { label: tf.sidebarBed4, value: "4" },
+    { label: tf.sidebarBed5, value: "5" },
+  ];
+
+  const AMENITIES = [
+    { key: "furnished", label: tf.amenityFurnished },
+    { key: "ac", label: tf.amenityAC },
+    { key: "security", label: tf.amenitySecurity },
+    { key: "rooftop", label: tf.amenityRooftop },
+    { key: "garden", label: tf.amenityGarden },
+    { key: "outdoor_toilet", label: tf.amenityOutdoorToilet },
+    { key: "wifi", label: tf.amenityWifi },
+    { key: "parking", label: tf.amenityParking },
+  ];
 
   const propertyTypes =
     mode === "commercial" ? COMMERCIAL_TYPES : mode === "rent" ? RENT_TYPES : BUY_TYPES;
 
-  const [activeTab, setActiveTab] = useState<Tab>("filters");
   const [showAmenities, setShowAmenities] = useState(false);
+  const [showTravel, setShowTravel] = useState(false);
   const [type, setType] = useState(searchParams.get("type") ?? "");
   const [city, setCity] = useState(searchParams.get("city") ?? "Kinshasa");
   const [suburb, setSuburb] = useState(searchParams.get("suburb") ?? "");
@@ -132,70 +133,30 @@ export default function FilterSidebar({
       <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-bold text-primary">
-            {activeTab === "filters" ? "Ajoutez vos filtres" : "Temps de trajet"}
-          </h2>
-          {activeTab === "filters" && activeCount > 0 && (
+          <h2 className="text-sm font-bold text-primary">{tf.sidebarTitle}</h2>
+          {activeCount > 0 && (
             <button
               onClick={reset}
               className="flex items-center gap-1 text-[11px] font-semibold text-white bg-primary rounded-full px-2 py-0.5 hover:bg-primary/80 transition-colors"
-              title="Effacer tous les filtres"
+              title={tf.sidebarReset}
             >
-              {activeCount} actif{activeCount > 1 ? "s" : ""} ×
+              {activeCount} {activeCount > 1 ? tf.sidebarActivePlural : tf.sidebarActive} ×
             </button>
           )}
         </div>
         <span className="text-xs font-semibold text-primary border border-primary/30 bg-primary/5 rounded-full px-3 py-1 whitespace-nowrap">
-          {totalListings.toLocaleString("fr-FR")} Résultats
+          {totalListings.toLocaleString("fr-FR")} {tf.sidebarResults}
         </span>
       </div>
 
-      {/* ── Tab switcher ───────────────────────────────────────── */}
-      <div className="flex border-b border-border shrink-0">
-        <button
-          onClick={() => setActiveTab("filters")}
-          className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${
-            activeTab === "filters"
-              ? "text-primary border-b-2 border-primary -mb-px"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Filtres
-        </button>
-        <button
-          onClick={() => setActiveTab("travel")}
-          className={`flex-1 py-2.5 text-xs font-semibold transition-colors flex items-center justify-center gap-1 ${
-            activeTab === "travel"
-              ? "text-primary border-b-2 border-primary -mb-px"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="12 6 12 12 16 14" />
-          </svg>
-          Temps de trajet
-        </button>
-      </div>
-
-      {/* ── Travel tab ─────────────────────────────────────────── */}
-      {activeTab === "travel" && (
-        <TravelTimes
-          embedded
-          properties={properties}
-          onFilter={onFilter}
-        />
-      )}
-
-      {/* ── Filters tab ────────────────────────────────────────── */}
-      {activeTab === "filters" && (
-        <>
+      {/* ── Single scrollable body ─────────────────────────────── */}
+      <>
           {/* Scrollable body */}
-          <div className="overflow-y-auto flex-1 p-6 space-y-6">
+          <div className="overflow-y-auto flex-1 min-h-0 p-6 space-y-6">
 
             {/* Type de propriété */}
             <section>
-              <h3 className="text-sm font-bold text-foreground mb-3">Type de propriété</h3>
+              <h3 className="text-sm font-bold text-foreground mb-3">{tf.sidebarPropType}</h3>
               <div className="flex flex-wrap gap-2">
                 {propertyTypes.map((t) => (
                   <button
@@ -217,10 +178,10 @@ export default function FilterSidebar({
 
             {/* Localisation */}
             <section>
-              <h3 className="text-sm font-bold text-foreground mb-3">Localisation</h3>
+              <h3 className="text-sm font-bold text-foreground mb-3">{tf.sidebarLocation}</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1.5 block font-medium">Ville</label>
+                  <label className="text-xs text-muted-foreground mb-1.5 block font-medium">{tf.sidebarCity}</label>
                   <input
                     type="text"
                     value={city}
@@ -229,13 +190,13 @@ export default function FilterSidebar({
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1.5 block font-medium">Commune</label>
+                  <label className="text-xs text-muted-foreground mb-1.5 block font-medium">{tf.sidebarCommune}</label>
                   <select
                     value={suburb}
                     onChange={(e) => setSuburb(e.target.value)}
                     className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
                   >
-                    <option value="">— Tous —</option>
+                    <option value="">{tf.sidebarAllCommunes}</option>
                     {KINSHASA_COMMUNES.map((c) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
@@ -248,7 +209,7 @@ export default function FilterSidebar({
 
             {/* Nombre de chambres */}
             <section>
-              <h3 className="text-sm font-bold text-foreground mb-3">Nombre de chambres</h3>
+              <h3 className="text-sm font-bold text-foreground mb-3">{tf.sidebarBedrooms}</h3>
               <select
                 value={beds}
                 onChange={(e) => setBeds(e.target.value)}
@@ -264,10 +225,10 @@ export default function FilterSidebar({
 
             {/* Budget */}
             <section>
-              <h3 className="text-sm font-bold text-foreground mb-3">Budget</h3>
+              <h3 className="text-sm font-bold text-foreground mb-3">{tf.sidebarBudget}</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1.5 block font-medium">Minimum</label>
+                  <label className="text-xs text-muted-foreground mb-1.5 block font-medium">{tf.sidebarMin}</label>
                   <input
                     type="number"
                     placeholder="Min"
@@ -277,7 +238,7 @@ export default function FilterSidebar({
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1.5 block font-medium">Maximum</label>
+                  <label className="text-xs text-muted-foreground mb-1.5 block font-medium">{tf.sidebarMax}</label>
                   <input
                     type="number"
                     placeholder="Max"
@@ -298,7 +259,7 @@ export default function FilterSidebar({
                 onClick={() => setShowAmenities((v) => !v)}
                 className="flex items-center justify-between w-full group py-0.5"
               >
-                <h3 className="text-sm font-bold text-foreground leading-none">Équipements</h3>
+                <h3 className="text-sm font-bold text-foreground leading-none">{tf.sidebarAmenities}</h3>
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -331,6 +292,35 @@ export default function FilterSidebar({
                 </div>
               )}
             </section>
+
+            <div className="border-t border-border" />
+
+            {/* Temps de trajet — collapsible */}
+            <section>
+              <button
+                type="button"
+                onClick={() => setShowTravel((v) => !v)}
+                className="flex items-center justify-between w-full group py-0.5"
+              >
+                <div className="flex items-center gap-2">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary">
+                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <h3 className="text-sm font-bold text-foreground leading-none">{tf.sidebarTravel}</h3>
+                </div>
+                <svg
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+                  className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${showTravel ? "rotate-180" : ""}`}
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              {showTravel && (
+                <div className="mt-3 -mx-6">
+                  <TravelTimes embedded properties={properties} onFilter={onFilter} />
+                </div>
+              )}
+            </section>
           </div>
 
           {/* Action buttons */}
@@ -340,22 +330,17 @@ export default function FilterSidebar({
                 onClick={reset}
                 className="py-2.5 px-3 rounded-full text-sm font-semibold border border-border text-primary hover:bg-primary/5 transition-colors"
               >
-                Réinitialiser
+                {tf.sidebarReset}
               </button>
               <button
                 onClick={apply}
                 className="py-2.5 px-3 rounded-full text-sm font-bold bg-primary text-white hover:bg-primary/90 transition-colors"
               >
-                Appliquer
+                {tf.sidebarApply}
               </button>
             </div>
-            <button className="w-full py-2.5 px-4 rounded-full text-xs font-semibold text-primary border border-primary/30 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
-              <span>⚙️</span>
-              Filtres personnalisés (WhatsApp)
-            </button>
           </div>
         </>
-      )}
     </div>
   );
 }

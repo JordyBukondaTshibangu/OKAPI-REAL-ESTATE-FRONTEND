@@ -87,7 +87,7 @@ export default function FavouritesPage() {
       })
       .catch(() => setError(t.dashboard.errLoadFavorites))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, t.dashboard.errLoadFavorites]);
 
   async function handleRemove(propertyId: string) {
     if (!token) return;

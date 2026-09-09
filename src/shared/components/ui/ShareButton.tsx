@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Share2 } from "lucide-react";
+import { useT } from "@/i18n/useT";
 
 export default function ShareButton({
   title,
@@ -15,6 +16,7 @@ export default function ShareButton({
   iconOnly?: boolean;
   className?: string;
 }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
@@ -50,7 +52,7 @@ export default function ShareButton({
       )}
       {!iconOnly && (
         <span className="hidden md:inline">
-          {copied ? "Lien copié !" : "Partager"}
+          {copied ? t.common.linkCopied : t.common.share}
         </span>
       )}
     </button>

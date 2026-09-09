@@ -1,5 +1,4 @@
 import { Button } from "@/shared/components/ui/button";
-import { Car, Shield, Trees, Wifi } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -107,13 +106,6 @@ const residences = [
       "Résidence accessible pour familles congolaises et primo-accédants. Environnement calme et bien desservi.",
   },
 ];
-
-const amenityIcons: Record<string, React.ElementType> = {
-  Piscine: Trees,
-  Sécurité: Shield,
-  Internet: Wifi,
-  Parking: Car,
-};
 
 export default function ToursResidencesPage() {
   return (

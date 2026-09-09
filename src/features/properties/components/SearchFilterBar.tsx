@@ -4,7 +4,6 @@ import { useT } from "@/i18n/useT";
 import { PropertyCategory } from "@/features/properties/types/property";
 import { Button } from "@/shared/components/ui/button";
 import {
-  Bell,
   ChevronDown,
   Map,
   Search,
@@ -351,14 +350,19 @@ function DuréeDropdown({
   const close = useCallback(() => setOpen(false), []);
   useOutsideClick(ref, close);
 
-  // Sync local state when URL params change
-  useEffect(() => {
+  // Sync local state when URL params change. Adjusted during render (rather
+  // than in an effect) by comparing against the previous render's params —
+  // see https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const syncKey = `${currentDuration}|${currentMinNightPrice}|${currentMaxNightPrice}|${currentMinStay}|${currentMaxStay}`;
+  const [prevSyncKey, setPrevSyncKey] = useState(syncKey);
+  if (syncKey !== prevSyncKey) {
+    setPrevSyncKey(syncKey);
     setLocalDuration(currentDuration);
     setLocalMinNight(currentMinNightPrice);
     setLocalMaxNight(currentMaxNightPrice);
     setLocalMinStay(currentMinStay);
     setLocalMaxStay(currentMaxStay);
-  }, [currentDuration, currentMinNightPrice, currentMaxNightPrice, currentMinStay, currentMaxStay]);
+  }
 
   const isActive = !!(currentDuration || currentMinNightPrice || currentMaxNightPrice || currentMinStay || currentMaxStay);
   const showShortTermFields = localDuration === "short" || localDuration === "both";
@@ -518,7 +522,6 @@ export type SearchFilterBarProps = {
 
 export default function SearchFilterBar({
   mode,
-  showOffPlanReady,
   typeRoutes,
   layout,
 }: SearchFilterBarProps) {
@@ -867,12 +870,7 @@ export default function SearchFilterBar({
             >
               <SlidersHorizontal className="w-4 h-4" />
             </button>
-            <button
-              aria-label={t.filters.ariaAlertsBtn}
-              className="w-10 h-10 rounded-full border border-border bg-white dark:bg-card flex items-center justify-center text-foreground/70 hover:border-primary/50"
-            >
-              <Bell className="w-4 h-4" />
-            </button>
+
             <Button
               variant="navy"
               size="sm"

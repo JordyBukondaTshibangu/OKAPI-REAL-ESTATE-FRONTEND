@@ -43,7 +43,7 @@ export default function ReviewsPage() {
       .then(setReviews)
       .catch(() => setError(t.dashboard.errLoadReviews))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, t.dashboard.errLoadReviews]);
 
   async function handleDelete(id: string) {
     if (!token) return;

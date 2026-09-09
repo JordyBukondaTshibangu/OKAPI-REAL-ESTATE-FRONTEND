@@ -1,5 +1,7 @@
 "use client";
 
+import { useT } from "@/i18n/useT";
+
 /**
  * OkapiLoader — branded loading spinner.
  *
@@ -11,13 +13,15 @@
  */
 export default function OkapiLoader({
   size = 96,
-  label = "Chargement...",
+  label,
   className = "",
 }: {
   size?: number;
   label?: string;
   className?: string;
 }) {
+  const t = useT();
+  const resolvedLabel = label ?? t.common.loading;
   return (
     <div
       role="status"
@@ -94,12 +98,12 @@ export default function OkapiLoader({
         </div>
       </div>
 
-      {label && (
+      {resolvedLabel && (
         <p className="text-xs font-medium tracking-wide text-muted-foreground">
-          {label}
+          {resolvedLabel}
         </p>
       )}
-      <span className="sr-only">Chargement en cours</span>
+      <span className="sr-only">{resolvedLabel}</span>
 
       <style jsx>{`
         .okapi-spin-slow {
@@ -141,9 +145,10 @@ export default function OkapiLoader({
 
 /** Full-screen variant used when the entire detail page is hydrating. */
 export function OkapiPageLoader({ label }: { label?: string }) {
+  const t = useT();
   return (
     <div className="min-h-[60vh] flex items-center justify-center bg-background">
-      <OkapiLoader size={120} label={label ?? "Chargement du bien..."} />
+      <OkapiLoader size={120} label={label ?? t.common.loading} />
     </div>
   );
 }

@@ -171,7 +171,9 @@ export default function MesAnnoncesPage() {
       router.replace("/connexion-agent");
       return;
     }
-    fetchListings();
+    // Defer to a microtask so the fetch's setState calls don't run
+    // synchronously within the effect body.
+    Promise.resolve().then(fetchListings);
   }, [hydrated, token, agent, router, fetchListings]);
 
   async function handleDelete(id: string) {

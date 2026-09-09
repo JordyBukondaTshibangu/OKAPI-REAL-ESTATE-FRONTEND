@@ -78,26 +78,27 @@ export default function NouvelleAnnonceAgencePage() {
     if (!hydrated) return;
     if (!token || !sessionAgent?.agencyId) { router.replace("/connexion-agent"); return; }
 
-    // Pre-fill agentId with self if AGENCY_OWNER is also an agent
-    setForm((f) => ({ ...f, agentId: sessionAgent.id ?? "" }));
-
-    // Fetch team agents for the "assign to" dropdown
+    // Fetch team agents for the "assign to" dropdown, then pre-fill agentId
+    // with self (AGENCY_OWNER may also be an agent) as a fallback default.
     getMyAgentProfile(token)
-      .then((p: any) => {
+      .then(() =>
         // profile.agency not needed here; fetch agents by agencyId
-        return axios.get(`/api/proxy/agents?agencyId=${sessionAgent.agencyId}&limit=50`, {
+        axios.get(`/api/proxy/agents?agencyId=${sessionAgent.agencyId}&limit=50`, {
           headers: { Authorization: `Bearer ${token}` },
-        });
-      })
+        })
+      )
       .then((r) => {
-        const data = r.data?.data ?? r.data ?? [];
-        setTeamAgents(data.map((a: any) => ({ id: a.id, name: a.name })));
-        // Default to current agent
-        if (data.length > 0 && !form.agentId) {
-          setForm((f) => ({ ...f, agentId: data[0].id }));
-        }
+        const data: { id: string; name: string }[] = r.data?.data ?? r.data ?? [];
+        setTeamAgents(data.map((a) => ({ id: a.id, name: a.name })));
+        setForm((f) => ({
+          ...f,
+          agentId: f.agentId || data[0]?.id || sessionAgent.id || "",
+        }));
       })
-      .catch(() => {/* no team agents loaded */});
+      .catch(() => {
+        // Team agents failed to load — still default agentId to self.
+        setForm((f) => ({ ...f, agentId: f.agentId || sessionAgent.id || "" }));
+      });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, token, sessionAgent]);
 
@@ -146,8 +147,9 @@ export default function NouvelleAnnonceAgencePage() {
       });
 
       router.push("/espace-agence/annonces");
-    } catch (e: any) {
-      const msg = e?.response?.data?.message;
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string | string[] } } })
+        ?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
     } finally {
       setSaving(false);

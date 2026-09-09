@@ -4,14 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import { Building2, Home, LandPlot, Store, Warehouse } from "lucide-react";
 
-function iconForCategory(category?: string | null) {
+function categoryIcon(category?: string | null, className?: string) {
   const c = (category ?? "").toLowerCase();
-  if (c.includes("land")) return LandPlot;
-  if (c.includes("office")) return Building2;
-  if (c.includes("warehouse")) return Warehouse;
+  const props = { className, strokeWidth: 1.5 };
+  if (c.includes("land")) return <LandPlot {...props} />;
+  if (c.includes("office")) return <Building2 {...props} />;
+  if (c.includes("warehouse")) return <Warehouse {...props} />;
   if (c.includes("retail") || c.includes("store") || c.includes("shop"))
-    return Store;
-  return Home;
+    return <Store {...props} />;
+  return <Home {...props} />;
 }
 
 export function PropertyCategoryFallback({
@@ -23,7 +24,6 @@ export function PropertyCategoryFallback({
   gradient?: string;
   className?: string;
 }) {
-  const Icon = iconForCategory(category);
   const colorClasses = gradient
     ? `bg-linear-to-br ${gradient} text-white/70`
     : "bg-muted text-muted-foreground/60";
@@ -31,7 +31,7 @@ export function PropertyCategoryFallback({
     <div
       className={`absolute inset-0 flex items-center justify-center ${colorClasses} ${className ?? ""}`}
     >
-      <Icon className="w-1/3 h-1/3" strokeWidth={1.5} />
+      {categoryIcon(category, "w-1/3 h-1/3")}
     </div>
   );
 }

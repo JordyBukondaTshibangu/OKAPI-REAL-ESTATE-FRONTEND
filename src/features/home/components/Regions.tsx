@@ -6,20 +6,7 @@ import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import type { PropertyStats } from "@/lib/api";
 import { useEffect, useRef, useState } from "react";
-
-const t = {
-  sectionLabel: "Explorer par quartier",
-  heading: "Trouvez votre bien idéal à Kinshasa",
-  liveLabel: "Marché en direct",
-  liveTag: "Mis à jour",
-  liveTitle: "Le marché immobilier aujourd'hui",
-  total: "Annonces",
-  forSale: "À vendre",
-  forRent: "À louer",
-  topSuburbs: "Communes les plus actives",
-  avgPrice: "Prix moyen de vente :",
-  ctaLabel: "Voir tous les biens",
-};
+import { useT } from "@/i18n/useT";
 
 const suburbs = [
   "Gombe", "Limete", "Lemba", "Ngaliema",
@@ -105,6 +92,7 @@ function AnimatedBar({
 
 /* ── Main component ───────────────────────────────────────────────── */
 export default function Regions({ stats }: { stats: PropertyStats }) {
+  const t = useT().regions;
   const { total, forSale, forRent, avgSalePrice, topSuburbs } = stats;
   const maxCount = topSuburbs[0]?.[1] ?? 1;
 

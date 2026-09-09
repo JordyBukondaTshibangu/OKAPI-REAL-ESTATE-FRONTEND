@@ -13,7 +13,7 @@ type Agency = { id: string; name: string; freeAgentCap?: number; agentCount: num
 
 export default function AjouterAgentPage() {
   const router = useRouter();
-  const { token, agent: sessionAgent } = useAgentSessionStore();
+  const { token } = useAgentSessionStore();
   const hydrated = useMounted();
   const [agency, setAgency] = useState<Agency | null>(null);
   const [copied, setCopied] = useState(false);

@@ -44,10 +44,10 @@ export default function PropertyTypeChips({
           chipHref = `${pathname}?${next.toString()}`;
         }
 
-        const chipClass = `inline-flex items-center gap-2 rounded-full border px-4 h-9 text-sm transition-colors bg-white dark:bg-card ${
+        const chipClass = `inline-flex items-center gap-2 rounded-full px-4 h-8 text-sm font-medium transition-colors ${
           isActive
-            ? "border-primary text-foreground"
-            : "border-border text-foreground/85 hover:border-primary/50"
+            ? "bg-primary/10 text-primary"
+            : "bg-muted text-foreground/70 hover:bg-muted/80 hover:text-foreground"
         }`;
 
         const inner = (
