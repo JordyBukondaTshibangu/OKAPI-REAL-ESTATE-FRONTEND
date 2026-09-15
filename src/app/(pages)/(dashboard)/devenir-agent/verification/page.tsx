@@ -1,7 +1,10 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import { verifyAgentEmail, resendAgentVerification } from "@/services/agentAuth";
+import {
+  verifyAgentEmail,
+  resendAgentVerification,
+} from "@/services/agentAuth";
 import { useAgentSignupStore } from "@/store/useAgentSignupStore";
 import { useT } from "@/i18n/useT";
 import Image from "next/image";
@@ -53,9 +56,14 @@ export default function AgentVerificationPage() {
 
   function handlePaste(e: React.ClipboardEvent) {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     const next = [...codes];
-    pasted.split("").forEach((d, i) => { if (i < 6) next[i] = d; });
+    pasted.split("").forEach((d, i) => {
+      if (i < 6) next[i] = d;
+    });
     setCodes(next);
     inputRefs.current[Math.min(pasted.length, 5)]?.focus();
   }
@@ -64,16 +72,20 @@ export default function AgentVerificationPage() {
     e.preventDefault();
     if (!token) return;
     const code = codes.join("");
-    if (code.length < 6) { setError(s.verifyCodeRequired); return; }
+    if (code.length < 6) {
+      setError(s.verifyCodeRequired);
+      return;
+    }
     setError(null);
     setSubmitting(true);
     try {
       await verifyAgentEmail(token, code);
       setVerified(true); // prevents the token guard from redirecting back
       clear();
-      router.push("/devenir-agent/profil");
+      router.push("/devenir-agent/en-attente");
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      const msg = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
       setError(typeof msg === "string" ? msg : s.verifyError);
     } finally {
       setSubmitting(false);
@@ -113,7 +125,13 @@ export default function AgentVerificationPage() {
 
         <div className="bg-card rounded-2xl shadow-lg p-8 text-center">
           <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
-            <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 text-primary" stroke="currentColor" strokeWidth={1.8}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              className="w-7 h-7 text-primary"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            >
               <rect x="3" y="5" width="18" height="14" rx="2" />
               <path d="M3 8l9 6 9-6" />
             </svg>
@@ -133,11 +151,16 @@ export default function AgentVerificationPage() {
 
           <form onSubmit={handleSubmit}>
             {/* OTP input boxes */}
-            <div className="flex gap-2.5 justify-center mb-6" onPaste={handlePaste}>
+            <div
+              className="flex gap-2.5 justify-center mb-6"
+              onPaste={handlePaste}
+            >
               {codes.map((digit, i) => (
                 <input
                   key={i}
-                  ref={(el) => { inputRefs.current[i] = el; }}
+                  ref={(el) => {
+                    inputRefs.current[i] = el;
+                  }}
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
@@ -145,7 +168,9 @@ export default function AgentVerificationPage() {
                   onChange={(e) => handleInput(i, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(i, e)}
                   className="w-11 h-13 text-center text-xl font-bold border-2 rounded-xl focus:border-primary focus:outline-none bg-background transition-colors"
-                  style={{ borderColor: digit ? "hsl(var(--primary))" : undefined }}
+                  style={{
+                    borderColor: digit ? "hsl(var(--primary))" : undefined,
+                  }}
                 />
               ))}
             </div>
@@ -174,7 +199,10 @@ export default function AgentVerificationPage() {
 
           <p className="text-xs text-muted-foreground mt-4">
             {s.wrongAddress}{" "}
-            <Link href="/devenir-agent" className="text-primary hover:underline">
+            <Link
+              href="/devenir-agent"
+              className="text-primary hover:underline"
+            >
               {s.restart}
             </Link>
           </p>

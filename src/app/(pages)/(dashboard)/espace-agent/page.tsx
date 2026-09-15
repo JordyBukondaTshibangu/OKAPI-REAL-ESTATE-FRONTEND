@@ -31,10 +31,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getMyAgentProfile } from "@/services/agentAuth";
 import { useT } from "@/i18n/useT";
+import { FEATURE_FLAGS } from "@/config/features";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -135,27 +135,42 @@ function formatDate(dateStr: string): string {
 
 // ─── Property thumbnail ───────────────────────────────────────────────────────
 
-const CATEGORY_ICON: Record<string, { Icon: LucideIcon; bg: string; color: string }> = {
-  apartment:  { Icon: Building2,   bg: "bg-blue-50",    color: "text-blue-400"    },
-  studio:     { Icon: Building2,   bg: "bg-blue-50",    color: "text-blue-400"    },
-  duplex:     { Icon: Building2,   bg: "bg-indigo-50",  color: "text-indigo-400"  },
-  penthouse:  { Icon: Building2,   bg: "bg-violet-50",  color: "text-violet-400"  },
-  villa:      { Icon: Home,        bg: "bg-emerald-50", color: "text-emerald-400" },
-  townhouse:  { Icon: Home,        bg: "bg-teal-50",    color: "text-teal-400"    },
-  house:      { Icon: Home,        bg: "bg-green-50",   color: "text-green-400"   },
-  land:       { Icon: TreePine,    bg: "bg-lime-50",    color: "text-lime-500"    },
-  terrain:    { Icon: TreePine,    bg: "bg-lime-50",    color: "text-lime-500"    },
-  office:     { Icon: Briefcase,   bg: "bg-amber-50",   color: "text-amber-400"   },
-  warehouse:  { Icon: Warehouse,   bg: "bg-orange-50",  color: "text-orange-400"  },
-  retail:     { Icon: ShoppingBag, bg: "bg-rose-50",    color: "text-rose-400"    },
-  store:      { Icon: ShoppingBag, bg: "bg-rose-50",    color: "text-rose-400"    },
-  commercial: { Icon: ShoppingBag, bg: "bg-pink-50",    color: "text-pink-400"    },
+const CATEGORY_ICON: Record<
+  string,
+  { Icon: LucideIcon; bg: string; color: string }
+> = {
+  apartment: { Icon: Building2, bg: "bg-blue-50", color: "text-blue-400" },
+  studio: { Icon: Building2, bg: "bg-blue-50", color: "text-blue-400" },
+  duplex: { Icon: Building2, bg: "bg-indigo-50", color: "text-indigo-400" },
+  penthouse: { Icon: Building2, bg: "bg-violet-50", color: "text-violet-400" },
+  villa: { Icon: Home, bg: "bg-emerald-50", color: "text-emerald-400" },
+  townhouse: { Icon: Home, bg: "bg-teal-50", color: "text-teal-400" },
+  house: { Icon: Home, bg: "bg-green-50", color: "text-green-400" },
+  land: { Icon: TreePine, bg: "bg-lime-50", color: "text-lime-500" },
+  terrain: { Icon: TreePine, bg: "bg-lime-50", color: "text-lime-500" },
+  office: { Icon: Briefcase, bg: "bg-amber-50", color: "text-amber-400" },
+  warehouse: { Icon: Warehouse, bg: "bg-orange-50", color: "text-orange-400" },
+  retail: { Icon: ShoppingBag, bg: "bg-rose-50", color: "text-rose-400" },
+  store: { Icon: ShoppingBag, bg: "bg-rose-50", color: "text-rose-400" },
+  commercial: { Icon: ShoppingBag, bg: "bg-pink-50", color: "text-pink-400" },
 };
 
-function PropertyThumb({ src, category, title }: { src?: string; category?: string; title: string }) {
+function PropertyThumb({
+  src,
+  category,
+  title,
+}: {
+  src?: string;
+  category?: string;
+  title: string;
+}) {
   const [failed, setFailed] = useState(false);
   const key = (category ?? "").toLowerCase();
-  const { Icon, bg, color } = CATEGORY_ICON[key] ?? { Icon: Home, bg: "bg-muted", color: "text-muted-foreground/40" };
+  const { Icon, bg, color } = CATEGORY_ICON[key] ?? {
+    Icon: Home,
+    bg: "bg-muted",
+    color: "text-muted-foreground/40",
+  };
 
   if (!src || failed) {
     return (
@@ -166,7 +181,12 @@ function PropertyThumb({ src, category, title }: { src?: string; category?: stri
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={title} className="w-full h-full object-cover" onError={() => setFailed(true)} />
+    <img
+      src={src}
+      alt={title}
+      className="w-full h-full object-cover"
+      onError={() => setFailed(true)}
+    />
   );
 }
 
@@ -303,6 +323,25 @@ function ProfileSection({
 }
 
 function GracePeriodBar({ profile, t }: { profile: AgentProfile; t: T }) {
+  // Launch phase — payments off: show a simple "full access" banner
+  if (!FEATURE_FLAGS.PAYMENTS_ENABLED) {
+    return (
+      <div className="bg-card rounded-2xl shadow-sm p-5 border border-emerald-200">
+        <div className="flex items-center gap-3">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-emerald-700">
+              ✨ Accès complet · Phase de lancement
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Toutes les fonctionnalités sont gratuites pendant notre lancement.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const cap = profile.freeListingCap ?? 10;
   const activeCount = profile.properties?.length ?? 0;
   const pct = Math.min(100, Math.round((activeCount / cap) * 100));
@@ -422,14 +461,15 @@ function GracePeriodBar({ profile, t }: { profile: AgentProfile; t: T }) {
 
 // Cap-scaled top banner — shown at ≥ 60% cap usage
 function CapBanner({ profile, t }: { profile: AgentProfile; t: T }) {
+  if (!FEATURE_FLAGS.PAYMENTS_ENABLED) return null;
   const isPro = profile.plan === "PRO" || profile.plan === "AGENCY";
   if (isPro) return null;
   const cap = profile.freeListingCap ?? 10;
   const active = (profile.properties ?? []).filter((p) =>
     ["open", "published", "active"].includes((p.status ?? "").toLowerCase()),
   ).length;
-  const hidden = (profile.properties ?? []).filter((p) =>
-    (p.status ?? "").toLowerCase() === "hidden",
+  const hidden = (profile.properties ?? []).filter(
+    (p) => (p.status ?? "").toLowerCase() === "hidden",
   ).length;
   const pct = cap > 0 ? active / cap : 0;
 
@@ -439,21 +479,42 @@ function CapBanner({ profile, t }: { profile: AgentProfile; t: T }) {
   const isStrong = pct >= 0.8 && !isFull;
 
   const [bgClass, borderClass, textClass] = isFull
-    ? ["bg-destructive/10 dark:bg-destructive/20", "border-destructive/30", "text-destructive"]
+    ? [
+        "bg-destructive/10 dark:bg-destructive/20",
+        "border-destructive/30",
+        "text-destructive",
+      ]
     : isStrong
-      ? ["bg-orange-50 dark:bg-orange-950/20", "border-orange-200 dark:border-orange-800", "text-orange-800 dark:text-orange-300"]
-      : ["bg-amber-50 dark:bg-amber-950/20", "border-amber-200 dark:border-amber-800", "text-amber-800 dark:text-amber-300"];
+      ? [
+          "bg-orange-50 dark:bg-orange-950/20",
+          "border-orange-200 dark:border-orange-800",
+          "text-orange-800 dark:text-orange-300",
+        ]
+      : [
+          "bg-amber-50 dark:bg-amber-950/20",
+          "border-amber-200 dark:border-amber-800",
+          "text-amber-800 dark:text-amber-300",
+        ];
   const message = isFull
     ? t.capBannerFull
     : isStrong
-      ? t.capBannerStrong.replace("{n}", String(active)).replace("{cap}", String(cap))
-      : t.capBannerMedium.replace("{n}", String(active)).replace("{cap}", String(cap));
+      ? t.capBannerStrong
+          .replace("{n}", String(active))
+          .replace("{cap}", String(cap))
+      : t.capBannerMedium
+          .replace("{n}", String(active))
+          .replace("{cap}", String(cap));
 
   return (
-    <div className={`rounded-xl border px-4 py-3 flex items-center gap-3 ${bgClass} ${borderClass}`}>
+    <div
+      className={`rounded-xl border px-4 py-3 flex items-center gap-3 ${bgClass} ${borderClass}`}
+    >
       <AlertTriangle className={`w-4 h-4 shrink-0 ${textClass}`} />
       <p className={`flex-1 text-sm font-medium ${textClass}`}>{message}</p>
-      <Link href="/pro" className={`text-xs font-bold whitespace-nowrap hover:underline ${textClass}`}>
+      <Link
+        href="/pro"
+        className={`text-xs font-bold whitespace-nowrap hover:underline ${textClass}`}
+      >
         {t.upgradeCardCta}
       </Link>
     </div>
@@ -462,15 +523,17 @@ function CapBanner({ profile, t }: { profile: AgentProfile; t: T }) {
 
 // Dedicated upgrade prompt card — shown below GracePeriodBar for non-Pro agents
 function UpgradePromptCard({ profile, t }: { profile: AgentProfile; t: T }) {
+  if (!FEATURE_FLAGS.PAYMENTS_ENABLED) return null;
   const isPro = profile.plan === "PRO" || profile.plan === "AGENCY";
   if (isPro) return null;
 
-  const hiddenCount = (profile.properties ?? []).filter((p) =>
-    (p.status ?? "").toLowerCase() === "hidden",
+  const hiddenCount = (profile.properties ?? []).filter(
+    (p) => (p.status ?? "").toLowerCase() === "hidden",
   ).length;
-  const body = hiddenCount > 0
-    ? t.upgradeCardBody.replace("{n}", String(hiddenCount))
-    : t.upgradeCardBodyZero;
+  const body =
+    hiddenCount > 0
+      ? t.upgradeCardBody.replace("{n}", String(hiddenCount))
+      : t.upgradeCardBodyZero;
 
   return (
     <div className="bg-gradient-to-br from-[#0B1D3A] to-[#0F2848] rounded-xl p-4 border border-[#C9A84C]/25">
@@ -479,7 +542,9 @@ function UpgradePromptCard({ profile, t }: { profile: AgentProfile; t: T }) {
           <Star className="w-4 h-4 text-[#C9A84C]" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-white mb-1">{t.upgradeCardTitle}</p>
+          <p className="text-sm font-bold text-white mb-1">
+            {t.upgradeCardTitle}
+          </p>
           <p className="text-xs text-[#A0B0C8] leading-relaxed mb-3">{body}</p>
           <Link
             href="/pro"
@@ -523,7 +588,7 @@ function TodoCard({ profile, t }: { profile: AgentProfile; t: T }) {
     });
   }
 
-  if (profile.graceEndsAt) {
+  if (FEATURE_FLAGS.PAYMENTS_ENABLED && profile.graceEndsAt) {
     const daysLeft = Math.floor(
       (new Date(profile.graceEndsAt).getTime() - pageLoadTime) / 86400000,
     );
@@ -632,7 +697,7 @@ function KpiCards({ profile, t }: { profile: AgentProfile; t: T }) {
       value: totalViews,
       label: t.kpiViews,
       sub: t.kpiThisMonth,
-      locked: !isPro,
+      locked: !isPro && FEATURE_FLAGS.PAYMENTS_ENABLED,
     },
     {
       icon: <MapPin className="w-4 h-4" />,
@@ -658,14 +723,22 @@ function KpiCards({ profile, t }: { profile: AgentProfile; t: T }) {
               </span>
             </div>
           )}
-          <div className={`mb-1.5 text-primary ${card.locked ? "flex" : "flex justify-center"}`}>
+          <div
+            className={`mb-1.5 text-primary ${card.locked ? "flex" : "flex justify-center"}`}
+          >
             {card.icon}
           </div>
           {card.locked ? (
             <Link href="/pro" className="block group">
-              <p className="text-xs font-semibold text-foreground leading-tight mb-0.5 pr-8">{t.lockedViewsTitle}</p>
-              <p className="text-[10px] text-muted-foreground leading-snug line-clamp-3">{t.lockedViewsDesc}</p>
-              <span className="inline-block mt-1.5 text-[10px] font-bold text-primary group-hover:underline">{t.passAuPro} →</span>
+              <p className="text-xs font-semibold text-foreground leading-tight mb-0.5 pr-8">
+                {t.lockedViewsTitle}
+              </p>
+              <p className="text-[10px] text-muted-foreground leading-snug line-clamp-3">
+                {t.lockedViewsDesc}
+              </p>
+              <span className="inline-block mt-1.5 text-[10px] font-bold text-primary group-hover:underline">
+                {t.passAuPro} →
+              </span>
             </Link>
           ) : card.listValue && card.listValue.length > 0 ? (
             <div className="space-y-0.5">
@@ -707,12 +780,16 @@ function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
       href: "/espace-agent/annonces",
       locked: false,
     },
-    {
-      icon: <Zap className="w-4 h-4" />,
-      label: t.boostListing,
-      href: "/espace-agent/boosts",
-      locked: false,
-    },
+    ...(FEATURE_FLAGS.BOOST_ENABLED
+      ? [
+          {
+            icon: <Zap className="w-4 h-4" />,
+            label: t.boostListing,
+            href: "/espace-agent/boosts",
+            locked: false,
+          },
+        ]
+      : []),
     {
       icon: <Settings className="w-4 h-4" />,
       label: t.editProfileAction,
@@ -730,7 +807,7 @@ function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
       icon: <BarChart2 className="w-4 h-4" />,
       label: t.statsAction,
       href: "/espace-agent/statistiques",
-      locked: !isPro,
+      locked: !isPro && FEATURE_FLAGS.PAYMENTS_ENABLED,
     },
     {
       icon: <MessageCircle className="w-4 h-4" />,
@@ -787,8 +864,8 @@ function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
         </Link>
       ))}
 
-      {/* ⭐ Upgrade row — always visible for non-Pro agents */}
-      {!isPro && (
+      {/* ⭐ Upgrade row — hidden during launch phase */}
+      {!isPro && FEATURE_FLAGS.PAYMENTS_ENABLED && (
         <Link
           href="/pro"
           className="flex items-center gap-3 px-6 py-4 border-t-2 border-[#C9A84C]/20 hover:bg-[#C9A84C]/5 transition-colors bg-gradient-to-r from-[#0B1D3A]/4 to-transparent"
@@ -796,7 +873,9 @@ function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
           <span className="text-[#C9A84C]">
             <Star className="w-4 h-4" />
           </span>
-          <span className="flex-1 text-sm font-semibold text-[#C9A84C]">{t.passAuPro}</span>
+          <span className="flex-1 text-sm font-semibold text-[#C9A84C]">
+            {t.passAuPro}
+          </span>
           <ChevronRight className="w-4 h-4 text-[#C9A84C]/50" />
         </Link>
       )}
@@ -811,7 +890,6 @@ function ListingsSection({
   properties?: AgentProperty[];
   t: T;
 }) {
-
   const recent = (properties ?? []).slice(0, 5);
 
   const statusLabel: Record<string, { label: string; color: string }> = {
@@ -841,7 +919,8 @@ function ListingsSection({
     },
     hidden: {
       label: "HIDDEN",
-      color: "text-rose-600 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/30 dark:border-rose-800",
+      color:
+        "text-rose-600 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/30 dark:border-rose-800",
     },
   };
 
@@ -892,7 +971,11 @@ function ListingsSection({
                 <div className="flex items-start gap-3">
                   {/* Thumbnail */}
                   <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-border">
-                    <PropertyThumb src={thumb} category={p.category} title={p.title} />
+                    <PropertyThumb
+                      src={thumb}
+                      category={p.category}
+                      title={p.title}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -922,8 +1005,8 @@ function ListingsSection({
                     </div>
                   </div>
                 </div>
-                {/* Inline nudge for hidden listings */}
-                {statusKey === "hidden" && (
+                {/* Inline nudge for hidden listings — only shown when payments active */}
+                {statusKey === "hidden" && FEATURE_FLAGS.PAYMENTS_ENABLED && (
                   <div className="mt-2 pl-[68px]">
                     <Link
                       href="/pro"
@@ -945,12 +1028,14 @@ function ListingsSection({
                       <Pencil className="w-3 h-3 mr-1" /> {t.editBtn}
                     </Link>
                   </Button>
-                  <Link
-                    href={`/espace-agent/boosts?propertyId=${p.id}&title=${encodeURIComponent(p.title ?? "")}`}
-                    className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm shadow-amber-200 hover:shadow-amber-300 hover:from-amber-500 hover:to-orange-500 transition-all duration-200"
-                  >
-                    <Zap className="w-3 h-3 fill-white" /> {t.boostBtn}
-                  </Link>
+                  {FEATURE_FLAGS.BOOST_ENABLED && (
+                    <Link
+                      href={`/espace-agent/boosts?propertyId=${p.id}&title=${encodeURIComponent(p.title ?? "")}`}
+                      className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm shadow-amber-200 hover:shadow-amber-300 hover:from-amber-500 hover:to-orange-500 transition-all duration-200"
+                    >
+                      <Zap className="w-3 h-3 fill-white" /> {t.boostBtn}
+                    </Link>
+                  )}
                   {p.status === "draft" && (
                     <Button size="sm" className="text-xs h-7 px-2.5" asChild>
                       <Link href={`/espace-agent/annonces/${p.id}/publier`}>
@@ -976,11 +1061,11 @@ export default function EspaceAgentPage() {
     token,
     agent: sessionAgent,
     logout: _logout,
+    _hasHydrated: hydrated,
   } = useAgentSessionStore();
   const t = useT().espaceAgent;
   const [profile, setProfile] = useState<AgentProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const hydrated = useMounted();
 
   useEffect(() => {
     if (!hydrated) return;

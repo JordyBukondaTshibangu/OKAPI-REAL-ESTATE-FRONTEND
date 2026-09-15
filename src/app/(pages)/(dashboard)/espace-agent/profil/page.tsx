@@ -16,7 +16,6 @@ import {
   FileText,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getMyAgentProfile } from "@/services/agentAuth";
 import { useT } from "@/i18n/useT";
@@ -123,9 +122,13 @@ function TextInput({
 
 export default function EditProfilePage() {
   const router = useRouter();
-  const { token, setAgent, agent: sessionAgent } = useAgentSessionStore();
+  const {
+    token,
+    setAgent,
+    agent: sessionAgent,
+    _hasHydrated: hydrated,
+  } = useAgentSessionStore();
   const t = useT().espaceAgent;
-  const hydrated = useMounted();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -168,7 +171,10 @@ export default function EditProfilePage() {
     }
     getMyAgentProfile(token)
       .then((raw_p: unknown) => {
-        const p = raw_p as Partial<FormState> & { photo?: string; photoUrl?: string };
+        const p = raw_p as Partial<FormState> & {
+          photo?: string;
+          photoUrl?: string;
+        };
         const raw = p.photo || p.photoUrl || "";
         setAvatarSrc(
           raw.startsWith("https://") && raw.length > 30 ? raw : null,
@@ -232,7 +238,9 @@ export default function EditProfilePage() {
     setError(null);
     try {
       // 1. Get presigned upload URL
-      const { data: { url, key } } = await axios.post(
+      const {
+        data: { url, key },
+      } = await axios.post(
         "/api/proxy/uploads/presign-agent-avatar",
         { filename: file.name, contentType: file.type },
         { headers: { Authorization: `Bearer ${token}` } },
@@ -255,9 +263,14 @@ export default function EditProfilePage() {
       // 4. Show preview immediately (CDN URL loads on next profile fetch)
       setAvatarSrc(URL.createObjectURL(file));
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string | string[] } } })
-        ?.response?.data?.message;
-      setError(Array.isArray(msg) ? msg.join(", ") : (msg ?? "Impossible de mettre à jour la photo."));
+      const msg = (
+        err as { response?: { data?: { message?: string | string[] } } }
+      )?.response?.data?.message;
+      setError(
+        Array.isArray(msg)
+          ? msg.join(", ")
+          : (msg ?? "Impossible de mettre à jour la photo."),
+      );
     } finally {
       setUploadingPhoto(false);
       // Reset so the same file can be re-selected if needed
@@ -286,8 +299,9 @@ export default function EditProfilePage() {
         router.push("/espace-agent");
       }, 1500);
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string | string[] } } })
-        ?.response?.data?.message;
+      const msg = (
+        e as { response?: { data?: { message?: string | string[] } } }
+      )?.response?.data?.message;
       setError(Array.isArray(msg) ? msg.join(", ") : (msg ?? t.errSave));
     } finally {
       setSaving(false);
@@ -372,9 +386,11 @@ export default function EditProfilePage() {
                   disabled={uploadingPhoto}
                   className="hidden lg:flex items-center gap-1.5 text-xs text-primary border border-primary/30 bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition disabled:opacity-50"
                 >
-                  {uploadingPhoto
-                    ? <Loader2 className="w-3 h-3 animate-spin" />
-                    : <Camera className="w-3 h-3" />}
+                  {uploadingPhoto ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Camera className="w-3 h-3" />
+                  )}
                   {t.changePhoto}
                 </button>
                 {/* Mobile change photo: icon only */}
@@ -385,9 +401,11 @@ export default function EditProfilePage() {
                   className="lg:hidden flex-shrink-0 w-8 h-8 rounded-full border border-border bg-muted flex items-center justify-center hover:bg-muted/80 transition disabled:opacity-50"
                   title={t.changePhoto}
                 >
-                  {uploadingPhoto
-                    ? <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-                    : <Camera className="w-3.5 h-3.5 text-muted-foreground" />}
+                  {uploadingPhoto ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                  ) : (
+                    <Camera className="w-3.5 h-3.5 text-muted-foreground" />
+                  )}
                 </button>
                 <input
                   ref={fileRef}

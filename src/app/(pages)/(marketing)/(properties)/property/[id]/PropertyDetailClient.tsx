@@ -4,7 +4,11 @@ import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { addFavourite, removeFavourite, createEnquiry } from "@/services/auth";
+import { createEnquiry } from "@/services/auth";
+import {
+  useFavouriteIds,
+  useToggleFavourite,
+} from "@/shared/hooks/useFavouriteIds";
 import {
   recordPropertyView,
   recordPropertyShare,
@@ -483,7 +487,9 @@ export default function PropertyDetailClient({
   const [activeImage, setActiveImage] = useState(0);
   const [sliderOpen, setSliderOpen] = useState(false);
   const [sliderIndex, setSliderIndex] = useState(0);
-  const [saved, setSaved] = useState(false);
+  const favouriteIds = useFavouriteIds();
+  const toggleFavourite = useToggleFavourite();
+  const saved = favouriteIds.has(id);
   const [saving, setSaving] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [enquiryMessage, setEnquiryMessage] = useState("");
@@ -520,29 +526,19 @@ export default function PropertyDetailClient({
   }
 
   async function handleToggleFavourite() {
-    if (!isAuthenticated || !token) {
+    if (!isAuthenticated) {
       router.push("/connexion");
       return;
     }
     if (saving) return;
     setSaving(true);
+    const wasSaved = saved;
     try {
-      if (saved) {
-        await removeFavourite(token, id);
-        setSaved(false);
-        setPerf((p) => ({ ...p, saved: Math.max(0, p.saved - 1) }));
-      } else {
-        try {
-          await addFavourite(token, id);
-        } catch (err: unknown) {
-          // 409 = already in favourites — treat as success
-          const status = (err as { response?: { status?: number } })?.response
-            ?.status;
-          if (status !== 409) throw err;
-        }
-        setSaved(true);
-        setPerf((p) => ({ ...p, saved: p.saved + 1 }));
-      }
+      await toggleFavourite(id, wasSaved);
+      setPerf((p) => ({
+        ...p,
+        saved: wasSaved ? Math.max(0, p.saved - 1) : p.saved + 1,
+      }));
     } finally {
       setSaving(false);
     }

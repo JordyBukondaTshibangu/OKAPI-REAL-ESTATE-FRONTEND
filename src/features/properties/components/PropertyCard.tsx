@@ -4,8 +4,11 @@ import { useT } from "@/i18n/useT";
 import type { Property } from "@/features/properties/types/property";
 import { categoryLabel, formatListedAgo, formatPrice } from "@/lib/properties";
 import { getR2ImageUrl } from "@/shared/utils/utils";
-import { addFavourite, removeFavourite } from "@/services/auth";
 import { useAuthStore } from "@/store/useAuthStore";
+import {
+  useFavouriteIds,
+  useToggleFavourite,
+} from "@/shared/hooks/useFavouriteIds";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { Button } from "@/shared/components/ui/button";
@@ -51,27 +54,40 @@ function CardCarousel({
   const [index, setIndex] = useState(0);
   const total = images.length;
 
-  const prev = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIndex((i) => (i - 1 + total) % total);
-  }, [total]);
+  const prev = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIndex((i) => (i - 1 + total) % total);
+    },
+    [total],
+  );
 
-  const next = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIndex((i) => (i + 1) % total);
-  }, [total]);
+  const next = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIndex((i) => (i + 1) % total);
+    },
+    [total],
+  );
 
   return (
     <div className="relative w-full h-full group/carousel overflow-hidden">
       {/* Images — slide via transform */}
       <div
         className="flex h-full transition-transform duration-300 ease-in-out"
-        style={{ transform: `translateX(-${index * 100}%)`, width: `${total * 100}%` }}
+        style={{
+          transform: `translateX(-${index * 100}%)`,
+          width: `${total * 100}%`,
+        }}
       >
         {images.map((src, i) => (
-          <div key={i} className="relative h-full shrink-0" style={{ width: `${100 / total}%` }}>
+          <div
+            key={i}
+            className="relative h-full shrink-0"
+            style={{ width: `${100 / total}%` }}
+          >
             <PropertyImage
               src={src}
               alt={`${alt} ${i + 1}`}
@@ -108,7 +124,11 @@ function CardCarousel({
               images.map((_, i) => (
                 <button
                   key={i}
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIndex(i); }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIndex(i);
+                  }}
                   aria-label={`Photo ${i + 1}`}
                   className={`rounded-full transition-all ${
                     i === index
@@ -138,30 +158,30 @@ interface PropertyCardProps {
   variant?: "list" | "grid";
 }
 
-export default function PropertyCard({ property, priority, variant = "list" }: PropertyCardProps) {
+export default function PropertyCard({
+  property,
+  priority,
+  variant = "list",
+}: PropertyCardProps) {
   const t = useT();
-  const { token, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const { isAuthenticated: isAgentAuth } = useAgentSessionStore();
   const router = useRouter();
-  const [saved, setSaved] = useState(false);
+  const favouriteIds = useFavouriteIds();
+  const toggleFavourite = useToggleFavourite();
+  const saved = favouriteIds.has(property.id);
   const [saving, setSaving] = useState(false);
 
   async function handleToggleFavourite(e: React.MouseEvent) {
     e.preventDefault();
-    if (!isAuthenticated || !token) {
+    if (!isAuthenticated) {
       router.push("/connexion");
       return;
     }
     if (saving) return;
     setSaving(true);
     try {
-      if (saved) {
-        await removeFavourite(token, property.id);
-        setSaved(false);
-      } else {
-        await addFavourite(token, property.id);
-        setSaved(true);
-      }
+      await toggleFavourite(property.id, saved);
     } finally {
       setSaving(false);
     }
@@ -176,27 +196,37 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
         {/* Photo — dominant, with carousel */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted shrink-0">
           <CardCarousel
-            images={property.gallery.map(getR2ImageUrl).filter(Boolean) as string[]}
+            images={
+              property.gallery.map(getR2ImageUrl).filter(Boolean) as string[]
+            }
             alt={property.title}
             category={property.category}
             gradient={property.imageGradient}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             priority={priority}
           >
-            <Link href={detailHref} aria-label={`Voir ${property.title}`} className="absolute inset-0 z-10" />
+            <Link
+              href={detailHref}
+              aria-label={`Voir ${property.title}`}
+              className="absolute inset-0 z-10"
+            />
 
             {/* Badges */}
             <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
               {property.verified && <VerifiedBadge />}
               {property.isNew && <NewBadge />}
-              {isHotProperty(property.performance) && <HotBadge label={t.cards.hotLabel} />}
+              {isHotProperty(property.performance) && (
+                <HotBadge label={t.cards.hotLabel} />
+              )}
             </div>
 
             {/* Heart */}
             {!isAgentAuth && (
               <button
                 onClick={handleToggleFavourite}
-                aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
+                aria-label={
+                  saved ? t.cards.removeFavourite : t.cards.addFavourite
+                }
                 disabled={saving}
                 className={`absolute top-3 right-3 z-20 w-9 h-9 rounded-full shadow-md flex items-center justify-center transition-all duration-200 active:scale-90 disabled:opacity-60 ${
                   saved
@@ -210,7 +240,10 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
 
             {/* Performance strip */}
             <div className="absolute bottom-10 left-3 z-20">
-              <CardPerformanceStrip perf={property.performance} variant="overlay" />
+              <CardPerformanceStrip
+                perf={property.performance}
+                variant="overlay"
+              />
             </div>
           </CardCarousel>
         </div>
@@ -220,7 +253,11 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
           <div className="mb-1">
             <Link href={detailHref} className="group">
               <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
-                {formatPrice(property.price, property.currency, property.period)}
+                {formatPrice(
+                  property.price,
+                  property.currency,
+                  property.period,
+                )}
               </p>
               <h3 className="text-sm text-foreground/80 mt-0.5 line-clamp-1 group-hover:text-primary transition-colors">
                 {property.title}
@@ -250,16 +287,25 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
               </span>
             )}
             <span className="inline-flex items-center gap-1 ml-auto">
-              <CategoryIcon className="w-3.5 h-3.5" /> {categoryLabel(property.category)}
+              <CategoryIcon className="w-3.5 h-3.5" />{" "}
+              {categoryLabel(property.category)}
             </span>
           </div>
 
           {/* Agent + "Voir →" */}
           <div className="mt-auto flex items-center gap-2 pt-3 border-t border-border">
-            <AgentAvatar name={property.agent?.name ?? "—"} photo={property.agent?.photo} size={28} />
+            <AgentAvatar
+              name={property.agent?.name ?? "—"}
+              photo={property.agent?.photo}
+              size={28}
+            />
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-semibold text-secondary tracking-wide truncate">{property.agent?.title}</p>
-              <p className="text-xs font-medium text-foreground truncate">{property.agent?.name ?? "—"}</p>
+              <p className="text-[10px] font-semibold text-secondary tracking-wide truncate">
+                {property.agent?.title}
+              </p>
+              <p className="text-xs font-medium text-foreground truncate">
+                {property.agent?.name ?? "—"}
+              </p>
             </div>
             {property.premium && <PremiumBadge />}
             <Link
@@ -268,8 +314,16 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
               onClick={(e) => e.stopPropagation()}
             >
               Voir
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-3 h-3"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </Link>
           </div>
@@ -285,14 +339,20 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
         {/* Image — with carousel */}
         <div className="relative aspect-4/3 md:aspect-auto overflow-hidden bg-muted">
           <CardCarousel
-            images={property.gallery.map(getR2ImageUrl).filter(Boolean) as string[]}
+            images={
+              property.gallery.map(getR2ImageUrl).filter(Boolean) as string[]
+            }
             alt={property.title}
             category={property.category}
             gradient={property.imageGradient}
             sizes="(max-width: 768px) 100vw, 280px"
             priority={priority}
           >
-            <Link href={detailHref} aria-label={`Voir ${property.title}`} className="absolute inset-0 z-10" />
+            <Link
+              href={detailHref}
+              aria-label={`Voir ${property.title}`}
+              className="absolute inset-0 z-10"
+            />
 
             <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
               {property.isBoosted && (
@@ -302,13 +362,17 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
               )}
               {property.verified && <VerifiedBadge />}
               {property.isNew && <NewBadge />}
-              {isHotProperty(property.performance) && <HotBadge label={t.cards.hotLabel} />}
+              {isHotProperty(property.performance) && (
+                <HotBadge label={t.cards.hotLabel} />
+              )}
             </div>
 
             {!isAgentAuth && (
               <button
                 onClick={handleToggleFavourite}
-                aria-label={saved ? t.cards.removeFavourite : t.cards.addFavourite}
+                aria-label={
+                  saved ? t.cards.removeFavourite : t.cards.addFavourite
+                }
                 disabled={saving}
                 className={`absolute top-3 right-3 z-20 w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-all duration-200 active:scale-90 disabled:opacity-60 ${
                   saved
@@ -326,7 +390,9 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
         <div className="p-5 flex flex-col">
           <div className="flex items-start justify-between mb-2 gap-3">
             <div className="flex flex-col gap-0.5">
-              <p className="text-xs text-muted-foreground">{formatListedAgo(property.listedDaysAgo)}</p>
+              <p className="text-xs text-muted-foreground">
+                {formatListedAgo(property.listedDaysAgo)}
+              </p>
               <FreshnessIndicator updatedAt={property.updatedAt} />
             </div>
             <div className="flex items-center gap-3">
@@ -361,26 +427,46 @@ export default function PropertyCard({ property, priority, variant = "list" }: P
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
-              <CategoryIcon className="w-4 h-4" /> {categoryLabel(property.category)}
+              <CategoryIcon className="w-4 h-4" />{" "}
+              {categoryLabel(property.category)}
             </span>
           </div>
 
           <p className="text-xs text-muted-foreground mb-5">
-            {property.neighborhood ? `${property.neighborhood}, ` : ""}{property.suburb}
+            {property.neighborhood ? `${property.neighborhood}, ` : ""}
+            {property.suburb}
           </p>
 
           <div className="mt-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="flex items-center gap-3">
-              <AgentAvatar name={property.agent?.name ?? "—"} photo={property.agent?.photo} size={36} />
+              <AgentAvatar
+                name={property.agent?.name ?? "—"}
+                photo={property.agent?.photo}
+                size={36}
+              />
               <div className="leading-tight">
-                <p className="text-[10px] font-semibold text-secondary tracking-widest">{property.agent?.title}</p>
-                <p className="text-sm font-medium text-foreground">{property.agent?.name ?? "—"}</p>
+                <p className="text-[10px] font-semibold text-secondary tracking-widest">
+                  {property.agent?.title}
+                </p>
+                <p className="text-sm font-medium text-foreground">
+                  {property.agent?.name ?? "—"}
+                </p>
               </div>
             </div>
             <Button variant="default" size="sm" className="gap-1.5" asChild>
               <Link href={detailHref}>
                 {t.cards.viewProperty}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 ml-0.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-3.5 h-3.5 ml-0.5"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </Link>
             </Button>
           </div>

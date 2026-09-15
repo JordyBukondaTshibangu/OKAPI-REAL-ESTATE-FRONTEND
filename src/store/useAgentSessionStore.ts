@@ -15,9 +15,12 @@ interface AgentSessionState {
   token: string | null;
   agent: AgentSession | null;
   isAuthenticated: boolean;
+  /** True once Zustand persist has finished rehydrating from localStorage. */
+  _hasHydrated: boolean;
   setSession: (token: string, agent: AgentSession) => void;
   setAgent: (agent: AgentSession) => void;
   logout: () => void;
+  setHasHydrated: (v: boolean) => void;
 }
 
 export const useAgentSessionStore = create<AgentSessionState>()(
@@ -26,10 +29,17 @@ export const useAgentSessionStore = create<AgentSessionState>()(
       token: null,
       agent: null,
       isAuthenticated: false,
+      _hasHydrated: false,
       setSession: (token, agent) => set({ token, agent, isAuthenticated: true }),
       setAgent: (agent) => set({ agent }),
       logout: () => set({ token: null, agent: null, isAuthenticated: false }),
+      setHasHydrated: (v) => set({ _hasHydrated: v }),
     }),
-    { name: "okapi-agent-session" },
+    {
+      name: "okapi-agent-session",
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
+    },
   ),
 );

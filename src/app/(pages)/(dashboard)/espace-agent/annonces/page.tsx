@@ -25,11 +25,17 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
+import { FEATURE_FLAGS } from "@/config/features";
 
-type ListingStatus = "DRAFT" | "PENDING" | "LIVE" | "HIDDEN" | "REJECTED" | "EXPIRED";
+type ListingStatus =
+  | "DRAFT"
+  | "PENDING"
+  | "LIVE"
+  | "HIDDEN"
+  | "REJECTED"
+  | "EXPIRED";
 
 type Property = {
   id: string;
@@ -59,27 +65,34 @@ function formatPrice(price?: number, currency?: string) {
   );
 }
 
-const CATEGORY_ICON: Record<string, { Icon: LucideIcon; bg: string; color: string }> = {
-  apartment:  { Icon: Building2,   bg: "bg-blue-50",    color: "text-blue-400"   },
-  studio:     { Icon: Building2,   bg: "bg-blue-50",    color: "text-blue-400"   },
-  duplex:     { Icon: Building2,   bg: "bg-indigo-50",  color: "text-indigo-400" },
-  penthouse:  { Icon: Building2,   bg: "bg-violet-50",  color: "text-violet-400" },
-  villa:      { Icon: Home,        bg: "bg-emerald-50", color: "text-emerald-400" },
-  townhouse:  { Icon: Home,        bg: "bg-teal-50",    color: "text-teal-400"   },
-  house:      { Icon: Home,        bg: "bg-green-50",   color: "text-green-400"  },
-  land:       { Icon: TreePine,    bg: "bg-lime-50",    color: "text-lime-500"   },
-  terrain:    { Icon: TreePine,    bg: "bg-lime-50",    color: "text-lime-500"   },
-  office:     { Icon: Briefcase,   bg: "bg-amber-50",   color: "text-amber-400"  },
-  warehouse:  { Icon: Warehouse,   bg: "bg-orange-50",  color: "text-orange-400" },
-  entrepot:   { Icon: Warehouse,   bg: "bg-orange-50",  color: "text-orange-400" },
-  retail:     { Icon: ShoppingBag, bg: "bg-rose-50",    color: "text-rose-400"   },
-  store:      { Icon: ShoppingBag, bg: "bg-rose-50",    color: "text-rose-400"   },
-  commercial: { Icon: ShoppingBag, bg: "bg-pink-50",    color: "text-pink-400"   },
+const CATEGORY_ICON: Record<
+  string,
+  { Icon: LucideIcon; bg: string; color: string }
+> = {
+  apartment: { Icon: Building2, bg: "bg-blue-50", color: "text-blue-400" },
+  studio: { Icon: Building2, bg: "bg-blue-50", color: "text-blue-400" },
+  duplex: { Icon: Building2, bg: "bg-indigo-50", color: "text-indigo-400" },
+  penthouse: { Icon: Building2, bg: "bg-violet-50", color: "text-violet-400" },
+  villa: { Icon: Home, bg: "bg-emerald-50", color: "text-emerald-400" },
+  townhouse: { Icon: Home, bg: "bg-teal-50", color: "text-teal-400" },
+  house: { Icon: Home, bg: "bg-green-50", color: "text-green-400" },
+  land: { Icon: TreePine, bg: "bg-lime-50", color: "text-lime-500" },
+  terrain: { Icon: TreePine, bg: "bg-lime-50", color: "text-lime-500" },
+  office: { Icon: Briefcase, bg: "bg-amber-50", color: "text-amber-400" },
+  warehouse: { Icon: Warehouse, bg: "bg-orange-50", color: "text-orange-400" },
+  entrepot: { Icon: Warehouse, bg: "bg-orange-50", color: "text-orange-400" },
+  retail: { Icon: ShoppingBag, bg: "bg-rose-50", color: "text-rose-400" },
+  store: { Icon: ShoppingBag, bg: "bg-rose-50", color: "text-rose-400" },
+  commercial: { Icon: ShoppingBag, bg: "bg-pink-50", color: "text-pink-400" },
 };
 
 function CategoryPlaceholder({ category }: { category?: string }) {
   const key = (category ?? "").toLowerCase();
-  const match = CATEGORY_ICON[key] ?? { Icon: Home, bg: "bg-muted", color: "text-muted-foreground/40" };
+  const match = CATEGORY_ICON[key] ?? {
+    Icon: Home,
+    bg: "bg-muted",
+    color: "text-muted-foreground/40",
+  };
   const { Icon, bg, color } = match;
   return (
     <div className={`w-full h-full flex items-center justify-center ${bg}`}>
@@ -88,7 +101,15 @@ function CategoryPlaceholder({ category }: { category?: string }) {
   );
 }
 
-function PropertyThumb({ src, category, title }: { src?: string; category?: string; title: string }) {
+function PropertyThumb({
+  src,
+  category,
+  title,
+}: {
+  src?: string;
+  category?: string;
+  title: string;
+}) {
   const [failed, setFailed] = useState(false);
   if (!src || failed) return <CategoryPlaceholder category={category} />;
   return (
@@ -104,7 +125,7 @@ function PropertyThumb({ src, category, title }: { src?: string; category?: stri
 
 export default function MesAnnoncesPage() {
   const router = useRouter();
-  const { token, agent } = useAgentSessionStore();
+  const { token, agent, _hasHydrated: hydrated } = useAgentSessionStore();
   const tAll = useT();
   const t = tAll.espaceAgent;
 
@@ -143,7 +164,6 @@ export default function MesAnnoncesPage() {
     { key: "HIDDEN", label: t.tabHidden },
   ];
 
-  const hydrated = useMounted();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -199,7 +219,7 @@ export default function MesAnnoncesPage() {
       await axios.post(
         `/api/proxy/properties/mine/${id}/publish`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       fetchListings();
     } catch {
@@ -216,7 +236,7 @@ export default function MesAnnoncesPage() {
       await axios.post(
         `/api/proxy/properties/mine/${id}/unpublish`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       fetchListings();
     } catch {
@@ -263,7 +283,8 @@ export default function MesAnnoncesPage() {
           <div className="mb-4 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-start gap-2.5 text-sm text-blue-800">
             <Clock className="w-4 h-4 mt-0.5 shrink-0" />
             <span>
-              <strong>{pendingCount}</strong> annonce{pendingCount > 1 ? "s" : ""} en cours de vérification.
+              <strong>{pendingCount}</strong> annonce
+              {pendingCount > 1 ? "s" : ""} en cours de vérification.
             </span>
           </div>
         )}
@@ -354,7 +375,11 @@ export default function MesAnnoncesPage() {
                       <div className="flex items-start gap-3">
                         {/* Thumbnail */}
                         <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-border">
-                          <PropertyThumb src={thumb} category={p.category} title={p.title} />
+                          <PropertyThumb
+                            src={thumb}
+                            category={p.category}
+                            title={p.title}
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -368,7 +393,8 @@ export default function MesAnnoncesPage() {
                             </span>
                             {isBoosted && (
                               <span className="text-[10px] px-1.5 py-0.5 rounded border font-medium text-amber-700 bg-amber-50 border-amber-200 flex items-center gap-0.5">
-                                <Zap className="w-2.5 h-2.5" /> {t.statusBoosted}
+                                <Zap className="w-2.5 h-2.5" />{" "}
+                                {t.statusBoosted}
                               </span>
                             )}
                           </div>
@@ -436,7 +462,7 @@ export default function MesAnnoncesPage() {
                                 <Eye className="w-3 h-3 mr-1" /> Voir
                               </Link>
                             </Button>
-                            {!isBoosted && (
+                            {!isBoosted && FEATURE_FLAGS.BOOST_ENABLED && (
                               <Link
                                 href={`/espace-agent/boosts?propertyId=${p.id}&title=${encodeURIComponent(p.title)}`}
                                 className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm shadow-amber-200 hover:shadow-amber-300 hover:from-amber-500 hover:to-orange-500 transition-all duration-200"

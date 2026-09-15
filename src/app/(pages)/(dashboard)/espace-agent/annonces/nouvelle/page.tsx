@@ -19,16 +19,24 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { useMounted } from "@/shared/hooks/useMounted";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
 const AMENITY_VALUES = [
-  "Eau courante","Électricité","Groupe électrogène","Climatisation",
-  "Gardiennage","Parking","Terrasse","Cuisine équipée",
-  "Internet","Piscine","Garage","Sécurité 24h/24",
+  "Eau courante",
+  "Électricité",
+  "Groupe électrogène",
+  "Climatisation",
+  "Gardiennage",
+  "Parking",
+  "Terrasse",
+  "Cuisine équipée",
+  "Internet",
+  "Piscine",
+  "Garage",
+  "Sécurité 24h/24",
 ] as const;
 
 const COMMUNES = KINSHASA_COMMUNES;
@@ -75,14 +83,21 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function Field({
-  label, required, hint, children,
+  label,
+  required,
+  hint,
+  children,
 }: {
-  label: string; required?: boolean; hint?: string; children: React.ReactNode;
+  label: string;
+  required?: boolean;
+  hint?: string;
+  children: React.ReactNode;
 }) {
   return (
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-foreground">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
       {children}
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
@@ -91,10 +106,17 @@ function Field({
 }
 
 function TextInput({
-  value, onChange, placeholder, type = "text", disabled,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  disabled,
 }: {
-  value: string; onChange: (v: string) => void;
-  placeholder?: string; type?: string; disabled?: boolean;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  disabled?: boolean;
 }) {
   return (
     <input
@@ -109,10 +131,15 @@ function TextInput({
 }
 
 function SelectInput({
-  value, onChange, children, disabled,
+  value,
+  onChange,
+  children,
+  disabled,
 }: {
-  value: string; onChange: (v: string) => void;
-  children: React.ReactNode; disabled?: boolean;
+  value: string;
+  onChange: (v: string) => void;
+  children: React.ReactNode;
+  disabled?: boolean;
 }) {
   return (
     <select
@@ -127,9 +154,13 @@ function SelectInput({
 }
 
 function Toggle({
-  label, value, onChange,
+  label,
+  value,
+  onChange,
 }: {
-  label: string; value: boolean; onChange: (v: boolean) => void;
+  label: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
 }) {
   return (
     <button
@@ -143,7 +174,9 @@ function Toggle({
     >
       <span
         className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${
-          value ? "border-primary-foreground bg-primary-foreground/20" : "border-current"
+          value
+            ? "border-primary-foreground bg-primary-foreground/20"
+            : "border-current"
         }`}
       >
         {value && <CheckCircle2 className="w-3 h-3" />}
@@ -155,11 +188,7 @@ function Toggle({
 
 // ─── Step indicator ─────────────────────────────────────────────────────────────
 
-function StepBar({
-  step, labels,
-}: {
-  step: number; labels: string[];
-}) {
+function StepBar({ step, labels }: { step: number; labels: string[] }) {
   return (
     <div className="flex items-center gap-1 mb-6">
       {labels.map((label, i) => {
@@ -174,18 +203,22 @@ function StepBar({
                   done
                     ? "bg-primary text-primary-foreground"
                     : active
-                    ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
-                    : "bg-muted text-muted-foreground"
+                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                      : "bg-muted text-muted-foreground"
                 }`}
               >
                 {done ? <CheckCircle2 className="w-4 h-4" /> : n}
               </div>
-              <span className={`text-[9px] mt-0.5 font-medium whitespace-nowrap ${active ? "text-primary" : "text-muted-foreground"}`}>
+              <span
+                className={`text-[9px] mt-0.5 font-medium whitespace-nowrap ${active ? "text-primary" : "text-muted-foreground"}`}
+              >
                 {label}
               </span>
             </div>
             {i < labels.length - 1 && (
-              <div className={`h-0.5 w-8 mb-3 transition ${done ? "bg-primary" : "bg-muted"}`} />
+              <div
+                className={`h-0.5 w-8 mb-3 transition ${done ? "bg-primary" : "bg-muted"}`}
+              />
             )}
           </div>
         );
@@ -200,33 +233,53 @@ const TOTAL_STEPS = 5;
 
 export default function NouvelleAnnoncePage() {
   const router = useRouter();
-  const { token, agent } = useAgentSessionStore();
+  const { token, agent, _hasHydrated: hydrated } = useAgentSessionStore();
   const t = useT().espaceAgent;
 
   // Build translated category and amenity lists inside the component
   const CATEGORIES = [
-    { value: "apartment",  label: t.catApartment },
-    { value: "villa",      label: t.catVilla },
-    { value: "studio",     label: t.catStudio },
-    { value: "duplex",     label: t.catDuplex },
-    { value: "penthouse",  label: t.catPenthouse },
-    { value: "house",      label: t.catHouse },
-    { value: "land",       label: t.catLand },
+    { value: "apartment", label: t.catApartment },
+    { value: "villa", label: t.catVilla },
+    { value: "studio", label: t.catStudio },
+    { value: "duplex", label: t.catDuplex },
+    { value: "penthouse", label: t.catPenthouse },
+    { value: "house", label: t.catHouse },
+    { value: "land", label: t.catLand },
     { value: "commercial", label: t.catCommercial },
-    { value: "office",     label: t.catOffice },
-    { value: "warehouse",  label: t.catWarehouse },
+    { value: "office", label: t.catOffice },
+    { value: "warehouse", label: t.catWarehouse },
   ];
 
   const AMENITY_LABELS = [
-    t.amenWater, t.amenElec, t.amenGenerator, t.amenAC,
-    t.amenGuard, t.amenParking, t.amenTerrace, t.amenKitchen,
-    t.amenInternet, t.amenPool, t.amenGarage, t.amenSecurity,
+    t.amenWater,
+    t.amenElec,
+    t.amenGenerator,
+    t.amenAC,
+    t.amenGuard,
+    t.amenParking,
+    t.amenTerrace,
+    t.amenKitchen,
+    t.amenInternet,
+    t.amenPool,
+    t.amenGarage,
+    t.amenSecurity,
   ];
 
-  const STEP_LABELS = [t.stepInfoLabel, t.stepLocationLabel, t.stepPriceLabel, t.stepPhotosLabel, t.stepReviewLabel];
-  const CARD_HEADERS = [t.cardStep1, t.cardStep2, t.cardStep3, t.cardStep4, t.cardStep5];
+  const STEP_LABELS = [
+    t.stepInfoLabel,
+    t.stepLocationLabel,
+    t.stepPriceLabel,
+    t.stepPhotosLabel,
+    t.stepReviewLabel,
+  ];
+  const CARD_HEADERS = [
+    t.cardStep1,
+    t.cardStep2,
+    t.cardStep3,
+    t.cardStep4,
+    t.cardStep5,
+  ];
 
-  const hydrated = useMounted();
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [savingDraft, setSavingDraft] = useState(false);
@@ -284,7 +337,10 @@ export default function NouvelleAnnoncePage() {
     if (!files) return;
     const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
     const oversized = Array.from(files).find((f) => f.size > MAX_SIZE);
-    if (oversized) { setError(t.errImageSize); return; }
+    if (oversized) {
+      setError(t.errImageSize);
+      return;
+    }
     const toAdd = Array.from(files)
       .filter((f) => f.type.startsWith("image/"))
       .slice(0, 15 - photos.length);
@@ -321,24 +377,23 @@ export default function NouvelleAnnoncePage() {
     const { data: presigned } = await axios.post(
       "/api/proxy/uploads/presign-property",
       { files },
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers: { Authorization: `Bearer ${token}` } },
     );
 
     await Promise.all(
-      presigned.map(async (
-        { url }: { key: string; url: string },
-        i: number
-      ) => {
-        await fetch("/api/proxy/uploads/put-r2", {
-          method: "POST",
-          body: photos[i].file,
-          headers: {
-            "Content-Type": photos[i].file.type || "image/jpeg",
-            "X-Presigned-Url": url,
-          },
-        });
-        setUploadProgress(Math.round(((i + 1) / presigned.length) * 100));
-      })
+      presigned.map(
+        async ({ url }: { key: string; url: string }, i: number) => {
+          await fetch("/api/proxy/uploads/put-r2", {
+            method: "POST",
+            body: photos[i].file,
+            headers: {
+              "Content-Type": photos[i].file.type || "image/jpeg",
+              "X-Presigned-Url": url,
+            },
+          });
+          setUploadProgress(Math.round(((i + 1) / presigned.length) * 100));
+        },
+      ),
     );
 
     return presigned.map(({ key }: { key: string }) => key);
@@ -357,9 +412,21 @@ export default function NouvelleAnnoncePage() {
     }
     if (s === 2) {
       if (!form.suburb) return t.errCommune;
-      if (form.bedrooms && (Number(form.bedrooms) < 0 || Number(form.bedrooms) > 50)) return t.errBedroomsRange;
-      if (form.bathrooms && (Number(form.bathrooms) < 0 || Number(form.bathrooms) > 30)) return t.errBathroomsRange;
-      if (form.areaSqm && (Number(form.areaSqm) < 1 || Number(form.areaSqm) > 100_000)) return t.errAreaRange;
+      if (
+        form.bedrooms &&
+        (Number(form.bedrooms) < 0 || Number(form.bedrooms) > 50)
+      )
+        return t.errBedroomsRange;
+      if (
+        form.bathrooms &&
+        (Number(form.bathrooms) < 0 || Number(form.bathrooms) > 30)
+      )
+        return t.errBathroomsRange;
+      if (
+        form.areaSqm &&
+        (Number(form.areaSqm) < 1 || Number(form.areaSqm) > 100_000)
+      )
+        return t.errAreaRange;
     }
     if (s === 3) {
       const price = Number(form.price);
@@ -381,9 +448,15 @@ export default function NouvelleAnnoncePage() {
 
   function handleNext() {
     const err = validateStep(step);
-    if (err) { setError(err); return; }
+    if (err) {
+      setError(err);
+      return;
+    }
     // Require ≥3 photos before advancing to the review step
-    if (step === 4 && photos.length < 3) { setError(t.errMinPhotos); return; }
+    if (step === 4 && photos.length < 3) {
+      setError(t.errMinPhotos);
+      return;
+    }
     setError(null);
     setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   }
@@ -392,33 +465,49 @@ export default function NouvelleAnnoncePage() {
 
   function buildPayload(gallery: string[]) {
     const isRent = form.listingType === "rent";
-    const hasShortTerm = form.durationType === "shortterm" || form.durationType === "both";
-    const hasLongTerm = form.durationType === "longterm" || form.durationType === "both";
+    const hasShortTerm =
+      form.durationType === "shortterm" || form.durationType === "both";
+    const hasLongTerm =
+      form.durationType === "longterm" || form.durationType === "both";
     return {
-      listingType:    form.listingType,
-      category:       form.category,
-      title:          form.title.trim(),
-      subtitle:       form.subtitle.trim() || CATEGORIES.find((c) => c.value === form.category)?.label || form.category,
-      description:    form.description.trim() || undefined,
-      price:          Number(form.price),
-      currency:       form.currency,
-      period:         isRent ? form.period : undefined,
-      bedrooms:       form.bedrooms ? Number(form.bedrooms) : 0,
-      bathrooms:      form.bathrooms ? Number(form.bathrooms) : 0,
-      areaSqm:        form.areaSqm ? Number(form.areaSqm) : 0,
-      suburb:         form.suburb,
-      neighborhood:   form.neighborhood.trim() || undefined,
-      landmark:       form.landmark.trim() || undefined,
-      city:           "Kinshasa",
-      isFurnished:    form.isFurnished,
-      availableFrom:  form.availableFrom || undefined,
-      isShortTerm:    hasShortTerm,
-      isLongTerm:     hasLongTerm,
-      pricePerNight:  hasShortTerm && form.pricePerNight ? Number(form.pricePerNight) : undefined,
-      minStayNights:  hasShortTerm && form.minStayNights ? Number(form.minStayNights) : undefined,
-      maxStayNights:  hasShortTerm && form.maxStayNights ? Number(form.maxStayNights) : undefined,
-      shortTermNotes: hasShortTerm ? form.shortTermNotes.trim() || undefined : undefined,
-      amenities:      form.amenities,
+      listingType: form.listingType,
+      category: form.category,
+      title: form.title.trim(),
+      subtitle:
+        form.subtitle.trim() ||
+        CATEGORIES.find((c) => c.value === form.category)?.label ||
+        form.category,
+      description: form.description.trim() || undefined,
+      price: Number(form.price),
+      currency: form.currency,
+      period: isRent ? form.period : undefined,
+      bedrooms: form.bedrooms ? Number(form.bedrooms) : 0,
+      bathrooms: form.bathrooms ? Number(form.bathrooms) : 0,
+      areaSqm: form.areaSqm ? Number(form.areaSqm) : 0,
+      suburb: form.suburb,
+      neighborhood: form.neighborhood.trim() || undefined,
+      landmark: form.landmark.trim() || undefined,
+      city: "Kinshasa",
+      isFurnished: form.isFurnished,
+      availableFrom: form.availableFrom || undefined,
+      isShortTerm: hasShortTerm,
+      isLongTerm: hasLongTerm,
+      pricePerNight:
+        hasShortTerm && form.pricePerNight
+          ? Number(form.pricePerNight)
+          : undefined,
+      minStayNights:
+        hasShortTerm && form.minStayNights
+          ? Number(form.minStayNights)
+          : undefined,
+      maxStayNights:
+        hasShortTerm && form.maxStayNights
+          ? Number(form.maxStayNights)
+          : undefined,
+      shortTermNotes: hasShortTerm
+        ? form.shortTermNotes.trim() || undefined
+        : undefined,
+      amenities: form.amenities,
       gallery,
     };
   }
@@ -428,7 +517,10 @@ export default function NouvelleAnnoncePage() {
   async function handleSaveDraft() {
     if (!token || !agent) return;
     const stepErr = validateStep(step);
-    if (stepErr) { setError(stepErr); return; }
+    if (stepErr) {
+      setError(stepErr);
+      return;
+    }
     setError(null);
     setSavingDraft(true);
     try {
@@ -438,9 +530,10 @@ export default function NouvelleAnnoncePage() {
       });
       router.push("/espace-agent/annonces");
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string | string[] } } })
-        ?.response?.data?.message;
-      setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
+      const msg = (
+        e as { response?: { data?: { message?: string | string[] } } }
+      )?.response?.data?.message;
+      setError(Array.isArray(msg) ? msg.join(", ") : (msg ?? t.errPublish));
     } finally {
       setSavingDraft(false);
       setUploadProgress(0);
@@ -454,24 +547,32 @@ export default function NouvelleAnnoncePage() {
       return;
     }
     const stepErr = validateForSubmit();
-    if (stepErr) { setError(stepErr); return; }
+    if (stepErr) {
+      setError(stepErr);
+      return;
+    }
     setError(null);
     setSubmitting(true);
     try {
       const gallery = await uploadPhotos();
-      const { data } = await axios.post("/api/proxy/properties/mine", buildPayload(gallery), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await axios.post(
+        "/api/proxy/properties/mine",
+        buildPayload(gallery),
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       await axios.post(
         `/api/proxy/properties/mine/${data.id}/publish`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       router.push("/espace-agent/annonces");
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string | string[] } } })
-        ?.response?.data?.message;
-      setError(Array.isArray(msg) ? msg.join(", ") : msg ?? t.errPublish);
+      const msg = (
+        e as { response?: { data?: { message?: string | string[] } } }
+      )?.response?.data?.message;
+      setError(Array.isArray(msg) ? msg.join(", ") : (msg ?? t.errPublish));
     } finally {
       setSubmitting(false);
       setUploadProgress(0);
@@ -494,10 +595,12 @@ export default function NouvelleAnnoncePage() {
             <section>
               <SectionLabel>{t.sectionType}</SectionLabel>
               <div className="grid grid-cols-2 gap-3">
-                {([
-                  { value: "rent", label: t.typeRent },
-                  { value: "sale", label: t.typeSale },
-                ] as const).map(({ value, label }) => (
+                {(
+                  [
+                    { value: "rent", label: t.typeRent },
+                    { value: "sale", label: t.typeSale },
+                  ] as const
+                ).map(({ value, label }) => (
                   <button
                     key={value}
                     type="button"
@@ -538,11 +641,13 @@ export default function NouvelleAnnoncePage() {
               <section>
                 <SectionLabel>{t.sectionDurationType}</SectionLabel>
                 <div className="grid grid-cols-3 gap-2">
-                  {([
-                    { value: "longterm",  label: t.durationLong },
-                    { value: "shortterm", label: t.durationShort },
-                    { value: "both",      label: t.durationBoth },
-                  ] as const).map(({ value, label }) => (
+                  {(
+                    [
+                      { value: "longterm", label: t.durationLong },
+                      { value: "shortterm", label: t.durationShort },
+                      { value: "both", label: t.durationBoth },
+                    ] as const
+                  ).map(({ value, label }) => (
                     <button
                       key={value}
                       type="button"
@@ -599,9 +704,16 @@ export default function NouvelleAnnoncePage() {
               <SectionLabel>{t.sectionLocation}</SectionLabel>
               <div className="space-y-4">
                 <Field label={t.labelCommune} required>
-                  <SelectInput value={form.suburb} onChange={(v) => set("suburb", v)}>
+                  <SelectInput
+                    value={form.suburb}
+                    onChange={(v) => set("suburb", v)}
+                  >
                     <option value="">{t.communePlaceholder}</option>
-                    {COMMUNES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    {COMMUNES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
                   </SelectInput>
                 </Field>
                 <div className="grid grid-cols-2 gap-4">
@@ -630,13 +742,28 @@ export default function NouvelleAnnoncePage() {
               <SectionLabel>{t.sectionFeatures}</SectionLabel>
               <div className="grid grid-cols-3 gap-3">
                 <Field label={t.labelBedrooms}>
-                  <TextInput type="number" value={form.bedrooms} onChange={(v) => set("bedrooms", v)} placeholder="3" />
+                  <TextInput
+                    type="number"
+                    value={form.bedrooms}
+                    onChange={(v) => set("bedrooms", v)}
+                    placeholder="3"
+                  />
                 </Field>
                 <Field label={t.labelBathrooms}>
-                  <TextInput type="number" value={form.bathrooms} onChange={(v) => set("bathrooms", v)} placeholder="2" />
+                  <TextInput
+                    type="number"
+                    value={form.bathrooms}
+                    onChange={(v) => set("bathrooms", v)}
+                    placeholder="2"
+                  />
                 </Field>
                 <Field label={t.labelArea}>
-                  <TextInput type="number" value={form.areaSqm} onChange={(v) => set("areaSqm", v)} placeholder="120" />
+                  <TextInput
+                    type="number"
+                    value={form.areaSqm}
+                    onChange={(v) => set("areaSqm", v)}
+                    placeholder="120"
+                  />
                 </Field>
               </div>
             </section>
@@ -685,13 +812,23 @@ export default function NouvelleAnnoncePage() {
                   />
                 </div>
                 <div className="w-28">
-                  <SelectInput value={form.currency} onChange={(v) => set("currency", v)}>
-                    {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  <SelectInput
+                    value={form.currency}
+                    onChange={(v) => set("currency", v)}
+                  >
+                    {CURRENCIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
                   </SelectInput>
                 </div>
                 {form.listingType === "rent" && (
                   <div className="w-32">
-                    <SelectInput value={form.period} onChange={(v) => set("period", v as FormState["period"])}>
+                    <SelectInput
+                      value={form.period}
+                      onChange={(v) => set("period", v as FormState["period"])}
+                    >
                       <option value="month">{t.periodMonth}</option>
                       <option value="year">{t.periodYear}</option>
                       <option value="day">{t.periodDay}</option>
@@ -731,7 +868,10 @@ export default function NouvelleAnnoncePage() {
                       />
                     </Field>
                   </div>
-                  <Field label={t.labelShortTermNotes} hint={t.shortTermNotesHint}>
+                  <Field
+                    label={t.labelShortTermNotes}
+                    hint={t.shortTermNotesHint}
+                  >
                     <TextInput
                       value={form.shortTermNotes}
                       onChange={(v) => set("shortTermNotes", v)}
@@ -751,7 +891,9 @@ export default function NouvelleAnnoncePage() {
           <div className="space-y-6">
             <section>
               <SectionLabel>{t.sectionPhotosLabel} *</SectionLabel>
-              <p className="text-xs text-muted-foreground mb-3">{t.photosInstruction}</p>
+              <p className="text-xs text-muted-foreground mb-3">
+                {t.photosInstruction}
+              </p>
 
               <div
                 className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition"
@@ -780,8 +922,16 @@ export default function NouvelleAnnoncePage() {
               {photos.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 mt-3">
                   {photos.map((p, i) => (
-                    <div key={i} className="relative group aspect-video rounded-xl overflow-hidden bg-muted">
-                      <Image src={p.preview} alt={`Photo ${i + 1}`} fill className="object-cover" />
+                    <div
+                      key={i}
+                      className="relative group aspect-video rounded-xl overflow-hidden bg-muted"
+                    >
+                      <Image
+                        src={p.preview}
+                        alt={`Photo ${i + 1}`}
+                        fill
+                        className="object-cover"
+                      />
                       {i === 0 && (
                         <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">
                           {t.coverLabel}
@@ -789,16 +939,29 @@ export default function NouvelleAnnoncePage() {
                       )}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-1.5">
                         {i > 0 && (
-                          <button type="button" onClick={() => movePhoto(i, i - 1)}
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5">←</button>
+                          <button
+                            type="button"
+                            onClick={() => movePhoto(i, i - 1)}
+                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5"
+                          >
+                            ←
+                          </button>
                         )}
-                        <button type="button" onClick={() => removePhoto(i)}
-                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1">
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(i)}
+                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1"
+                        >
                           <Trash2 className="w-3 h-3" />
                         </button>
                         {i < photos.length - 1 && (
-                          <button type="button" onClick={() => movePhoto(i, i + 1)}
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5">→</button>
+                          <button
+                            type="button"
+                            onClick={() => movePhoto(i, i + 1)}
+                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5"
+                          >
+                            →
+                          </button>
                         )}
                       </div>
                     </div>
@@ -829,7 +992,8 @@ export default function NouvelleAnnoncePage() {
                           : "border-border bg-background hover:border-primary/30 text-foreground"
                       }`}
                     >
-                      {selected && "✓ "}{AMENITY_LABELS[idx]}
+                      {selected && "✓ "}
+                      {AMENITY_LABELS[idx]}
                     </button>
                   );
                 })}
@@ -841,28 +1005,53 @@ export default function NouvelleAnnoncePage() {
       // ─────────── STEP 5: Review & Confirm ───────────────────────────────────
       case 5: {
         const isRent = form.listingType === "rent";
-        const hasShortTerm = form.durationType === "shortterm" || form.durationType === "both";
-        const categoryLabel = CATEGORIES.find((c) => c.value === form.category)?.label ?? form.category;
+        const hasShortTerm =
+          form.durationType === "shortterm" || form.durationType === "both";
+        const categoryLabel =
+          CATEGORIES.find((c) => c.value === form.category)?.label ??
+          form.category;
         const durationLabel: Record<string, string> = {
-          longterm: t.durationLong, shortterm: t.durationShort, both: t.durationBoth,
+          longterm: t.durationLong,
+          shortterm: t.durationShort,
+          both: t.durationBoth,
         };
         const periodLabel: Record<string, string> = {
-          month: t.periodMonth, year: t.periodYear, day: t.periodDay,
+          month: t.periodMonth,
+          year: t.periodYear,
+          day: t.periodDay,
         };
 
-        function ReviewSection({ title, children }: { title: string; children: React.ReactNode }) {
+        function ReviewSection({
+          title,
+          children,
+        }: {
+          title: string;
+          children: React.ReactNode;
+        }) {
           return (
             <div>
-              <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2">{title}</p>
-              <div className="rounded-xl border border-border bg-muted/30 divide-y divide-border">{children}</div>
+              <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2">
+                {title}
+              </p>
+              <div className="rounded-xl border border-border bg-muted/30 divide-y divide-border">
+                {children}
+              </div>
             </div>
           );
         }
-        function ReviewRow({ label, value }: { label: string; value: string | number }) {
+        function ReviewRow({
+          label,
+          value,
+        }: {
+          label: string;
+          value: string | number;
+        }) {
           return (
             <div className="flex items-center justify-between px-3.5 py-2.5 text-sm gap-4">
               <span className="text-muted-foreground shrink-0">{label}</span>
-              <span className="font-medium text-right truncate">{String(value) || t.reviewNone}</span>
+              <span className="font-medium text-right truncate">
+                {String(value) || t.reviewNone}
+              </span>
             </div>
           );
         }
@@ -872,32 +1061,79 @@ export default function NouvelleAnnoncePage() {
             <p className="text-sm text-muted-foreground">{t.reviewBody}</p>
 
             <ReviewSection title={t.sectionType}>
-              <ReviewRow label={t.reviewListingType} value={isRent ? t.typeRent : t.typeSale} />
+              <ReviewRow
+                label={t.reviewListingType}
+                value={isRent ? t.typeRent : t.typeSale}
+              />
               <ReviewRow label={t.sectionCategory} value={categoryLabel} />
-              {isRent && <ReviewRow label={t.sectionDurationType} value={durationLabel[form.durationType] ?? form.durationType} />}
+              {isRent && (
+                <ReviewRow
+                  label={t.sectionDurationType}
+                  value={durationLabel[form.durationType] ?? form.durationType}
+                />
+              )}
             </ReviewSection>
 
             <ReviewSection title={t.sectionPresentation}>
-              <ReviewRow label={t.labelTitle} value={form.title || t.reviewNone} />
-              <ReviewRow label={t.labelSubtitle} value={form.subtitle || t.reviewNone} />
+              <ReviewRow
+                label={t.labelTitle}
+                value={form.title || t.reviewNone}
+              />
+              <ReviewRow
+                label={t.labelSubtitle}
+                value={form.subtitle || t.reviewNone}
+              />
               <ReviewRow
                 label={t.labelDescription}
-                value={form.description ? form.description.slice(0, 90) + (form.description.length > 90 ? "…" : "") : t.reviewNone}
+                value={
+                  form.description
+                    ? form.description.slice(0, 90) +
+                      (form.description.length > 90 ? "…" : "")
+                    : t.reviewNone
+                }
               />
             </ReviewSection>
 
             <ReviewSection title={t.sectionLocation}>
-              <ReviewRow label={t.labelCommune} value={form.suburb || t.reviewNone} />
-              <ReviewRow label={t.labelNeighborhood} value={form.neighborhood || t.reviewNone} />
-              <ReviewRow label={t.labelLandmark} value={form.landmark || t.reviewNone} />
+              <ReviewRow
+                label={t.labelCommune}
+                value={form.suburb || t.reviewNone}
+              />
+              <ReviewRow
+                label={t.labelNeighborhood}
+                value={form.neighborhood || t.reviewNone}
+              />
+              <ReviewRow
+                label={t.labelLandmark}
+                value={form.landmark || t.reviewNone}
+              />
             </ReviewSection>
 
             <ReviewSection title={t.sectionFeatures}>
-              <ReviewRow label={t.labelBedrooms} value={form.bedrooms || t.reviewNone} />
-              <ReviewRow label={t.labelBathrooms} value={form.bathrooms || t.reviewNone} />
-              <ReviewRow label={t.labelArea} value={form.areaSqm ? `${form.areaSqm} m²` : t.reviewNone} />
-              <ReviewRow label={t.labelFurnished} value={form.isFurnished ? t.reviewFurnishedYes : t.reviewFurnishedNo} />
-              {form.availableFrom && <ReviewRow label={t.labelAvailableFrom} value={form.availableFrom} />}
+              <ReviewRow
+                label={t.labelBedrooms}
+                value={form.bedrooms || t.reviewNone}
+              />
+              <ReviewRow
+                label={t.labelBathrooms}
+                value={form.bathrooms || t.reviewNone}
+              />
+              <ReviewRow
+                label={t.labelArea}
+                value={form.areaSqm ? `${form.areaSqm} m²` : t.reviewNone}
+              />
+              <ReviewRow
+                label={t.labelFurnished}
+                value={
+                  form.isFurnished ? t.reviewFurnishedYes : t.reviewFurnishedNo
+                }
+              />
+              {form.availableFrom && (
+                <ReviewRow
+                  label={t.labelAvailableFrom}
+                  value={form.availableFrom}
+                />
+              )}
             </ReviewSection>
 
             <ReviewSection title={t.sectionPrice}>
@@ -906,20 +1142,28 @@ export default function NouvelleAnnoncePage() {
                 value={`${form.price} ${form.currency}${isRent ? ` / ${periodLabel[form.period] ?? form.period}` : ""}`}
               />
               {hasShortTerm && form.pricePerNight && (
-                <ReviewRow label={t.labelPricePerNight} value={`${form.pricePerNight} ${form.currency} / ${t.periodDay}`} />
+                <ReviewRow
+                  label={t.labelPricePerNight}
+                  value={`${form.pricePerNight} ${form.currency} / ${t.periodDay}`}
+                />
               )}
             </ReviewSection>
 
             <ReviewSection title={t.sectionPhotosLabel}>
               <ReviewRow
                 label={t.sectionPhotosLabel}
-                value={t.reviewPhotosCount.replace("{n}", String(photos.length))}
+                value={t.reviewPhotosCount.replace(
+                  "{n}",
+                  String(photos.length),
+                )}
               />
             </ReviewSection>
 
             {form.amenities.length > 0 && (
               <ReviewSection title={t.sectionAmenities}>
-                <div className="px-3.5 py-2.5 text-sm">{form.amenities.join(" · ")}</div>
+                <div className="px-3.5 py-2.5 text-sm">
+                  {form.amenities.join(" · ")}
+                </div>
               </ReviewSection>
             )}
 
@@ -940,7 +1184,6 @@ export default function NouvelleAnnoncePage() {
   return (
     <div className="min-h-screen bg-muted">
       <main className="max-w-2xl mx-auto px-4 py-8">
-
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <Link
@@ -959,7 +1202,9 @@ export default function NouvelleAnnoncePage() {
         <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
           {/* Card header */}
           <div className="px-6 py-4 border-b border-border">
-            <h1 className="text-base font-semibold">{CARD_HEADERS[step - 1]}</h1>
+            <h1 className="text-base font-semibold">
+              {CARD_HEADERS[step - 1]}
+            </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
               {step} {t.stepSuffix} {TOTAL_STEPS}
             </p>
@@ -974,17 +1219,22 @@ export default function NouvelleAnnoncePage() {
               </div>
             )}
 
-            {(savingDraft || submitting) && uploadProgress > 0 && uploadProgress < 100 && (
-              <div className="mb-4">
-                <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>{t.uploadingPhotos}</span>
-                  <span>{uploadProgress}%</span>
+            {(savingDraft || submitting) &&
+              uploadProgress > 0 &&
+              uploadProgress < 100 && (
+                <div className="mb-4">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                    <span>{t.uploadingPhotos}</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-1.5">
+                    <div
+                      className="bg-primary h-1.5 rounded-full transition-all"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-muted rounded-full h-1.5">
-                  <div className="bg-primary h-1.5 rounded-full transition-all" style={{ width: `${uploadProgress}%` }} />
-                </div>
-              </div>
-            )}
+              )}
 
             {renderStep()}
           </div>
@@ -996,7 +1246,10 @@ export default function NouvelleAnnoncePage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => { setError(null); setStep((s) => s - 1); }}
+                  onClick={() => {
+                    setError(null);
+                    setStep((s) => s - 1);
+                  }}
                   disabled={busy}
                 >
                   <ChevronLeft className="w-3.5 h-3.5 mr-1" /> {t.backBtn}
@@ -1010,11 +1263,21 @@ export default function NouvelleAnnoncePage() {
 
             <div className="flex items-center gap-2">
               {step < TOTAL_STEPS && (
-                <Button variant="outline" size="sm" onClick={handleSaveDraft} disabled={busy}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSaveDraft}
+                  disabled={busy}
+                >
                   {savingDraft ? (
-                    <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.savingBtn}</>
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />{" "}
+                      {t.savingBtn}
+                    </>
                   ) : (
-                    <><Save className="w-3.5 h-3.5 mr-1.5" /> {t.saveDraftBtn}</>
+                    <>
+                      <Save className="w-3.5 h-3.5 mr-1.5" /> {t.saveDraftBtn}
+                    </>
                   )}
                 </Button>
               )}
@@ -1024,11 +1287,22 @@ export default function NouvelleAnnoncePage() {
                   {t.nextBtn} <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                 </Button>
               ) : (
-                <Button size="sm" onClick={handleSubmit} disabled={busy} className="bg-primary">
+                <Button
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={busy}
+                  className="bg-primary"
+                >
                   {submitting ? (
-                    <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> {t.submittingBtn}</>
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />{" "}
+                      {t.submittingBtn}
+                    </>
                   ) : (
-                    <><SendHorizontal className="w-3.5 h-3.5 mr-1.5" /> {t.reviewConfirmBtn}</>
+                    <>
+                      <SendHorizontal className="w-3.5 h-3.5 mr-1.5" />{" "}
+                      {t.reviewConfirmBtn}
+                    </>
                   )}
                 </Button>
               )}
