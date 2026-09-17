@@ -8,6 +8,7 @@ import AgentAvatar from "@/shared/components/ui/AgentAvatar";
 import { Button } from "@/shared/components/ui/button";
 import {
   ArrowLeft,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Home,
@@ -120,7 +121,7 @@ export default function AgentDetailClient({
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewSuccess, setReviewSuccess] = useState(false);
-  const { token, isAuthenticated } = useAuthStore();
+  const { token, isAuthenticated, user } = useAuthStore();
   const { isAuthenticated: isAgentAuth } = useAgentSessionStore();
   const router = useRouter();
 
@@ -163,6 +164,8 @@ export default function AgentDetailClient({
       setReviewSubmitting(false);
     }
   }
+
+  const alreadyReviewed = isAuthenticated && !!user && reviews.some((r) => r.user?.id === user.id);
 
   const filteredProps = agentProperties.filter((p) =>
     propertiesTab === "sale"
@@ -481,66 +484,77 @@ export default function AgentDetailClient({
             )}
           </div>
 
-          {/* Submit review — hidden for agents */}
-          {!isAgentAuth && <div className="mb-6 rounded-xl bg-accent/50 border border-accent p-5">
-            <h3 className="text-sm font-semibold text-foreground mb-3">
-              {isAuthenticated ? da.leaveReviewLabel : da.loginToReviewLabel}
-            </h3>
-            <div className="flex items-center gap-1 mb-3">
-              {Array.from({ length: 5 }).map((_, i) => {
-                const val = i + 1;
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    onMouseEnter={() => setReviewHover(val)}
-                    onMouseLeave={() => setReviewHover(0)}
-                    onClick={() =>
-                      isAuthenticated ? setReviewRating(val) : router.push("/connexion")
-                    }
-                    className="p-0.5"
-                    aria-label={`${val} étoile${val > 1 ? "s" : ""}`}
+          {/* Submit review — hidden for agents and users who already reviewed */}
+          {!isAgentAuth && (
+            alreadyReviewed ? (
+              <div className="mb-6 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-5 flex items-center gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+                <p className="text-sm text-green-800 dark:text-green-300 font-medium">
+                  Vous avez déjà laissé un avis pour cet agent.
+                </p>
+              </div>
+            ) : (
+              <div className="mb-6 rounded-xl bg-accent/50 border border-accent p-5">
+                <h3 className="text-sm font-semibold text-foreground mb-3">
+                  {isAuthenticated ? da.leaveReviewLabel : da.loginToReviewLabel}
+                </h3>
+                <div className="flex items-center gap-1 mb-3">
+                  {Array.from({ length: 5 }).map((_, i) => {
+                    const val = i + 1;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onMouseEnter={() => setReviewHover(val)}
+                        onMouseLeave={() => setReviewHover(0)}
+                        onClick={() =>
+                          isAuthenticated ? setReviewRating(val) : router.push("/connexion")
+                        }
+                        className="p-0.5"
+                        aria-label={`${val} étoile${val > 1 ? "s" : ""}`}
+                      >
+                        <Star
+                          className={`w-7 h-7 transition-colors ${
+                            val <= (reviewHover || reviewRating)
+                              ? "fill-secondary text-secondary"
+                              : "text-foreground/20"
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                  {reviewRating > 0 && (
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      {ratingLabels[reviewRating]}
+                    </span>
+                  )}
+                </div>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder={da.reviewPlaceholder}
+                  rows={3}
+                  className="w-full text-sm border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white dark:bg-card"
+                  disabled={!isAuthenticated}
+                />
+                {reviewError && (
+                  <p className="text-xs text-destructive mt-2">{reviewError}</p>
+                )}
+                {reviewSuccess && (
+                  <p className="text-xs text-green-600 mt-2">{da.reviewPosted}</p>
+                )}
+                <div className="mt-3 flex justify-end">
+                  <Button
+                    onClick={handleSubmitReview}
+                    disabled={reviewSubmitting || reviewRating === 0 || !isAuthenticated}
+                    className="h-9 text-sm"
                   >
-                    <Star
-                      className={`w-7 h-7 transition-colors ${
-                        val <= (reviewHover || reviewRating)
-                          ? "fill-secondary text-secondary"
-                          : "text-foreground/20"
-                      }`}
-                    />
-                  </button>
-                );
-              })}
-              {reviewRating > 0 && (
-                <span className="ml-2 text-sm text-muted-foreground">
-                  {ratingLabels[reviewRating]}
-                </span>
-              )}
-            </div>
-            <textarea
-              value={reviewComment}
-              onChange={(e) => setReviewComment(e.target.value)}
-              placeholder={da.reviewPlaceholder}
-              rows={3}
-              className="w-full text-sm border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white dark:bg-card"
-              disabled={!isAuthenticated}
-            />
-            {reviewError && (
-              <p className="text-xs text-destructive mt-2">{reviewError}</p>
-            )}
-            {reviewSuccess && (
-              <p className="text-xs text-green-600 mt-2">{da.reviewPosted}</p>
-            )}
-            <div className="mt-3 flex justify-end">
-              <Button
-                onClick={handleSubmitReview}
-                disabled={reviewSubmitting || reviewRating === 0 || !isAuthenticated}
-                className="h-9 text-sm"
-              >
-                {reviewSubmitting ? da.publishingLabel : da.publishBtn}
-              </Button>
-            </div>
-          </div>}
+                    {reviewSubmitting ? da.publishingLabel : da.publishBtn}
+                  </Button>
+                </div>
+              </div>
+            )
+          )}
 
           {/* Reviews list */}
           {reviewsLoading ? (

@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import OkapiLoader from "@/shared/components/ui/OkapiLoader";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 
@@ -183,6 +184,90 @@ function Toggle({
       </span>
       {label}
     </button>
+  );
+}
+
+// ─── Did You Know facts ─────────────────────────────────────────────────────────
+
+const DID_YOU_KNOW = [
+  "Chaque agent sur Okapi est vérifié manuellement par notre équipe avant de pouvoir publier des annonces.",
+  "Les photos de vos annonces reçoivent un filigrane automatique pour protéger votre contenu contre la copie.",
+  "Okapi couvre plus de 24 communes de Kinshasa — de Gombe à Limete, de Ngaliema à Kintambo.",
+  "Les annonces exclusives sur Okapi sont des biens introuvables ailleurs — un avantage concurrentiel pour vos clients.",
+  "Les acheteurs peuvent contacter un agent directement via WhatsApp depuis chaque annonce Okapi, sans intermédiaire.",
+];
+
+// ─── Publishing overlay ──────────────────────────────────────────────────────────
+
+function PublishingOverlay({ progress }: { progress: number }) {
+  const [factIndex, setFactIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setFactIndex((i) => (i + 1) % DID_YOU_KNOW.length);
+        setVisible(true);
+      }, 400);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0B1D3A]/95 backdrop-blur-sm">
+      <OkapiLoader size={120} label="" />
+
+      <p className="mt-6 text-white font-semibold text-lg tracking-wide">
+        Publication en cours…
+      </p>
+
+      {/* Upload progress bar */}
+      {progress > 0 && progress < 100 && (
+        <div className="mt-4 w-64">
+          <div className="flex justify-between text-xs text-white/60 mb-1">
+            <span>Téléchargement des photos</span>
+            <span>{progress}%</span>
+          </div>
+          <div className="w-full bg-white/10 rounded-full h-1">
+            <div
+              className="h-1 rounded-full transition-all duration-500"
+              style={{
+                width: `${progress}%`,
+                background: "linear-gradient(90deg, #D4AF37, #F4E4A6)",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Did you know card */}
+      <div
+        className="mt-8 mx-6 max-w-sm rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-center transition-opacity duration-400"
+        style={{ opacity: visible ? 1 : 0 }}
+      >
+        <p className="text-[10px] font-bold tracking-widest text-[#D4AF37] uppercase mb-2">
+          Le saviez-vous ?
+        </p>
+        <p className="text-sm text-white/80 leading-relaxed">
+          {DID_YOU_KNOW[factIndex]}
+        </p>
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex gap-1.5 mt-4">
+        {DID_YOU_KNOW.map((_, i) => (
+          <div
+            key={i}
+            className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+            style={{
+              background: i === factIndex ? "#D4AF37" : "rgba(255,255,255,0.2)",
+              transform: i === factIndex ? "scale(1.3)" : "scale(1)",
+            }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -1183,6 +1268,7 @@ export default function NouvelleAnnoncePage() {
 
   return (
     <div className="min-h-screen bg-muted">
+      {busy && <PublishingOverlay progress={uploadProgress} />}
       <main className="max-w-2xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -1218,23 +1304,6 @@ export default function NouvelleAnnoncePage() {
                 {error}
               </div>
             )}
-
-            {(savingDraft || submitting) &&
-              uploadProgress > 0 &&
-              uploadProgress < 100 && (
-                <div className="mb-4">
-                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <span>{t.uploadingPhotos}</span>
-                    <span>{uploadProgress}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-1.5">
-                    <div
-                      className="bg-primary h-1.5 rounded-full transition-all"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
 
             {renderStep()}
           </div>
