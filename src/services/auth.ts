@@ -276,6 +276,8 @@ export async function deleteEnquiry(token: string, id: string) {
 
 export type Review = {
   id: string;
+  userId?: string;
+  user?: { id: string; firstName: string; lastName: string };
   propertyId?: string;
   agentId?: string;
   property?: { id: string; title: string };
