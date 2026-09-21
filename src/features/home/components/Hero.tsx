@@ -183,7 +183,7 @@ export default function Hero({
   }
 
   return (
-    <section className="relative bg-navy text-white pt-8 pb-20 md:pt-12 md:pb-28 lg:pt-16 lg:pb-32 px-5 md:px-8 overflow-hidden">
+    <section className="relative bg-navy text-white pt-8 pb-20 md:pt-12 md:pb-28 lg:pt-16 lg:pb-32 px-5 md:px-8">
       {/* Ambient gradient */}
       <div
         className="absolute inset-0 bg-linear-to-br from-navy via-navy to-primary/30 pointer-events-none"
