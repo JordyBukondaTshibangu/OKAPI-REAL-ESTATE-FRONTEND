@@ -280,6 +280,11 @@ export default function EditProfilePage() {
 
   async function handleSave() {
     if (!token) return;
+    // Client-side: WhatsApp number is required to publish listings
+    if (!form.whatsappNumber.trim() && !form.phoneNumber.trim()) {
+      setError("Un numéro WhatsApp ou un numéro de téléphone est requis pour pouvoir publier des annonces.");
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
@@ -308,15 +313,16 @@ export default function EditProfilePage() {
     }
   }
 
-  // Profile completeness (5 key fields)
+  // Profile completeness (6 key fields — WhatsApp is now required)
   const completedFields = [
     !!form.name.trim(),
-    !!form.phoneNumber.trim(),
+    !!form.phoneNumber.trim() || !!form.whatsappNumber.trim(),
+    !!form.whatsappNumber.trim(),
     form.communes.length > 0,
     form.propertyTypes.length > 0,
     !!form.bio.trim(),
   ].filter(Boolean).length;
-  const completenessPercent = Math.round((completedFields / 5) * 100);
+  const completenessPercent = Math.round((completedFields / 6) * 100);
 
   const navSections = [
     { id: "basic-info", label: t.sectionBasicInfo, icon: User },
@@ -511,7 +517,7 @@ export default function EditProfilePage() {
                     />
                   </Field>
                 </div>
-                <Field label={t.labelWhatsapp} hint={t.whatsappHint}>
+                <Field label={t.labelWhatsapp} required hint={t.whatsappHint}>
                   <TextInput
                     value={form.whatsappNumber}
                     onChange={(v) => set("whatsappNumber", v)}

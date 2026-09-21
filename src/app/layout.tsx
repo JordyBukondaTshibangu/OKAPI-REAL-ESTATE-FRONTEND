@@ -6,6 +6,7 @@ import QueryProvider from "@/store/QueryProvider";
 import AuthProvider from "@/store/AuthProvider";
 import ThemeProvider from "@/shared/components/layout/ThemeProvider";
 import ChatWidget from "@/shared/components/ui/ChatWidget";
+import { ToastProvider } from "@/shared/context/ToastContext";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -29,10 +30,12 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <ThemeProvider>
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <ChatWidget />
+              <ToastProvider>
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+                <ChatWidget />
+              </ToastProvider>
             </ThemeProvider>
           </AuthProvider>
         </QueryProvider>

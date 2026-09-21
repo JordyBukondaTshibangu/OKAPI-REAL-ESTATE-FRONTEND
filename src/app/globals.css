@@ -7,6 +7,18 @@
   100% { transform: translateX(200%); }
 }
 
+/* ─── Toast animations ─────────────────────────────────────────────── */
+@keyframes toast-down {
+  from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)     scale(1); }
+}
+@keyframes toast-up {
+  from { opacity: 0; transform: translateY(20px)  scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)     scale(1); }
+}
+.animate-toast-down { animation: toast-down 0.25s cubic-bezier(0.16,1,0.3,1) forwards; }
+.animate-toast-up   { animation: toast-up   0.25s cubic-bezier(0.16,1,0.3,1) forwards; }
+
 /* ─── Okapi motion system ─────────────────────────────────────────── */
 
 /* Hero entrance — elements slide up and fade in */

@@ -66,7 +66,7 @@ export type Property = {
   premium: boolean;
   isNew: boolean;
   listedDaysAgo: number;
-  agent: { name: string; title: string; photo: string } | null;
+  agent: { name: string; title: string; photo: string; phone?: string; whatsappNumber?: string } | null;
   imageGradient: string;
   iconType: "building" | "home" | "land" | "office" | "store" | "warehouse";
   transaction?: CommercialTransaction;

@@ -40,6 +40,7 @@ export type Agent = {
   closedDeals: number;
   totalDealsValueUsd: number;
   phone?: string;
+  whatsappNumber?: string;
   bio: string;
   photo: string;
   photoGradient: string;
@@ -48,4 +49,5 @@ export type Agent = {
   verificationTier?: "NON_VERIFIE" | "VERIFIE";
   verifiedAt?: string; // ISO date — used for "Membre depuis"
   createdAt?: string;
+  grade?: "NOUVEAU" | "ACTIF" | "FIABLE" | "EXPERT";
 };

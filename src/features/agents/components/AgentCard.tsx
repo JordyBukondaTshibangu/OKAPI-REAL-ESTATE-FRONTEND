@@ -7,11 +7,13 @@ import Link from "next/link";
 import TitleBadge from "./TitleBadge";
 
 import { Agent } from "@/features/agents/types/agent";
+import AgentGradeBadge from "./AgentGradeBadge";
 
 export default function AgentCard({ agent }: { agent: Agent }) {
   const t = useT();
   const isVerified = agent.verificationTier === "VERIFIE";
-  const activeListings = (agent.forSaleCount ?? 0) + (agent.forRentCount ?? 0);
+  const forSaleCount = agent.forSaleCount ?? 0;
+  const forRentCount = agent.forRentCount ?? 0;
 
   return (
     <Link
@@ -59,14 +61,23 @@ export default function AgentCard({ agent }: { agent: Agent }) {
           </p>
         </div>
 
-        {/* Title badge + rating */}
+        {/* Title badge + grade */}
         <div className="flex items-center gap-2 mt-2 flex-wrap">
           <TitleBadge title={agent.title} />
-          <span className="inline-flex items-center gap-1 text-xs text-foreground/85">
-            <Star className="w-3.5 h-3.5 fill-secondary text-secondary" />
-            <span className="font-semibold">{agent.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground">({agent.ratingsCount})</span>
-          </span>
+          <AgentGradeBadge grade={agent.grade} />
+        </div>
+
+        {/* Rating */}
+        <div className="mt-1.5">
+          {agent.ratingsCount > 0 ? (
+            <span className="inline-flex items-center gap-1 text-xs text-foreground/85">
+              <Star className="w-3.5 h-3.5 fill-secondary text-secondary" />
+              <span className="font-semibold">{agent.rating.toFixed(1)}</span>
+              <span className="text-muted-foreground">({agent.ratingsCount} avis)</span>
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground/70 italic">Pas encore noté</span>
+          )}
         </div>
 
         {/* Languages */}
@@ -77,24 +88,28 @@ export default function AgentCard({ agent }: { agent: Agent }) {
         )}
 
         {/* Stats bar */}
-        <div className="mt-auto pt-3 mt-3 border-t border-border grid grid-cols-3 gap-2 text-center">
+        <div className="mt-auto pt-3 mt-3 border-t border-border grid grid-cols-4 gap-1 text-center">
           <div>
-            <p className="text-sm font-bold text-foreground">{activeListings}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">{t.cards.forSale} / {t.cards.forRent}</p>
+            <p className="text-sm font-bold text-foreground">{forSaleCount}</p>
+            <p className="text-[10px] text-muted-foreground leading-tight">{t.cards.forSale}</p>
+          </div>
+          <div>
+            <p className="text-sm font-bold text-foreground">{forRentCount}</p>
+            <p className="text-[10px] text-muted-foreground leading-tight">{t.cards.forRent}</p>
           </div>
           <div>
             <p className="text-sm font-bold text-foreground flex items-center justify-center gap-0.5">
               <TrendingUp className="w-3 h-3 text-primary" />
               {agent.closedDeals ?? 0}
             </p>
-            <p className="text-[10px] text-muted-foreground leading-tight">Ventes conclues</p>
+            <p className="text-[10px] text-muted-foreground leading-tight">Conclues</p>
           </div>
           <div>
             <p className="text-sm font-bold text-foreground flex items-center justify-center gap-0.5">
               <Clock className="w-3 h-3 text-primary" />
               {agent.responseMinutes ? `${agent.responseMinutes}m` : "–"}
             </p>
-            <p className="text-[10px] text-muted-foreground leading-tight">Réponse moy.</p>
+            <p className="text-[10px] text-muted-foreground leading-tight">Répons.</p>
           </div>
         </div>
       </div>

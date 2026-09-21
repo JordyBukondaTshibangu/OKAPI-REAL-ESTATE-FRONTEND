@@ -10,7 +10,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
-import { registerUser, getMe } from "@/services/auth";
+import { registerUser } from "@/services/auth";
+import { useToast } from "@/shared/context/ToastContext";
 import { registerAgent } from "@/services/agentAuth";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
@@ -182,6 +183,7 @@ function UserForm({ onSuccess }: { onSuccess: () => void }) {
   const [apiError, setApiError] = useState<string | null>(null);
   const { setAuth } = useAuthStore();
   const { logout: clearAgentSession } = useAgentSessionStore();
+  const { showToast } = useToast();
 
   const {
     register,
@@ -198,20 +200,22 @@ function UserForm({ onSuccess }: { onSuccess: () => void }) {
   async function onSubmit(data: UserFormData) {
     setApiError(null);
     try {
-      const { access_token } = await registerUser({
+      const { access_token, user } = await registerUser({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         phoneNumber: data.phone,
         password: data.password,
       });
-      const user = await getMe(access_token);
       clearAgentSession();
       setAuth(access_token, user);
+      showToast("Bienvenue ! Votre compte a été créé avec succès.", "success");
       onSuccess();
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
-      setApiError(status === 409 ? tr.errEmailTaken : tr.errGeneric);
+      const msg = status === 409 ? tr.errEmailTaken : tr.errGeneric;
+      setApiError(msg);
+      showToast(msg, "error");
     }
   }
 

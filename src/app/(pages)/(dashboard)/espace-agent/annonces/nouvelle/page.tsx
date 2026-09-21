@@ -372,6 +372,7 @@ export default function NouvelleAnnoncePage() {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [photos, setPhotos] = useState<StagedPhoto[]>([]);
+  const [photoStandardsOpen, setPhotoStandardsOpen] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<FormState>({
@@ -418,17 +419,56 @@ export default function NouvelleAnnoncePage() {
 
   // ── Photo handling ──────────────────────────────────────────────────────────
 
-  function addPhotos(files: FileList | null) {
+  async function addPhotos(files: FileList | null) {
     if (!files) return;
-    const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
-    const oversized = Array.from(files).find((f) => f.size > MAX_SIZE);
-    if (oversized) {
-      setError(t.errImageSize);
-      return;
+
+    const MAX_SIZE = 10 * 1024 * 1024;
+    const MIN_W = 800, MIN_H = 600;
+    const MIN_RATIO = 4 / 3, MAX_RATIO = 16 / 9;
+    const ACCEPTED = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+    const rejected: string[] = [];
+    const valid: File[] = [];
+
+    for (const f of Array.from(files)) {
+      // Format
+      if (!ACCEPTED.includes(f.type)) {
+        rejected.push(`"${f.name}" — ${t.errImageFormat}`);
+        continue;
+      }
+      // Size
+      if (f.size > MAX_SIZE) {
+        rejected.push(`"${f.name}" — ${t.errImageSize} (${(f.size / 1024 / 1024).toFixed(1)} Mo)`);
+        continue;
+      }
+      // Dimensions + ratio via Image
+      const dims = await new Promise<{ w: number; h: number }>((resolve) => {
+        const img = new window.Image();
+        const url = URL.createObjectURL(f);
+        img.onload = () => { URL.revokeObjectURL(url); resolve({ w: img.naturalWidth, h: img.naturalHeight }); };
+        img.onerror = () => { URL.revokeObjectURL(url); resolve({ w: 0, h: 0 }); };
+        img.src = url;
+      });
+      if (dims.w > 0 && dims.h > 0) {
+        if (dims.w < MIN_W || dims.h < MIN_H) {
+          rejected.push(`"${f.name}" — ${t.errImageDimensions} (${dims.w}×${dims.h} px)`);
+          continue;
+        }
+        const ratio = dims.w / dims.h;
+        if (ratio < MIN_RATIO - 0.05 || ratio > MAX_RATIO + 0.05) {
+          rejected.push(`"${f.name}" — ${t.errImageAspectRatio} (${dims.w}×${dims.h})`);
+          continue;
+        }
+      }
+      valid.push(f);
     }
-    const toAdd = Array.from(files)
-      .filter((f) => f.type.startsWith("image/"))
-      .slice(0, 15 - photos.length);
+
+    if (rejected.length > 0) {
+      setError(t.errPhotosRejectedPrefix + "\n" + rejected.join("\n"));
+      if (valid.length === 0) return;
+    }
+
+    const toAdd = valid.slice(0, 15 - photos.length);
     setPhotos((prev) => [
       ...prev,
       ...toAdd.map((file) => ({ file, preview: URL.createObjectURL(file) })),
@@ -979,6 +1019,42 @@ export default function NouvelleAnnoncePage() {
               <p className="text-xs text-muted-foreground mb-3">
                 {t.photosInstruction}
               </p>
+
+              {/* Photo standards banner */}
+              <div className="mb-4 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/40 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setPhotoStandardsOpen((v) => !v)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left"
+                >
+                  <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">📋 {t.photoStandardsTitle}</span>
+                  <span className="text-blue-500 text-xs">{photoStandardsOpen ? t.photoStandardsHide : t.photoStandardsShow}</span>
+                </button>
+                {photoStandardsOpen && (
+                  <div className="px-4 pb-4 space-y-2 text-xs text-muted-foreground">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+                      <div className="bg-white dark:bg-blue-950/60 rounded-lg p-2.5 border border-blue-100 dark:border-blue-900">
+                        <p className="font-semibold text-foreground mb-0.5">📐 Dimensions</p>
+                        <p>{t.photoStandardsDimensions}</p>
+                      </div>
+                      <div className="bg-white dark:bg-blue-950/60 rounded-lg p-2.5 border border-blue-100 dark:border-blue-900">
+                        <p className="font-semibold text-foreground mb-0.5">🖼️ Formats</p>
+                        <p>{t.photoStandardsFormats}</p>
+                      </div>
+                      <div className="bg-white dark:bg-blue-950/60 rounded-lg p-2.5 border border-blue-100 dark:border-blue-900">
+                        <p className="font-semibold text-foreground mb-0.5">↔️ Ratio</p>
+                        <p>{t.photoStandardsRatio}</p>
+                      </div>
+                    </div>
+                    <p className="font-semibold text-foreground">{t.photoStandardsOrderTitle}</p>
+                    <div className="grid grid-cols-2 gap-1">
+                      {t.photoStandardsOrderItems.map((item) => (
+                        <p key={item}>{item}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div
                 className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition"

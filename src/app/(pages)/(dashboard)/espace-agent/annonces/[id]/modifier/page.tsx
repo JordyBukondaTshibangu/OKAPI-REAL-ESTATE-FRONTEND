@@ -317,14 +317,52 @@ export default function ModifierAnnoncePage() {
 
   const totalPhotos = existingPhotos.length + newPhotos.length;
 
-  function addNewPhotos(files: FileList | null) {
+  async function addNewPhotos(files: FileList | null) {
     if (!files) return;
-    const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
-    const oversized = Array.from(files).find((f) => f.size > MAX_SIZE);
-    if (oversized) { setError(t.errImageSize); return; }
-    const toAdd = Array.from(files)
-      .filter((f) => f.type.startsWith("image/"))
-      .slice(0, 15 - totalPhotos);
+    const MAX_SIZE = 10 * 1024 * 1024;
+    const MIN_W = 800, MIN_H = 600;
+    const MIN_RATIO = 4 / 3, MAX_RATIO = 16 / 9;
+    const ACCEPTED = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+    const rejected: string[] = [];
+    const valid: File[] = [];
+
+    for (const f of Array.from(files)) {
+      if (!ACCEPTED.includes(f.type)) {
+        rejected.push(`"${f.name}" — ${t.errImageFormat}`);
+        continue;
+      }
+      if (f.size > MAX_SIZE) {
+        rejected.push(`"${f.name}" — ${t.errImageSize} (${(f.size / 1024 / 1024).toFixed(1)} Mo)`);
+        continue;
+      }
+      const dims = await new Promise<{ w: number; h: number }>((resolve) => {
+        const img = new window.Image();
+        const url = URL.createObjectURL(f);
+        img.onload = () => { URL.revokeObjectURL(url); resolve({ w: img.naturalWidth, h: img.naturalHeight }); };
+        img.onerror = () => { URL.revokeObjectURL(url); resolve({ w: 0, h: 0 }); };
+        img.src = url;
+      });
+      if (dims.w > 0 && dims.h > 0) {
+        if (dims.w < MIN_W || dims.h < MIN_H) {
+          rejected.push(`"${f.name}" — ${t.errImageDimensions} (${dims.w}×${dims.h} px)`);
+          continue;
+        }
+        const ratio = dims.w / dims.h;
+        if (ratio < MIN_RATIO - 0.05 || ratio > MAX_RATIO + 0.05) {
+          rejected.push(`"${f.name}" — ${t.errImageAspectRatio} (${dims.w}×${dims.h})`);
+          continue;
+        }
+      }
+      valid.push(f);
+    }
+
+    if (rejected.length > 0) {
+      setError(t.errPhotosRejectedPrefix + "\n" + rejected.join("\n"));
+      if (valid.length === 0) return;
+    }
+
+    const toAdd = valid.slice(0, 15 - totalPhotos);
     setNewPhotos((prev) => [
       ...prev,
       ...toAdd.map((file) => ({ file, preview: URL.createObjectURL(file) })),

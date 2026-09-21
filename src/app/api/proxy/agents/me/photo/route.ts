@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND = process.env.API_URL ?? "http://localhost:3000";
+const BACKEND = process.env.API_URL ?? "http://localhost:8080";
 
 export async function PATCH(req: NextRequest): Promise<NextResponse> {
   const auth = req.headers.get("authorization");

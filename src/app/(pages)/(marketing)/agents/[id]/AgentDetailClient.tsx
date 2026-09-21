@@ -25,6 +25,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { getAgentReviews, createReview, type Review } from "@/services/auth";
 import { useT } from "@/i18n/useT";
+import AgentGradeBadge from "@/features/agents/components/AgentGradeBadge";
 
 function StarRating({ value, max = 5 }: { value: number; max?: number }) {
   const full = Math.floor(value);
@@ -117,6 +118,11 @@ export default function AgentDetailClient({
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewHover, setReviewHover] = useState(0);
+  const [reviewReactivite, setReviewReactivite] = useState(0);
+  const [reviewReactiviteHover, setReviewReactiviteHover] = useState(0);
+  const [reviewProfessionnalisme, setReviewProfessionnalisme] = useState(0);
+  const [reviewProfessionnalismeHover, setReviewProfessionnalismeHover] = useState(0);
+  const [propertyMatch, setPropertyMatch] = useState<"oui" | "non" | "pas_visite" | null>(null);
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
@@ -147,15 +153,23 @@ export default function AgentDetailClient({
     if (reviewRating === 0) return;
     setReviewSubmitting(true);
     setReviewError(null);
+    const ratingHonnetete =
+      propertyMatch === "oui" ? 5 : propertyMatch === "non" ? 1 : null;
     try {
       const review = await createReview(token, {
         agentId: id,
         rating: reviewRating,
-        comment: reviewComment || undefined,
+        ratingReactivite: reviewReactivite || null,
+        ratingHonnetete,
+        ratingProfessionnalisme: reviewProfessionnalisme || null,
+        comment: reviewComment.trim() || undefined,
       });
       setReviews((prev) => [review, ...prev]);
       setReviewSuccess(true);
       setReviewRating(0);
+      setReviewReactivite(0);
+      setReviewProfessionnalisme(0);
+      setPropertyMatch(null);
       setReviewComment("");
       setTimeout(() => setReviewSuccess(false), 4000);
     } catch {
@@ -223,6 +237,11 @@ export default function AgentDetailClient({
               <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
                 {agent.name}
               </h1>
+              {agent.grade && agent.grade !== "NOUVEAU" && (
+                <div className="mt-2">
+                  <AgentGradeBadge grade={agent.grade} size="md" />
+                </div>
+              )}
               <div className="flex items-center gap-3 mt-3 text-sm">
                 <span className="font-semibold">{agent.rating.toFixed(1)}</span>
                 <StarRating value={agent.rating} />
@@ -243,9 +262,11 @@ export default function AgentDetailClient({
               <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
                 <Button className="h-11 gap-2 bg-white dark:bg-card text-foreground hover:bg-white dark:bg-card/90" asChild>
                   <a
-                    href={agent.phone
-                      ? `https://wa.me/${agent.phone.replace(/[\s+\-()]/g, "")}?text=${encodeURIComponent(da.whatsappMsg.replace("{name}", agent.name))}`
-                      : `https://wa.me/?text=${encodeURIComponent(da.whatsappMsg.replace("{name}", agent.name))}`}
+                    href={(() => {
+                      const waNum = (agent.whatsappNumber || agent.phone || "").replace(/[\s+\-()]/g, "");
+                      const msg = encodeURIComponent(da.whatsappMsg.replace("{name}", agent.name));
+                      return waNum ? `https://wa.me/${waNum}?text=${msg}` : `https://wa.me/?text=${msg}`;
+                    })()}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -490,60 +511,119 @@ export default function AgentDetailClient({
               <div className="mb-6 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-5 flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
                 <p className="text-sm text-green-800 dark:text-green-300 font-medium">
-                  Vous avez déjà laissé un avis pour cet agent.
+                  {da.alreadyReviewedMsg}
                 </p>
               </div>
             ) : (
-              <div className="mb-6 rounded-xl bg-accent/50 border border-accent p-5">
-                <h3 className="text-sm font-semibold text-foreground mb-3">
+              <div className="mb-6 rounded-xl bg-accent/50 border border-accent p-5 space-y-5">
+                <h3 className="text-sm font-semibold text-foreground">
                   {isAuthenticated ? da.leaveReviewLabel : da.loginToReviewLabel}
                 </h3>
-                <div className="flex items-center gap-1 mb-3">
-                  {Array.from({ length: 5 }).map((_, i) => {
-                    const val = i + 1;
-                    return (
-                      <button
-                        key={i}
-                        type="button"
-                        onMouseEnter={() => setReviewHover(val)}
-                        onMouseLeave={() => setReviewHover(0)}
-                        onClick={() =>
-                          isAuthenticated ? setReviewRating(val) : router.push("/connexion")
-                        }
-                        className="p-0.5"
-                        aria-label={`${val} étoile${val > 1 ? "s" : ""}`}
-                      >
-                        <Star
-                          className={`w-7 h-7 transition-colors ${
-                            val <= (reviewHover || reviewRating)
-                              ? "fill-secondary text-secondary"
-                              : "text-foreground/20"
-                          }`}
-                        />
-                      </button>
-                    );
-                  })}
-                  {reviewRating > 0 && (
-                    <span className="ml-2 text-sm text-muted-foreground">
-                      {ratingLabels[reviewRating]}
-                    </span>
-                  )}
+
+                {/* Global rating */}
+                <div>
+                  <div className="flex items-center gap-1 mb-1">
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const val = i + 1;
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onMouseEnter={() => setReviewHover(val)}
+                          onMouseLeave={() => setReviewHover(0)}
+                          onClick={() =>
+                            isAuthenticated ? setReviewRating(val) : router.push("/connexion")
+                          }
+                          className="p-0.5"
+                          aria-label={`${val} étoile${val > 1 ? "s" : ""}`}
+                        >
+                          <Star
+                            className={`w-7 h-7 transition-colors ${
+                              val <= (reviewHover || reviewRating)
+                                ? "fill-secondary text-secondary"
+                                : "text-foreground/20"
+                            }`}
+                          />
+                        </button>
+                      );
+                    })}
+                    {reviewRating > 0 && (
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        {ratingLabels[reviewRating]}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <textarea
-                  value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder={da.reviewPlaceholder}
-                  rows={3}
-                  className="w-full text-sm border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white dark:bg-card"
-                  disabled={!isAuthenticated}
-                />
+
+                {/* Sub-ratings */}
+                <div className="rounded-lg border border-border bg-white dark:bg-card p-4 space-y-3">
+                  <p className="text-xs font-semibold text-foreground/70 uppercase tracking-wide">{da.subRatingsTitle}</p>
+
+                  {/* Réactivité */}
+                  <SubRatingRow
+                    label={da.ratingReactiviteLabel}
+                    value={reviewReactivite}
+                    hover={reviewReactiviteHover}
+                    disabled={!isAuthenticated}
+                    onHover={setReviewReactiviteHover}
+                    onChange={setReviewReactivite}
+                  />
+
+                  {/* Professionnalisme */}
+                  <SubRatingRow
+                    label={da.ratingProfessionnalismeLabel}
+                    value={reviewProfessionnalisme}
+                    hover={reviewProfessionnalismeHover}
+                    disabled={!isAuthenticated}
+                    onHover={setReviewProfessionnalismeHover}
+                    onChange={setReviewProfessionnalisme}
+                  />
+
+                  {/* Property match → Honnêteté */}
+                  <div>
+                    <p className="text-xs text-foreground/70 mb-1.5">{da.propertyMatchLabel}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(["oui", "non", "pas_visite"] as const).map((opt) => {
+                        const label = opt === "oui" ? da.propertyMatchYes : opt === "non" ? da.propertyMatchNo : da.propertyMatchNotVisited;
+                        return (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => isAuthenticated ? setPropertyMatch(propertyMatch === opt ? null : opt) : router.push("/connexion")}
+                            className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${
+                              propertyMatch === opt
+                                ? "bg-primary text-white border-primary"
+                                : "border-border text-foreground/70 hover:border-primary/50"
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Comment */}
+                <div>
+                  <textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value.slice(0, 200))}
+                    placeholder={da.reviewPlaceholder}
+                    rows={3}
+                    className="w-full text-sm border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white dark:bg-card"
+                    disabled={!isAuthenticated}
+                  />
+                  <p className="text-right text-xs text-muted-foreground mt-1">{reviewComment.length}/200 · {da.commentMaxLength}</p>
+                </div>
+
                 {reviewError && (
-                  <p className="text-xs text-destructive mt-2">{reviewError}</p>
+                  <p className="text-xs text-destructive">{reviewError}</p>
                 )}
                 {reviewSuccess && (
-                  <p className="text-xs text-green-600 mt-2">{da.reviewPosted}</p>
+                  <p className="text-xs text-green-600">{da.reviewPosted}</p>
                 )}
-                <div className="mt-3 flex justify-end">
+                <div className="flex justify-end">
                   <Button
                     onClick={handleSubmitReview}
                     disabled={reviewSubmitting || reviewRating === 0 || !isAuthenticated}
@@ -656,6 +736,56 @@ export default function AgentDetailClient({
 }
 
 /* ------------------------------ subcomponents ------------------------------ */
+
+function SubRatingRow({
+  label,
+  value,
+  hover,
+  disabled,
+  onHover,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  hover: number;
+  disabled: boolean;
+  onHover: (v: number) => void;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-xs text-foreground/70 min-w-[120px]">{label}</span>
+      <div className="flex items-center gap-0.5">
+        {Array.from({ length: 5 }).map((_, i) => {
+          const val = i + 1;
+          return (
+            <button
+              key={i}
+              type="button"
+              onMouseEnter={() => onHover(val)}
+              onMouseLeave={() => onHover(0)}
+              onClick={() => !disabled && onChange(value === val ? 0 : val)}
+              className="p-0.5"
+              disabled={disabled}
+              aria-label={`${label} ${val}/5`}
+            >
+              <Star
+                className={`w-5 h-5 transition-colors ${
+                  val <= (hover || value)
+                    ? "fill-secondary text-secondary"
+                    : "text-foreground/15"
+                }`}
+              />
+            </button>
+          );
+        })}
+        {value > 0 && (
+          <span className="ml-1.5 text-xs text-muted-foreground tabular-nums">{value}/5</span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function Breadcrumb({ agent }: { agent: Agent }) {
   const t = useT();

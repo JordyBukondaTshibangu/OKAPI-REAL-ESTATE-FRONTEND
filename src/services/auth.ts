@@ -25,7 +25,7 @@ export async function registerUser(data: {
   phoneNumber: string;
   password: string;
 }) {
-  const res = await axios.post<{ access_token: string }>(
+  const res = await axios.post<{ access_token: string; user: User }>(
     `/api/proxy/auth/register`,
     data
   );
@@ -283,6 +283,9 @@ export type Review = {
   property?: { id: string; title: string };
   agent?: { id: string; name: string };
   rating: number;
+  ratingReactivite?: number | null;
+  ratingHonnetete?: number | null;
+  ratingProfessionnalisme?: number | null;
   comment?: string;
   createdAt: string;
 };
@@ -296,7 +299,15 @@ export async function getMyReviews(token: string): Promise<Review[]> {
 
 export async function createReview(
   token: string,
-  data: { propertyId?: string; agentId?: string; rating: number; comment?: string }
+  data: {
+    propertyId?: string;
+    agentId?: string;
+    rating: number;
+    ratingReactivite?: number | null;
+    ratingHonnetete?: number | null;
+    ratingProfessionnalisme?: number | null;
+    comment?: string;
+  }
 ) {
   const res = await axios.post(`${BASE}/api/user/reviews`, data, {
     headers: authHeader(token),

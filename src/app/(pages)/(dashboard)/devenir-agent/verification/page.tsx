@@ -4,8 +4,10 @@ import { Button } from "@/shared/components/ui/button";
 import {
   verifyAgentEmail,
   resendAgentVerification,
+  getMyAgentProfile,
 } from "@/services/agentAuth";
 import { useAgentSignupStore } from "@/store/useAgentSignupStore";
+import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { useT } from "@/i18n/useT";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,6 +17,7 @@ import { useEffect, useRef, useState } from "react";
 export default function AgentVerificationPage() {
   const router = useRouter();
   const { token, agentEmail, agentName, clear } = useAgentSignupStore();
+  const { setSession } = useAgentSessionStore();
   const t = useT();
   const s = t.agentSignup;
 
@@ -80,9 +83,22 @@ export default function AgentVerificationPage() {
     setSubmitting(true);
     try {
       await verifyAgentEmail(token, code);
+      // Fetch full agent profile so we can establish a real session
+      const profile = await getMyAgentProfile(token);
+      setSession(token, {
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+        verificationTier: profile.verificationTier ?? "NON_VERIFIE",
+        emailVerified: profile.emailVerified ?? true,
+        agentType: profile.agentType ?? null,
+        agencyId: profile.agencyId ?? null,
+      });
       setVerified(true); // prevents the token guard from redirecting back
       clear();
-      router.push("/devenir-agent/en-attente");
+      // Go straight to the agent dashboard — the page shows a "pending approval"
+      // banner for NON_VERIFIE agents and blocks publishing until approved.
+      router.push("/espace-agent");
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })
         ?.response?.data?.message;

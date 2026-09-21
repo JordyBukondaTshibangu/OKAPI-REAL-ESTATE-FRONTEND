@@ -4,7 +4,7 @@ import { DiscoverCard } from "./Discover";
 export default function DiscoverCardItem({ card }: { card: DiscoverCard }) {
   const { Icon, Badge } = card;
   return (
-    <div className="flex flex-col items-center text-center px-6 py-8 hover:bg-secondary/5 transition-all duration-300 group">
+    <div className="flex flex-col items-center text-center px-6 py-8 hover:bg-secondary/5 dark:hover:bg-secondary/10 transition-all duration-300 group">
       {/* Illustration */}
       <div className="relative mb-8">
         <div className="w-28 h-28 rounded-full bg-navy flex items-center justify-center group-hover:scale-105 group-hover:shadow-[0_0_24px_rgba(212,175,55,0.25)] transition-all duration-300">

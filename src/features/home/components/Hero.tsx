@@ -70,7 +70,11 @@ function useTypewriter(segments: [string, string | null][], speed = 45) {
   const fullText = segments.map(([t]) => t).join("");
   // Store charCount together with which text it belongs to so we can
   // derive a 0 value when fullText changes without a synchronous setState.
-  const [state, setState] = useState({ charCount: 0, done: false, forText: fullText });
+  const [state, setState] = useState({
+    charCount: 0,
+    done: false,
+    forText: fullText,
+  });
 
   useEffect(() => {
     let i = 0;
@@ -87,13 +91,20 @@ function useTypewriter(segments: [string, string | null][], speed = 45) {
   const charCount = state.forText === fullText ? state.charCount : 0;
   const done = state.forText === fullText ? state.done : false;
 
-  const { nodes } = segments.reduce<{ nodes: React.ReactNode[]; remaining: number }>(
+  const { nodes } = segments.reduce<{
+    nodes: React.ReactNode[];
+    remaining: number;
+  }>(
     ({ nodes, remaining }, [seg, cls], idx) => {
       if (remaining <= 0) return { nodes: [...nodes, null], remaining: 0 };
       const visible = seg.slice(0, remaining);
-      const node = cls
-        ? <span key={idx} className={cls}>{visible}</span>
-        : <span key={idx}>{visible}</span>;
+      const node = cls ? (
+        <span key={idx} className={cls}>
+          {visible}
+        </span>
+      ) : (
+        <span key={idx}>{visible}</span>
+      );
       return { nodes: [...nodes, node], remaining: remaining - seg.length };
     },
     { nodes: [], remaining: charCount },
@@ -172,7 +183,7 @@ export default function Hero({
   }
 
   return (
-    <section className="relative bg-navy text-white py-8 md:py-12 lg:py-16 px-5 md:px-8 overflow-hidden">
+    <section className="relative bg-navy text-white pt-8 pb-20 md:pt-12 md:pb-28 lg:pt-16 lg:pb-32 px-5 md:px-8 overflow-hidden">
       {/* Ambient gradient */}
       <div
         className="absolute inset-0 bg-linear-to-br from-navy via-navy to-primary/30 pointer-events-none"

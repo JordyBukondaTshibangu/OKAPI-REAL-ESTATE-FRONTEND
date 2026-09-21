@@ -353,8 +353,13 @@ function AgentCard({
             const message = dp.whatsappMsg
               .replace("{link}", link)
               .replace("{ref}", detail.reference ?? "");
+            const contactNum = (
+              detail.agent?.whatsappNumber ||
+              detail.agent?.phone ||
+              ""
+            ).replace(/\D/g, "");
             window.open(
-              `https://wa.me/971523787362?text=${encodeURIComponent(message)}`,
+              `https://wa.me/${contactNum}?text=${encodeURIComponent(message)}`,
               "_blank",
               "noopener,noreferrer",
             );

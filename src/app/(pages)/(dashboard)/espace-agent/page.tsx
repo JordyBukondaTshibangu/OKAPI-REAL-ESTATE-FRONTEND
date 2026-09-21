@@ -651,19 +651,50 @@ function TodoCard({ profile, t }: { profile: AgentProfile; t: T }) {
 
 function PendingPrompt({ t }: { t: T }) {
   return (
-    <div className="bg-card rounded-2xl shadow-sm p-6 text-center">
-      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-        <User className="w-6 h-6 text-primary" />
+    <div className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-5">
+      {/* Header */}
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center shrink-0">
+          <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+            {t.pendingPromptTitle}
+          </p>
+          <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5 leading-relaxed">
+            {t.pendingPromptBody}
+          </p>
+        </div>
       </div>
-      <p className="text-sm font-semibold text-foreground mb-1">
-        {t.pendingPromptTitle}
-      </p>
-      <p className="text-xs text-muted-foreground mb-4 max-w-xs mx-auto leading-relaxed">
-        {t.pendingPromptBody}
-      </p>
-      <Button size="sm" asChild>
-        <Link href="/espace-agent/profil">{t.pendingPromptCta}</Link>
-      </Button>
+
+      {/* Steps */}
+      <ol className="space-y-2.5 mb-4">
+        {[
+          { label: "Compte créé", done: true },
+          { label: "E-mail vérifié", done: true },
+          { label: "Vérification en cours par Okapi", done: false, active: true },
+          { label: "Compte activé — vous pouvez publier", done: false },
+        ].map((step, i) => (
+          <li key={i} className="flex items-center gap-2.5 text-xs">
+            <span className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold
+              ${step.done ? "bg-emerald-500 text-white" : step.active ? "bg-amber-500 text-white" : "bg-amber-200 dark:bg-amber-800 text-amber-600 dark:text-amber-400"}`}>
+              {step.done ? "✓" : i + 1}
+            </span>
+            <span className={step.done ? "text-emerald-700 dark:text-emerald-400 line-through" : step.active ? "text-amber-800 dark:text-amber-200 font-medium" : "text-amber-600/60 dark:text-amber-600"}>
+              {step.label}
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      <div className="flex gap-2">
+        <Button size="sm" variant="outline" className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-950/40 text-xs" asChild>
+          <Link href="/espace-agent/profil">{t.pendingPromptCta}</Link>
+        </Button>
+        <Button size="sm" variant="outline" className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-950/40 text-xs" asChild>
+          <a href="mailto:support@okapi.immo">Contacter le support</a>
+        </Button>
+      </div>
     </div>
   );
 }
@@ -772,7 +803,7 @@ function KpiCards({ profile, t }: { profile: AgentProfile; t: T }) {
   );
 }
 
-function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
+function ActionSection({ t, isPro, isVerified = true }: { t: T; isPro: boolean; isVerified?: boolean }) {
   const actions = [
     {
       icon: <Home className="w-4 h-4" />,
@@ -825,16 +856,28 @@ function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
 
       {/* Primary CTA */}
       <div className="px-4 py-4 border-b border-border">
-        <Button
-          size="sm"
-          className="w-full justify-start gap-2 text-xs whitespace-nowrap"
-          asChild
-        >
-          <Link href="/espace-agent/annonces/nouvelle">
-            <PlusCircle className="w-3.5 h-3.5 shrink-0" />
-            {t.publishListing}
-          </Link>
-        </Button>
+        {isVerified ? (
+          <Button
+            size="sm"
+            className="w-full justify-start gap-2 text-xs whitespace-nowrap"
+            asChild
+          >
+            <Link href="/espace-agent/annonces/nouvelle">
+              <PlusCircle className="w-3.5 h-3.5 shrink-0" />
+              {t.publishListing}
+            </Link>
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full justify-start gap-2 text-xs whitespace-nowrap opacity-60 cursor-not-allowed"
+            disabled
+          >
+            <Lock className="w-3.5 h-3.5 shrink-0" />
+            En attente d&apos;approbation
+          </Button>
+        )}
       </div>
 
       {/* Secondary actions */}
@@ -886,9 +929,11 @@ function ActionSection({ t, isPro }: { t: T; isPro: boolean }) {
 function ListingsSection({
   properties,
   t,
+  isVerified = true,
 }: {
   properties?: AgentProperty[];
   t: T;
+  isVerified?: boolean;
 }) {
   const recent = (properties ?? []).slice(0, 5);
 
@@ -947,12 +992,19 @@ function ListingsSection({
           <p className="text-xs text-muted-foreground mb-4 max-w-xs mx-auto">
             {t.noListingsBody}
           </p>
-          <Button size="sm" asChild>
-            <Link href="/espace-agent/annonces/nouvelle">
-              <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
-              {t.publishFirstListing}
-            </Link>
-          </Button>
+          {isVerified ? (
+            <Button size="sm" asChild>
+              <Link href="/espace-agent/annonces/nouvelle">
+                <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
+                {t.publishFirstListing}
+              </Link>
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" disabled className="opacity-50 cursor-not-allowed">
+              <Lock className="w-3.5 h-3.5 mr-1.5" />
+              Disponible après approbation
+            </Button>
+          )}
         </div>
       ) : (
         <div className="divide-y divide-border">
@@ -1122,8 +1174,8 @@ export default function EspaceAgentPage() {
           ) : (
             <KpiCards profile={agent} t={t} />
           )}
-          <ActionSection t={t} isPro={isPro} />
-          <ListingsSection properties={agent.properties} t={t} />
+          <ActionSection t={t} isPro={isPro} isVerified={agent.verificationTier === "VERIFIE"} />
+          <ListingsSection properties={agent.properties} t={t} isVerified={agent.verificationTier === "VERIFIE"} />
         </div>
 
         {/* ── Tablet + Desktop: multi-column grid ── */}
@@ -1145,16 +1197,16 @@ export default function EspaceAgentPage() {
             ) : (
               <KpiCards profile={agent} t={t} />
             )}
-            <ListingsSection properties={agent.properties} t={t} />
+            <ListingsSection properties={agent.properties} t={t} isVerified={agent.verificationTier === "VERIFIE"} />
             {/* ActionSection moves here on tablet (< lg) */}
             <div className="lg:hidden">
-              <ActionSection t={t} isPro={isPro} />
+              <ActionSection t={t} isPro={isPro} isVerified={agent.verificationTier === "VERIFIE"} />
             </div>
           </div>
 
           {/* RIGHT sidebar — desktop only */}
           <div className="hidden lg:flex flex-col gap-4 min-w-0">
-            <ActionSection t={t} isPro={isPro} />
+            <ActionSection t={t} isPro={isPro} isVerified={agent.verificationTier === "VERIFIE"} />
           </div>
         </div>
       </main>
