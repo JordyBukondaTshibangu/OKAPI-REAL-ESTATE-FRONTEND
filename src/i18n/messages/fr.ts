@@ -509,8 +509,8 @@ const fr: Messages = {
     about: {
       badge: "À propos de nous", heading: "Le portail immobilier numéro un à Kinshasa",
       subtitle: "Depuis 2014, Okapi Real Estate connecte acheteurs, locataires, vendeurs et agents immobiliers à travers la RDC.",
-      stat1Label: "Biens listés", stat1Value: "250 000+", stat2Label: "Utilisateurs actifs", stat2Value: "500 000+",
-      stat3Label: "Agences partenaires", stat3Value: "1 200+", stat4Label: "Années d'expérience", stat4Value: "10+",
+      stat1Label: "Annonces vérifiées", stat1Value: "100%", stat2Label: "Délai de réponse", stat2Value: "< 24h",
+      stat3Label: "Pour acheteurs & locataires", stat3Value: "Gratuit", stat4Label: "Communes couvertes", stat4Value: "26",
       missionBadge: "Notre mission", missionHeading: "Rendre l'immobilier accessible à tous les Congolais",
       missionPara1: "Okapi Real Estate est né d'une conviction simple : trouver un bien immobilier en RDC ne doit pas être compliqué. Notre plateforme rassemble les annonces des principales agences et particuliers pour vous offrir le choix le plus large.",
       missionPara2: "Que vous cherchiez à acheter votre première maison, à louer un appartement en Gombe ou à vendre un terrain à Limete, Okapi Real Estate est votre partenaire de confiance à chaque étape.",
