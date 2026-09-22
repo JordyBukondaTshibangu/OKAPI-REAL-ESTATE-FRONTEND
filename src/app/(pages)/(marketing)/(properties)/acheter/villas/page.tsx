@@ -7,7 +7,12 @@ import {
 } from "@/lib/properties";
 
 export const metadata = {
-  title: "Villas à vendre à Kinshasa — Okapi Real Estate",
+  title: "Villas à vendre à Kinshasa — Annonces & Prix",
+  description:
+    "Trouvez une villa à acheter à Kinshasa : villas de standing, avec piscine, en résidence sécurisée. Annonces vérifiées avec prix et photos sur Okapi Real Estate.",
+  keywords: ["villa à vendre Kinshasa", "villa de luxe Kinshasa", "acheter villa RDC", "maison villa Kinshasa"],
+  openGraph: { title: "Villas à vendre à Kinshasa", description: "Achetez une villa à Kinshasa. Annonces vérifiées sur Okapi Real Estate.", url: "https://okapi-real-estate.com/acheter/villas" },
+  alternates: { canonical: "https://okapi-real-estate.com/acheter/villas" },
 };
 
 export default async function Page({

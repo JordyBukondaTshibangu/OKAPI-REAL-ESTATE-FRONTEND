@@ -6,7 +6,13 @@ import {
   type PropertyFilters,
 } from "@/lib/properties";
 
-export const metadata = { title: "Bureaux à Kinshasa — Okapi Real Estate" };
+export const metadata = {
+  title: "Bureaux à louer & à vendre à Kinshasa — Locaux professionnels",
+  description: "Trouvez un bureau à louer ou à acheter à Kinshasa : open-spaces, bureaux individuels et plateaux de bureaux disponibles. Annonces vérifiées sur Okapi Real Estate.",
+  keywords: ["bureau à louer Kinshasa", "local professionnel Kinshasa", "bureau à vendre RDC", "espace de travail Kinshasa"],
+  openGraph: { title: "Bureaux à Kinshasa", url: "https://okapi-real-estate.com/commercial/bureaux" },
+  alternates: { canonical: "https://okapi-real-estate.com/commercial/bureaux" },
+};
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; type?: string; minPrice?: string; maxPrice?: string; beds?: string }> }) {
   const { page, q, type, minPrice, maxPrice, beds } = await searchParams;

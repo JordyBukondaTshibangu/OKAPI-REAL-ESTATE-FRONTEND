@@ -2,7 +2,13 @@
 import PropertyListingPage from "@/features/properties/components/PropertyListingPage";
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
-export const metadata = { title: "Entrepôts à Kinshasa — Okapi Real Estate" };
+export const metadata = {
+  title: "Entrepôts à louer & à vendre à Kinshasa — Locaux industriels",
+  description: "Louez ou achetez un entrepôt à Kinshasa : entrepôts logistiques, industriels et de stockage disponibles. Annonces vérifiées sur Okapi Real Estate.",
+  keywords: ["entrepôt à louer Kinshasa", "entrepôt industriel RDC", "stockage Kinshasa", "local industriel Congo"],
+  openGraph: { title: "Entrepôts à Kinshasa", url: "https://okapi-real-estate.com/commercial/entrepots" },
+  alternates: { canonical: "https://okapi-real-estate.com/commercial/entrepots" },
+};
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; type?: string; minPrice?: string; maxPrice?: string; beds?: string }> }) {
   const { page, q, type, minPrice, maxPrice, beds } = await searchParams;

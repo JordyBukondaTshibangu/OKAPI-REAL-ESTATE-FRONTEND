@@ -2,7 +2,11 @@ import PropertyListingPage from "@/features/properties/components/PropertyListin
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
 export const metadata = {
-  title: "Penthouses à vendre à Kinshasa — Okapi Real Estate",
+  title: "Penthouses à vendre à Kinshasa — Luxe & Vue Panoramique",
+  description: "Achetez un penthouse à Kinshasa : appartements de luxe en dernier étage avec vue panoramique. Annonces haut de gamme vérifiées sur Okapi Real Estate.",
+  keywords: ["penthouse Kinshasa", "appartement luxe Kinshasa", "penthouse à vendre RDC", "immobilier luxe Kinshasa"],
+  openGraph: { title: "Penthouses à vendre à Kinshasa", url: "https://okapi-real-estate.com/acheter/penthouses" },
+  alternates: { canonical: "https://okapi-real-estate.com/acheter/penthouses" },
 };
 
 export default async function Page({

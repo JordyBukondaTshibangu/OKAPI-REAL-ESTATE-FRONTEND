@@ -311,7 +311,7 @@ export default function Footer() {
         <div className="flex items-center gap-3 mt-10 pt-6 border-t border-white/10">
           <Image
             src="/assets/images/company-logo.png"
-            alt=""
+            alt="Okapi Real Estate"
             width={56}
             height={22}
             className="h-[18px] w-auto opacity-40"

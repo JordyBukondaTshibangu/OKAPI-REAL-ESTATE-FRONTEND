@@ -2,7 +2,12 @@
 import PropertyListingPage from "@/features/properties/components/PropertyListingPage";
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
-export const metadata = { title: "Magasins à louer à Kinshasa — Okapi Real Estate" };
+export const metadata = {
+  title: "Magasins à louer à Kinshasa — Boutiques & Locaux retail",
+  description: "Louez un magasin ou une boutique à Kinshasa : locaux commerciaux, espaces de vente et boutiques en centre-ville disponibles. Annonces vérifiées sur Okapi Real Estate.",
+  keywords: ["magasin à louer Kinshasa", "boutique location Kinshasa", "local retail RDC", "commerce Kinshasa"],
+  alternates: { canonical: "https://okapi-real-estate.com/commercial/location/magasins" },
+};
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; type?: string; minPrice?: string; maxPrice?: string; beds?: string }> }) {
   const { page, q, type, minPrice, maxPrice, beds } = await searchParams;

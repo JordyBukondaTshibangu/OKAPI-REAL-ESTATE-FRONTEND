@@ -2,7 +2,12 @@
 import PropertyListingPage from "@/features/properties/components/PropertyListingPage";
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
-export const metadata = { title: "Bureaux à louer à Kinshasa — Okapi Real Estate" };
+export const metadata = {
+  title: "Bureaux à louer à Kinshasa — Espaces professionnels disponibles",
+  description: "Louez un bureau à Kinshasa : espaces partagés, bureaux fermés et plateaux de bureaux disponibles immédiatement. Annonces vérifiées sur Okapi Real Estate.",
+  keywords: ["bureau à louer Kinshasa", "location bureau RDC", "espace professionnel Kinshasa", "coworking Congo"],
+  alternates: { canonical: "https://okapi-real-estate.com/commercial/location/bureaux" },
+};
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; type?: string; minPrice?: string; maxPrice?: string; beds?: string }> }) {
   const { page, q, type, minPrice, maxPrice, beds } = await searchParams;

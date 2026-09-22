@@ -2,7 +2,11 @@ import PropertyListingPage from "@/features/properties/components/PropertyListin
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
 export const metadata = {
-  title: "Villas à louer à Kinshasa — Okapi Real Estate",
+  title: "Villas à louer à Kinshasa — Résidences de standing",
+  description: "Louez une villa à Kinshasa : villas meublées, avec piscine, en résidence sécurisée. Annonces vérifiées avec prix et contact agent direct sur Okapi Real Estate.",
+  keywords: ["villa à louer Kinshasa", "louer villa RDC", "villa meublée Kinshasa", "location villa Congo"],
+  openGraph: { title: "Villas à louer à Kinshasa", url: "https://okapi-real-estate.com/louer/villas" },
+  alternates: { canonical: "https://okapi-real-estate.com/louer/villas" },
 };
 
 export default async function Page({

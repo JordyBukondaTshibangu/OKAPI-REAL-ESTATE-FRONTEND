@@ -3,7 +3,11 @@ import PropertyListingPage from "@/features/properties/components/PropertyListin
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
 export const metadata = {
-  title: "Terrains à vendre à Kinshasa — Okapi Real Estate",
+  title: "Terrains à vendre à Kinshasa — Parcelles & Lopins",
+  description: "Achetez un terrain à Kinshasa : parcelles constructibles, lopins de terre et terrains industriels. Annonces vérifiées avec titres fonciers sur Okapi Real Estate.",
+  keywords: ["terrain à vendre Kinshasa", "parcelle Kinshasa", "lopin de terre RDC", "achat terrain Congo"],
+  openGraph: { title: "Terrains à vendre à Kinshasa", url: "https://okapi-real-estate.com/acheter/terrains" },
+  alternates: { canonical: "https://okapi-real-estate.com/acheter/terrains" },
 };
 
 export default async function Page({

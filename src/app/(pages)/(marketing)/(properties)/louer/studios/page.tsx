@@ -2,7 +2,11 @@ import PropertyListingPage from "@/features/properties/components/PropertyListin
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
 export const metadata = {
-  title: "Studios à louer à Kinshasa — Okapi Real Estate",
+  title: "Studios à louer à Kinshasa — Petits appartements meublés",
+  description: "Trouvez un studio à louer à Kinshasa : studios meublés, avec kitchenette, idéals pour étudiants ou jeunes professionnels. Annonces vérifiées sur Okapi Real Estate.",
+  keywords: ["studio à louer Kinshasa", "studio meublé Kinshasa", "location studio RDC", "petit appartement Kinshasa"],
+  openGraph: { title: "Studios à louer à Kinshasa", url: "https://okapi-real-estate.com/louer/studios" },
+  alternates: { canonical: "https://okapi-real-estate.com/louer/studios" },
 };
 
 export default async function Page({

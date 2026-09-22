@@ -7,8 +7,12 @@ import {
 } from "@/lib/properties";
 
 export const metadata = {
-  title: "Appartements à vendre à Kinshasa — Okapi Real Estate",
-  description: "Trouvez les meilleurs appartements à acheter à Kinshasa.",
+  title: "Appartements à vendre à Kinshasa — Prix & Annonces",
+  description:
+    "Achetez un appartement à Kinshasa : studios, T2, T3, duplex et penthouses disponibles. Annonces vérifiées avec photos, prix et contact agent direct sur Okapi Real Estate.",
+  keywords: ["appartement à vendre Kinshasa", "acheter appartement RDC", "appartement neuf Kinshasa", "prix appartement Kinshasa"],
+  openGraph: { title: "Appartements à vendre à Kinshasa", description: "Achetez un appartement à Kinshasa. Annonces vérifiées sur Okapi Real Estate.", url: "https://okapi-real-estate.com/acheter/appartements" },
+  alternates: { canonical: "https://okapi-real-estate.com/acheter/appartements" },
 };
 
 export default async function Page({

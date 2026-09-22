@@ -7,9 +7,12 @@ import {
 } from "@/lib/properties";
 
 export const metadata = {
-  title: "Biens commerciaux à Kinshasa — Okapi Real Estate",
+  title: "Biens commerciaux à Kinshasa — Bureaux, Locaux & Entrepôts",
   description:
-    "Bureaux, locaux commerciaux et entrepôts à vendre ou à louer à Kinshasa.",
+    "Louez ou achetez des bureaux, locaux commerciaux, magasins et entrepôts à Kinshasa. Annonces immobilières commerciales vérifiées en RDC sur Okapi Real Estate.",
+  keywords: ["local commercial Kinshasa", "bureau à louer Kinshasa", "entrepôt RDC", "immobilier commercial Congo", "magasin à louer Kinshasa"],
+  openGraph: { title: "Biens commerciaux à Kinshasa — Bureaux, Locaux & Entrepôts", url: "https://okapi-real-estate.com/commercial" },
+  alternates: { canonical: "https://okapi-real-estate.com/commercial" },
 };
 
 export default async function CommercialPage({

@@ -8,9 +8,22 @@ import {
 import { parseSearchQuery } from "@/lib/parseSearchQuery";
 
 export const metadata = {
-  title: "Biens à louer à Kinshasa — Okapi Real Estate",
+  title: "Biens à louer à Kinshasa — Appartements, Studios & Villas",
   description:
-    "Découvrez les biens à louer à Kinshasa : appartements, villas, maisons et plus encore.",
+    "Louez un appartement, un studio, une villa ou une maison à Kinshasa. Annonces vérifiées et agents certifiés sur Okapi Real Estate, la référence immobilière en RDC.",
+  keywords: [
+    "appartement à louer Kinshasa",
+    "studio à louer Kinshasa",
+    "villa à louer RDC",
+    "location maison Kinshasa",
+    "louer bien immobilier Congo",
+  ],
+  openGraph: {
+    title: "Biens à louer à Kinshasa — Appartements, Studios & Villas",
+    description: "Louez un appartement, studio ou villa à Kinshasa. Annonces vérifiées sur Okapi Real Estate.",
+    url: "https://okapi-real-estate.com/louer",
+  },
+  alternates: { canonical: "https://okapi-real-estate.com/louer" },
 };
 
 export default async function LouerPage({

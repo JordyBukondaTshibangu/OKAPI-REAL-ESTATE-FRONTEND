@@ -7,7 +7,12 @@ import {
 } from "@/lib/properties";
 
 export const metadata = {
-  title: "Appartements à louer à Kinshasa — Okapi Real Estate",
+  title: "Appartements à louer à Kinshasa — Annonces & Prix",
+  description:
+    "Louez un appartement à Kinshasa : studios meublés, T2, T3 et duplex dans les meilleurs quartiers. Annonces vérifiées avec photos, prix mensuels et contact direct.",
+  keywords: ["appartement à louer Kinshasa", "louer appartement RDC", "studio meublé Kinshasa", "location appartement Congo"],
+  openGraph: { title: "Appartements à louer à Kinshasa", description: "Louez un appartement à Kinshasa. Annonces vérifiées sur Okapi Real Estate.", url: "https://okapi-real-estate.com/louer/appartements" },
+  alternates: { canonical: "https://okapi-real-estate.com/louer/appartements" },
 };
 
 export default async function Page({

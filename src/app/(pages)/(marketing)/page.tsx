@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import AboutSection from "@/features/home/components/AboutSection";
 import ContentSections from "@/features/home/components/ContentSections";
 import Discover from "@/features/home/components/Discover";
@@ -9,6 +10,27 @@ import Regions from "@/features/home/components/Regions";
 import SectionReveal from "@/shared/components/layout/SectionReveal";
 import { getPropertyStats } from "@/lib/api";
 import { getPropertiesByListingType } from "@/lib/properties";
+
+export const metadata: Metadata = {
+  title: "Immobilier à Kinshasa — Appartements, Villas & Maisons",
+  description:
+    "Okapi Real Estate : la plateforme immobilière de référence à Kinshasa. Achetez ou louez des appartements, villas, maisons et locaux commerciaux en RDC. Annonces vérifiées, agents certifiés.",
+  keywords: [
+    "immobilier Kinshasa",
+    "appartement Kinshasa",
+    "villa à vendre Kinshasa",
+    "maison à louer RDC",
+    "agence immobilière Kinshasa",
+    "bien immobilier Congo",
+  ],
+  openGraph: {
+    title: "Immobilier à Kinshasa — Appartements, Villas & Maisons | Okapi Real Estate",
+    description:
+      "La plateforme immobilière de référence à Kinshasa. Achetez ou louez des biens vérifiés en RDC.",
+    url: "https://okapi-real-estate.com",
+  },
+  alternates: { canonical: "https://okapi-real-estate.com" },
+};
 
 export default async function Home() {
   const [initialRent, stats] = await Promise.all([

@@ -2,7 +2,11 @@ import PropertyListingPage from "@/features/properties/components/PropertyListin
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
 export const metadata = {
-  title: "Maisons de ville à louer à Kinshasa — Okapi Real Estate",
+  title: "Maisons de ville à louer à Kinshasa — Townhouses disponibles",
+  description: "Louez une maison de ville à Kinshasa : townhouses et maisons urbaines disponibles à la location. Annonces vérifiées avec photos et prix mensuels sur Okapi Real Estate.",
+  keywords: ["maison de ville à louer Kinshasa", "townhouse location Kinshasa", "louer maison RDC", "maison urbaine location Congo"],
+  openGraph: { title: "Maisons de ville à louer à Kinshasa", url: "https://okapi-real-estate.com/louer/maisons-ville" },
+  alternates: { canonical: "https://okapi-real-estate.com/louer/maisons-ville" },
 };
 
 export default async function Page({

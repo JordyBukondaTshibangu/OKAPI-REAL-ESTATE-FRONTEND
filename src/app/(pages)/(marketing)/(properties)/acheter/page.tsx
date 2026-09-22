@@ -8,9 +8,22 @@ import {
 import { parseSearchQuery } from "@/lib/parseSearchQuery";
 
 export const metadata = {
-  title: "Biens à acheter à Kinshasa — Okapi Real Estate",
+  title: "Biens à acheter à Kinshasa — Appartements, Villas, Maisons",
   description:
-    "Trouvez le bien idéal à acheter à Kinshasa avec Okapi Real Estate.",
+    "Achetez un appartement, une villa ou une maison à Kinshasa. Parcourez des centaines d'annonces vérifiées sur Okapi Real Estate et trouvez le bien idéal en RDC.",
+  keywords: [
+    "acheter appartement Kinshasa",
+    "villa à vendre Kinshasa",
+    "maison à vendre RDC",
+    "achat immobilier Kinshasa",
+    "bien à acheter Congo",
+  ],
+  openGraph: {
+    title: "Biens à acheter à Kinshasa — Appartements, Villas, Maisons",
+    description: "Achetez un appartement, une villa ou une maison à Kinshasa. Annonces vérifiées sur Okapi Real Estate.",
+    url: "https://okapi-real-estate.com/acheter",
+  },
+  alternates: { canonical: "https://okapi-real-estate.com/acheter" },
 };
 
 export default async function AcheterPage({

@@ -1,7 +1,13 @@
 import PropertyListingPage from "@/features/properties/components/PropertyListingPage";
 import { getPropertiesByCategory, paginateProperties, filterProperties, type PropertyFilters } from "@/lib/properties";
 
-export const metadata = { title: "Terrains commerciaux à Kinshasa — Okapi Real Estate" };
+export const metadata = {
+  title: "Terrains commerciaux à Kinshasa — Parcelles à usage commercial",
+  description: "Achetez un terrain commercial ou industriel à Kinshasa : parcelles à usage commercial, zones industrielles et terrains logistiques disponibles.",
+  keywords: ["terrain commercial Kinshasa", "parcelle industrielle RDC", "terrain à usage commercial Congo", "zone industrielle Kinshasa"],
+  openGraph: { title: "Terrains commerciaux à Kinshasa", url: "https://okapi-real-estate.com/commercial/terrains" },
+  alternates: { canonical: "https://okapi-real-estate.com/commercial/terrains" },
+};
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; type?: string; minPrice?: string; maxPrice?: string; beds?: string }> }) {
   const { page, q, type, minPrice, maxPrice, beds } = await searchParams;

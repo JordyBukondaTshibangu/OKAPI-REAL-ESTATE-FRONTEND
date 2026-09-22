@@ -9,7 +9,11 @@ import {
 
 
 export const metadata = {
-  title: "Maisons de ville à vendre à Kinshasa — Okapi Real Estate",
+  title: "Maisons de ville à vendre à Kinshasa — Annonces",
+  description: "Achetez une maison de ville à Kinshasa. Townhouses et maisons urbaines disponibles à la vente avec photos, prix et contact agent direct.",
+  keywords: ["maison de ville à vendre Kinshasa", "townhouse Kinshasa", "acheter maison Kinshasa", "maison urbaine RDC"],
+  openGraph: { title: "Maisons de ville à vendre à Kinshasa", url: "https://okapi-real-estate.com/acheter/maisons-ville" },
+  alternates: { canonical: "https://okapi-real-estate.com/acheter/maisons-ville" },
 };
 
 export default async function Page({
