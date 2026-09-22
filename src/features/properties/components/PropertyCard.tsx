@@ -22,6 +22,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import ExclusiveBadge from "./badges/ExclusiveBadge";
 import FreshnessIndicator from "./badges/FreshnessIndicator";
 import NewBadge from "./badges/NewBadge";
 import PremiumBadge from "./badges/PremiumBadge";
@@ -214,6 +215,7 @@ export default function PropertyCard({
             {/* Badges */}
             <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 items-start">
               {property.verified && <VerifiedBadge />}
+              {property.isExclusive && <ExclusiveBadge />}
               {property.isNew && <NewBadge />}
               {isHotProperty(property.performance) && (
                 <HotBadge label={t.cards.hotLabel} />
@@ -361,6 +363,7 @@ export default function PropertyCard({
                 </span>
               )}
               {property.verified && <VerifiedBadge />}
+              {property.isExclusive && <ExclusiveBadge />}
               {property.isNew && <NewBadge />}
               {isHotProperty(property.performance) && (
                 <HotBadge label={t.cards.hotLabel} />

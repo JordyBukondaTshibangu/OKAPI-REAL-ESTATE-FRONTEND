@@ -85,6 +85,8 @@ export type Property = {
   // Boost — paid featured placement
   isBoosted?: boolean;
   boostedUntil?: string | null;
+  // Exclusive listing — unavailable elsewhere
+  isExclusive?: boolean;
 };
 
 export type PropertyDetail = Property & {

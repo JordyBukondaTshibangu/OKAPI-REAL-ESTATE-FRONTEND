@@ -16,6 +16,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
 import { cn } from "@/shared/utils/utils";
 import { useToast } from "@/shared/context/ToastContext";
+import { useT } from "@/i18n/useT";
 
 // ─── Google Icon ────────────────────────────────────────────────────────────
 
@@ -30,25 +31,6 @@ function GoogleIcon() {
   );
 }
 
-// ─── Schemas ────────────────────────────────────────────────────────────────
-
-const userSchema = z.object({
-  email: z.string().email("Adresse e-mail invalide"),
-  password: z
-    .string()
-    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-});
-
-const agentSchema = z.object({
-  identifier: z.string().min(1, "Entrez votre e-mail ou numéro de téléphone"),
-  password: z
-    .string()
-    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-});
-
-type UserForm = z.infer<typeof userSchema>;
-type AgentForm = z.infer<typeof agentSchema>;
-
 // ─── Tab types ───────────────────────────────────────────────────────────────
 
 type Tab = "client" | "agent";
@@ -56,6 +38,7 @@ type Tab = "client" | "agent";
 // ─── User login form ─────────────────────────────────────────────────────────
 
 function UserLoginForm() {
+  const t = useT().connexion;
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
@@ -63,11 +46,17 @@ function UserLoginForm() {
   const { logout: clearAgentSession } = useAgentSessionStore();
   const { showToast } = useToast();
 
+  const schema = z.object({
+    email: z.string().email(t.errInvalidCredentials),
+    password: z.string().min(6, t.errInvalidCredentials),
+  });
+  type UserForm = z.infer<typeof schema>;
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<UserForm>({ resolver: zodResolver(userSchema) });
+  } = useForm<UserForm>({ resolver: zodResolver(schema) });
 
   async function onSubmit(data: UserForm) {
     setApiError(null);
@@ -76,15 +65,11 @@ function UserLoginForm() {
       const user = await getMe(access_token);
       clearAgentSession();
       setAuth(access_token, user);
-      showToast(`Bienvenue, ${user.firstName} !`, "success");
+      showToast(t.welcomeBack.replace("{{name}}", user.firstName), "success");
       router.push("/");
     } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })?.response
-        ?.status;
-      const msg =
-        status === 401
-          ? "Identifiants incorrects. Vérifiez votre e-mail et mot de passe."
-          : "Une erreur est survenue. Veuillez réessayer.";
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      const msg = status === 401 ? t.errInvalidCredentials : t.errGeneric;
       setApiError(msg);
       showToast(msg, "error");
     }
@@ -93,30 +78,23 @@ function UserLoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div>
-        <label className="text-sm font-medium block mb-1.5">
-          Adresse e-mail
-        </label>
+        <label className="text-sm font-medium block mb-1.5">{t.emailLabel}</label>
         <Input
           {...register("email")}
           type="email"
-          placeholder="vous@exemple.cd"
+          placeholder={t.emailPlaceholder}
           autoComplete="email"
         />
         {errors.email && (
-          <p className="text-xs text-destructive mt-1">
-            {errors.email.message}
-          </p>
+          <p className="text-xs text-destructive mt-1">{errors.email.message}</p>
         )}
       </div>
 
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <label className="text-sm font-medium">Mot de passe</label>
-          <Link
-            href="/mot-de-passe-oublie"
-            className="text-xs text-primary hover:underline"
-          >
-            Mot de passe oublié ?
+          <label className="text-sm font-medium">{t.passwordLabel}</label>
+          <Link href="/mot-de-passe-oublie" className="text-xs text-primary hover:underline">
+            {t.forgotPassword}
           </Link>
         </div>
         <div className="relative">
@@ -133,17 +111,11 @@ function UserLoginForm() {
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             tabIndex={-1}
           >
-            {showPassword ? (
-              <EyeOff className="w-4 h-4" />
-            ) : (
-              <Eye className="w-4 h-4" />
-            )}
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
         {errors.password && (
-          <p className="text-xs text-destructive mt-1">
-            {errors.password.message}
-          </p>
+          <p className="text-xs text-destructive mt-1">{errors.password.message}</p>
         )}
       </div>
 
@@ -154,16 +126,15 @@ function UserLoginForm() {
       )}
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Connexion…" : "Se connecter"}
+        {isSubmitting ? t.signingIn : t.signInBtn}
       </Button>
 
-      {/* Google OAuth — redirects to backend */}
       <div className="relative my-1">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs text-muted-foreground">
-          <span className="bg-card px-3">ou continuer avec</span>
+          <span className="bg-card px-3">{t.orContinueWith}</span>
         </div>
       </div>
 
@@ -177,16 +148,13 @@ function UserLoginForm() {
         }}
       >
         <GoogleIcon />
-        Continuer avec Google
+        {t.continueWithGoogle}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground pt-1">
-        Pas encore de compte ?{" "}
-        <Link
-          href="/inscription"
-          className="text-primary font-medium hover:underline"
-        >
-          S&apos;inscrire gratuitement
+        {t.noAccountYet}{" "}
+        <Link href="/inscription" className="text-primary font-medium hover:underline">
+          {t.signUpFree}
         </Link>
       </p>
     </form>
@@ -196,6 +164,7 @@ function UserLoginForm() {
 // ─── Agent login form ─────────────────────────────────────────────────────────
 
 function AgentLoginForm() {
+  const t = useT().connexion;
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
@@ -203,22 +172,25 @@ function AgentLoginForm() {
   const { logout: clearUserSession } = useAuthStore();
   const { showToast } = useToast();
 
+  const schema = z.object({
+    identifier: z.string().min(1, t.identifierLabel),
+    password: z.string().min(6, t.errInvalidAgentCredentials),
+  });
+  type AgentForm = z.infer<typeof schema>;
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<AgentForm>({ resolver: zodResolver(agentSchema) });
+  } = useForm<AgentForm>({ resolver: zodResolver(schema) });
 
   async function onSubmit(data: AgentForm) {
     setApiError(null);
     try {
-      const { access_token, agent } = await loginAgent(
-        data.identifier,
-        data.password,
-      );
+      const { access_token, agent } = await loginAgent(data.identifier, data.password);
       clearUserSession();
       setSession(access_token, agent);
-      showToast(`Bienvenue, ${agent.name} !`, "success");
+      showToast(t.welcomeBack.replace("{{name}}", agent.name), "success");
 
       if (agent.agentType === "AGENCY_OWNER" && agent.agencyId) {
         router.push("/espace-agence");
@@ -226,14 +198,13 @@ function AgentLoginForm() {
         router.push("/espace-agent");
       }
     } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })?.response
-        ?.status;
+      const status = (err as { response?: { status?: number } })?.response?.status;
       const msg =
         status === 401
-          ? "Identifiants incorrects. Vérifiez votre e-mail ou mot de passe."
+          ? t.errInvalidAgentCredentials
           : status === 403
-            ? "Votre compte n'est pas encore approuvé. Réessayez plus tard."
-            : "Une erreur est survenue. Veuillez réessayer.";
+            ? t.errNotApproved
+            : t.errGeneric;
       setApiError(msg);
       showToast(msg, "error");
     }
@@ -242,30 +213,23 @@ function AgentLoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div>
-        <label className="text-sm font-medium block mb-1.5">
-          E-mail ou téléphone
-        </label>
+        <label className="text-sm font-medium block mb-1.5">{t.identifierLabel}</label>
         <Input
           {...register("identifier")}
           type="text"
-          placeholder="vous@exemple.cd ou +243 81 234 5678"
+          placeholder={t.identifierPlaceholder}
           autoComplete="username"
         />
         {errors.identifier && (
-          <p className="text-xs text-destructive mt-1">
-            {errors.identifier.message}
-          </p>
+          <p className="text-xs text-destructive mt-1">{errors.identifier.message}</p>
         )}
       </div>
 
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <label className="text-sm font-medium">Mot de passe</label>
-          <Link
-            href="/mot-de-passe-oublie"
-            className="text-xs text-primary hover:underline"
-          >
-            Mot de passe oublié ?
+          <label className="text-sm font-medium">{t.passwordLabel}</label>
+          <Link href="/mot-de-passe-oublie" className="text-xs text-primary hover:underline">
+            {t.forgotPassword}
           </Link>
         </div>
         <div className="relative">
@@ -282,17 +246,11 @@ function AgentLoginForm() {
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             tabIndex={-1}
           >
-            {showPassword ? (
-              <EyeOff className="w-4 h-4" />
-            ) : (
-              <Eye className="w-4 h-4" />
-            )}
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
         {errors.password && (
-          <p className="text-xs text-destructive mt-1">
-            {errors.password.message}
-          </p>
+          <p className="text-xs text-destructive mt-1">{errors.password.message}</p>
         )}
       </div>
 
@@ -303,16 +261,15 @@ function AgentLoginForm() {
       )}
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Connexion…" : "Se connecter"}
+        {isSubmitting ? t.signingIn : t.signInBtn}
       </Button>
 
-      {/* Google OAuth — redirects to backend which redirects to Google */}
       <div className="relative my-1">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs text-muted-foreground">
-          <span className="bg-card px-3">ou continuer avec</span>
+          <span className="bg-card px-3">{t.orContinueWith}</span>
         </div>
       </div>
 
@@ -326,16 +283,13 @@ function AgentLoginForm() {
         }}
       >
         <GoogleIcon />
-        Continuer avec Google
+        {t.continueWithGoogle}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground pt-1">
-        Pas encore agent ?{" "}
-        <Link
-          href="/devenir-agent"
-          className="text-primary font-medium hover:underline"
-        >
-          Rejoindre Okapi
+        {t.notAnAgentYet}{" "}
+        <Link href="/devenir-agent" className="text-primary font-medium hover:underline">
+          {t.joinOkapi}
         </Link>
       </p>
     </form>
@@ -345,10 +299,11 @@ function AgentLoginForm() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function LoginPageInner() {
+  const t = useT().connexion;
   const searchParams = useSearchParams();
-  const initialTab: Tab =
-    searchParams.get("tab") === "agent" ? "agent" : "client";
+  const initialTab: Tab = searchParams.get("tab") === "agent" ? "agent" : "client";
   const [tab, setTab] = useState<Tab>(initialTab);
+
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
@@ -365,9 +320,7 @@ function LoginPageInner() {
             />
           </Link>
           <p className="text-sm text-muted-foreground mt-3">
-            {tab === "agent"
-              ? "Espace réservé aux agents immobiliers."
-              : "Bienvenue ! Connectez-vous à votre compte."}
+            {tab === "agent" ? t.subtitleAgent : t.subtitleClient}
           </p>
         </div>
 
@@ -384,7 +337,7 @@ function LoginPageInner() {
               )}
             >
               <Home className="w-4 h-4" />
-              Client
+              {t.tabClient}
             </button>
             <button
               onClick={() => setTab("agent")}
@@ -396,14 +349,14 @@ function LoginPageInner() {
               )}
             >
               <UserCheck className="w-4 h-4" />
-              Agent immobilier
+              {t.tabAgent}
             </button>
           </div>
 
           {/* Form area */}
           <div className="p-8">
             <h1 className="text-xl font-semibold mb-6 text-center">
-              {tab === "agent" ? "Connexion agent" : "Connexion"}
+              {tab === "agent" ? t.titleAgent : t.titleClient}
             </h1>
             {tab === "client" ? <UserLoginForm /> : <AgentLoginForm />}
           </div>

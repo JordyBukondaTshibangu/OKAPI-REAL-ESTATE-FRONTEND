@@ -60,6 +60,7 @@ type FormState = {
   bathrooms: string;
   areaSqm: string;
   isFurnished: boolean;
+  isExclusive: boolean;
   availableFrom: string;
   price: string;
   currency: string;
@@ -389,6 +390,7 @@ export default function NouvelleAnnoncePage() {
     bathrooms: "",
     areaSqm: "",
     isFurnished: false,
+    isExclusive: false,
     availableFrom: "",
     price: "",
     currency: "USD",
@@ -614,6 +616,7 @@ export default function NouvelleAnnoncePage() {
       landmark: form.landmark.trim() || undefined,
       city: "Kinshasa",
       isFurnished: form.isFurnished,
+      isExclusive: form.isExclusive,
       availableFrom: form.availableFrom || undefined,
       isShortTerm: hasShortTerm,
       isLongTerm: hasLongTerm,
@@ -901,7 +904,20 @@ export default function NouvelleAnnoncePage() {
                   value={form.isFurnished}
                   onChange={(v) => set("isFurnished", v)}
                 />
+                <Toggle
+                  label={t.labelExclusive}
+                  value={form.isExclusive}
+                  onChange={(v) => set("isExclusive", v)}
+                />
               </div>
+              {form.isExclusive && (
+                <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 shrink-0">
+                    <path d="M12 2l1.5 4.5H18l-3.75 2.73L15.75 14 12 11.27 8.25 14l1.5-4.77L6 6.5h4.5L12 2z" />
+                  </svg>
+                  {t.exclusiveHint}
+                </p>
+              )}
             </section>
 
             <section>

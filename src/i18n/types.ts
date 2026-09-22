@@ -286,7 +286,7 @@ export type Messages = {
   detail: {
     property: {
       backToResults: string; saved: string; saveBtn: string; reportBtn: string;
-      viewPhotos: string; verified: string; premium: string;
+      viewPhotos: string; verified: string; premium: string; exclusive: string;
       bedroom: string; bedrooms: string; bathroom: string;
       viewOnMap: string; initialCosts: string; rentOrBuy: string;
       toRent: string; toSell: string;
@@ -1008,7 +1008,7 @@ export type Messages = {
     // Location
     labelLandmark: string; landmarkHint: string; landmarkPlaceholder: string;
     // Options
-    sectionOptions: string; labelFurnished: string;
+    sectionOptions: string; labelFurnished: string; labelExclusive: string; exclusiveHint: string;
     // Availability
     sectionAvailability: string; labelAvailableFrom: string; availableFromHint: string;
     // Short-term
@@ -1146,6 +1146,33 @@ export type Messages = {
     pwdUppercase: string;
     pwdLowercase: string;
     pwdSpecial: string;
+  };
+  connexion: {
+    tabClient: string;
+    tabAgent: string;
+    subtitleClient: string;
+    subtitleAgent: string;
+    titleClient: string;
+    titleAgent: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    identifierLabel: string;
+    identifierPlaceholder: string;
+    passwordLabel: string;
+    forgotPassword: string;
+    signingIn: string;
+    signInBtn: string;
+    orContinueWith: string;
+    continueWithGoogle: string;
+    noAccountYet: string;
+    signUpFree: string;
+    notAnAgentYet: string;
+    joinOkapi: string;
+    errInvalidCredentials: string;
+    errInvalidAgentCredentials: string;
+    errNotApproved: string;
+    errGeneric: string;
+    welcomeBack: string;
   };
   espaceAgence: {
     // Dashboard

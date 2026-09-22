@@ -67,6 +67,16 @@ function PremiumChip({ label }: { label: string }) {
     </span>
   );
 }
+function ExclusiveChip({ label }: { label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 bg-amber-500 text-white text-[10px] font-semibold px-2 py-1 rounded-md shadow-sm">
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+        <path d="M12 2l1.5 4.5H18l-3.75 2.73L15.75 14 12 11.27 8.25 14l1.5-4.77L6 6.5h4.5L12 2z" />
+      </svg>
+      {label}
+    </span>
+  );
+}
 
 function GalleryImg({
   src,
@@ -660,8 +670,10 @@ export default function PropertyDetailClient({
           onOpenSlider={openSlider}
           verified={detail.verified}
           isPremium={detail.premium}
+          isExclusive={detail.isExclusive}
           verifiedLabel={dp.verified}
           premiumLabel={dp.premium}
+          exclusiveLabel={dp.exclusive}
           viewPhotosLabel={dp.viewPhotos}
           category={detail.category}
           gradient={detail.imageGradient}
@@ -1113,8 +1125,10 @@ function Gallery({
   onOpenSlider,
   verified,
   isPremium,
+  isExclusive,
   verifiedLabel,
   premiumLabel,
+  exclusiveLabel,
   viewPhotosLabel,
   category,
   gradient,
@@ -1126,8 +1140,10 @@ function Gallery({
   onOpenSlider: (idx: number) => void;
   verified: boolean;
   isPremium: boolean;
+  isExclusive?: boolean;
   verifiedLabel: string;
   premiumLabel: string;
+  exclusiveLabel: string;
   viewPhotosLabel: string;
   category?: string;
   gradient?: string;
@@ -1162,6 +1178,7 @@ function Gallery({
         badge={
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
             {verified && <VerifiedChip label={verifiedLabel} />}
+            {isExclusive && <ExclusiveChip label={exclusiveLabel} />}
             {isPremium && <PremiumChip label={premiumLabel} />}
           </div>
         }
