@@ -43,6 +43,9 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+  verification: {
+    google: "DAtqOX_1I4OrzXhFxBkbiZqaGgtHwqWSkv5j-b_KErI",
+  },
   openGraph: {
     type: "website",
     locale: "fr_CD",
