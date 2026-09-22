@@ -483,8 +483,8 @@ const en: Messages = {
     about: {
       badge: "About us", heading: "The number one property portal in Kinshasa",
       subtitle: "Since 2014, Okapi Real Estate has connected buyers, tenants, sellers and real estate agents across the DRC.",
-      stat1Label: "Listed properties", stat1Value: "250,000+", stat2Label: "Active users", stat2Value: "500,000+",
-      stat3Label: "Partner agencies", stat3Value: "1,200+", stat4Label: "Years of experience", stat4Value: "10+",
+      stat1Label: "Verified listings", stat1Value: "100%", stat2Label: "Response time", stat2Value: "< 24h",
+      stat3Label: "Free for buyers & renters", stat3Value: "Free", stat4Label: "Districts covered", stat4Value: "26",
       missionBadge: "Our mission", missionHeading: "Making real estate accessible to all Congolese",
       missionPara1: "Okapi Real Estate was born from a simple belief: finding a property in the DRC should not be complicated. Our platform brings together listings from the main agencies and private sellers to give you the widest choice.",
       missionPara2: "Whether you're looking to buy your first home, rent an apartment in Gombe or sell a plot in Limete, Okapi Real Estate is your trusted partner at every step.",

@@ -484,8 +484,8 @@ const ln: Messages = {
     about: {
       badge: "Biso", heading: "Portail ya ndako numero moko na Kinshasa",
       subtitle: "Kobanda 2014, Okapi Real Estate ekangaka basombi, bafunga, bateki mpe bato ya mosala ya ndako na mobimba RDC.",
-      stat1Label: "Ndako ezali na liste", stat1Value: "250 000+", stat2Label: "Bato bazali kosalela", stat2Value: "500 000+",
-      stat3Label: "Agences partenaires", stat3Value: "1 200+", stat4Label: "Bambula ya experience", stat4Value: "10+",
+      stat1Label: "Milimo ezali kovérifier", stat1Value: "100%", stat2Label: "Ntango ya réponse", stat2Value: "< 24h",
+      stat3Label: "Ofele mpo na basombi & bafunga", stat3Value: "Ofele", stat4Label: "Communes ezali kozipa", stat4Value: "26",
       missionBadge: "Mission na biso", missionHeading: "Kozwa ndako pete mpo na Bakongo nyonso",
       missionPara1: "Okapi Real Estate ebotamaki na makanisi moko ya pete: koluka ndako na RDC esengeli koyiba mpiko te. Plateforme na biso ekutisaka annonces ya agences ya monene mpe bato mpo na kopesa yo choix ya monene.",
       missionPara2: "Ozali koluka kosombola ndako ya liboso na yo, kofunga appartement na Gombe to koteka terrain na Limete, Okapi Real Estate azali partenaire na yo ya bolamu na étape nyonso.",
