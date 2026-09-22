@@ -157,6 +157,29 @@ function UserLoginForm() {
         {isSubmitting ? "Connexion…" : "Se connecter"}
       </Button>
 
+      {/* Google OAuth — redirects to backend */}
+      <div className="relative my-1">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs text-muted-foreground">
+          <span className="bg-card px-3">ou continuer avec</span>
+        </div>
+      </div>
+
+      <Button
+        variant="outline"
+        className="w-full"
+        type="button"
+        onClick={() => {
+          const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+          window.location.href = `${backendUrl}/auth/google`;
+        }}
+      >
+        <GoogleIcon />
+        Continuer avec Google
+      </Button>
+
       <p className="text-center text-sm text-muted-foreground pt-1">
         Pas encore de compte ?{" "}
         <Link
