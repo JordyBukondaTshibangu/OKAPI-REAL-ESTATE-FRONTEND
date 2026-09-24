@@ -302,7 +302,7 @@ const en: Messages = {
     filterCommune: "Commune", filterAllCommunes: "— All communes —",
     filterPropertyType: "Property type", filterRating: "Minimum rating", filterAllRatings: "All ratings",
     filterSpecialization: "Specialisation", filterTeamSize: "Team size", filterAllSizes: "All sizes",
-    filterClearBtn: "Clear ×",
+    filterClearBtn: "Clear ×", filterBtn: "Filters", filterApplyBtn: "Show results",
     rentalFocusAll: "All", rentalFocusLong: "Long-term rental", rentalFocusShort: "Short-term rental", rentalFocusBoth: "Sales & Rentals",
     propTypeApartments: "Apartments", propTypeVillas: "Villas", propTypeStudios: "Studios",
     propTypeLand: "Land", propTypeOffices: "Offices", propTypeWarehouses: "Warehouses",

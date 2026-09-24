@@ -303,7 +303,7 @@ const ln: Messages = {
     filterCommune: "Komini", filterAllCommunes: "— Komini nyonso —",
     filterPropertyType: "Ndenge ya ndako", filterRating: "Note ya mike", filterAllRatings: "Note nyonso",
     filterSpecialization: "Bokani", filterTeamSize: "Bonkoko ya bato", filterAllSizes: "Bonkoko nyonso",
-    filterClearBtn: "Sala pamba ×",
+    filterClearBtn: "Sala pamba ×", filterBtn: "Bisaleli", filterApplyBtn: "Tala ba résultats",
     rentalFocusAll: "Nyonso", rentalFocusLong: "Lokumu ya ntango molai", rentalFocusShort: "Lokumu ya ntango mokuse", rentalFocusBoth: "Bika mpe Lokumu",
     propTypeApartments: "Apartema", propTypeVillas: "Villas", propTypeStudios: "Studios",
     propTypeLand: "Mabele", propTypeOffices: "Biró", propTypeWarehouses: "Ndako ya kobomba",

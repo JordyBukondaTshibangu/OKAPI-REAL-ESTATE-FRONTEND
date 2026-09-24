@@ -261,7 +261,7 @@ export type Messages = {
     filterCommune: string; filterAllCommunes: string;
     filterPropertyType: string; filterRating: string; filterAllRatings: string;
     filterSpecialization: string; filterTeamSize: string; filterAllSizes: string;
-    filterClearBtn: string;
+    filterClearBtn: string; filterBtn: string; filterApplyBtn: string;
     rentalFocusAll: string; rentalFocusLong: string; rentalFocusShort: string; rentalFocusBoth: string;
     propTypeApartments: string; propTypeVillas: string; propTypeStudios: string;
     propTypeLand: string; propTypeOffices: string; propTypeWarehouses: string;

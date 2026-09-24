@@ -325,7 +325,7 @@ const fr: Messages = {
     filterCommune: "Commune", filterAllCommunes: "— Toutes les communes —",
     filterPropertyType: "Type de bien", filterRating: "Note minimale", filterAllRatings: "Toutes les notes",
     filterSpecialization: "Spécialisation", filterTeamSize: "Taille d'équipe", filterAllSizes: "Toutes tailles",
-    filterClearBtn: "Effacer ×",
+    filterClearBtn: "Effacer ×", filterBtn: "Filtres", filterApplyBtn: "Voir les résultats",
     rentalFocusAll: "Tous", rentalFocusLong: "Location longue durée", rentalFocusShort: "Location courte durée", rentalFocusBoth: "Vente & Location",
     propTypeApartments: "Appartements", propTypeVillas: "Villas", propTypeStudios: "Studios",
     propTypeLand: "Terrains", propTypeOffices: "Bureaux", propTypeWarehouses: "Entrepôts",
