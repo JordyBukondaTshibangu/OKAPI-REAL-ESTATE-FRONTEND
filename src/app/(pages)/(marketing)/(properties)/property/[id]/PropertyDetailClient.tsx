@@ -328,24 +328,38 @@ function AgentCard({
   const dp = t.detail.property;
   return (
     <aside className="bg-white dark:bg-card rounded-2xl border border-border shadow-sm p-5 lg:sticky lg:top-28 space-y-5 self-start">
-      {/* Agent header */}
-      <div className="flex items-center gap-3">
-        <AgentInitials
-          name={detail.agent?.name ?? "—"}
-          profile={detail.agent?.photo}
-        />
-        <div className="leading-tight">
-          <p className="text-[10px] font-semibold text-secondary tracking-widest">
-            {detail.agent?.title}
-          </p>
-          <p className="text-sm font-semibold text-foreground">
-            {detail.agent?.name ?? "—"}
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {dp.responseTime}
-          </p>
-        </div>
-      </div>
+      {/* Agent header — links to the agent's public profile when we have an id */}
+      {(() => {
+        const header = (
+          <>
+            <AgentInitials
+              name={detail.agent?.name ?? "—"}
+              profile={detail.agent?.photo}
+            />
+            <div className="leading-tight">
+              <p className="text-[10px] font-semibold text-secondary tracking-widest">
+                {detail.agent?.title}
+              </p>
+              <p className="text-sm font-semibold text-foreground group-hover:text-primary group-hover:underline transition-colors">
+                {detail.agent?.name ?? "—"}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {dp.responseTime}
+              </p>
+            </div>
+          </>
+        );
+        return detail.agent?.id ? (
+          <Link
+            href={`/agents/${detail.agent.id}`}
+            className="group flex items-center gap-3 rounded-xl -m-1 p-1 hover:bg-muted/50 transition-colors"
+          >
+            {header}
+          </Link>
+        ) : (
+          <div className="flex items-center gap-3">{header}</div>
+        );
+      })()}
 
       {/* Call + WhatsApp */}
       <div className="grid grid-cols-2 gap-2">
