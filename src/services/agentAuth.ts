@@ -71,6 +71,23 @@ export async function completeAgentProfile(
   return res.data;
 }
 
+/** Submit Stage 2 identity verification documents. */
+export async function submitAgentIdentity(
+  token: string,
+  data: {
+    dateOfBirth: string;          // ISO date string, e.g. "1995-06-15"
+    nationalIdNumber: string;     // stored hashed on backend, never returned
+    idDocumentUrl: string;        // R2 key from presigned upload
+    selfieUrl?: string;           // optional R2 key
+    residenceCommune: string;
+  },
+): Promise<{ message: string }> {
+  const res = await axios.patch(`/api/proxy/agents/me/identity`, data, {
+    headers: agentAuthHeader(token),
+  });
+  return res.data;
+}
+
 /** Fetch the authenticated agent's full profile. */
 export async function getMyAgentProfile(token: string) {
   const res = await axios.get(`/api/proxy/agents/me`, {

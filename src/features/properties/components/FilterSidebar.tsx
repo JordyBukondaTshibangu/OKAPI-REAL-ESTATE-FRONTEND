@@ -10,6 +10,9 @@ import { useT } from "@/i18n/useT";
 
 type Mode = "rent" | "sale" | "buy" | "commercial";
 
+/** Temporarily hidden — flip to true to re-enable the "Temps de trajet" section. */
+const SHOW_TRAVEL_TIMES = false;
+
 interface FilterSidebarProps {
   mode: Mode;
   totalListings: number;
@@ -293,6 +296,8 @@ export default function FilterSidebar({
               )}
             </section>
 
+            {SHOW_TRAVEL_TIMES && (
+            <>
             <div className="border-t border-border" />
 
             {/* Temps de trajet — collapsible */}
@@ -321,6 +326,8 @@ export default function FilterSidebar({
                 </div>
               )}
             </section>
+            </>
+            )}
           </div>
 
           {/* Action buttons */}

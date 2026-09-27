@@ -214,10 +214,15 @@ function ProfileMenu() {
               boxShadow:
                 "0 0 0 2px hsl(var(--navy)), 0 0 0 4px hsl(var(--secondary))",
             }}
-            className="w-9 h-9 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none"
+            className="w-9 h-9 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center hover:opacity-90 transition-opacity select-none overflow-hidden"
             aria-label="Menu agent"
           >
-            {initials}
+            {agentSession.photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={agentSession.photo} alt={agentSession.name} className="w-full h-full object-cover" />
+            ) : (
+              initials
+            )}
           </button>
           {open && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-card rounded-xl shadow-lg border border-border py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
@@ -441,13 +446,13 @@ function MobileDrawer({
           {/* Auth strip */}
           {isAgentAuth && agentSession ? (
             <div className="flex items-center gap-3 px-5 py-4 bg-primary/5 border-b border-border">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-sm select-none shrink-0">
-                {agentSession.name
-                  .split(" ")
-                  .map((w) => w[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase()}
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-sm select-none shrink-0 overflow-hidden">
+                {agentSession.photo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={agentSession.photo} alt={agentSession.name} className="w-full h-full object-cover" />
+                ) : (
+                  agentSession.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-primary uppercase tracking-wide">

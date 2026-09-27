@@ -9,6 +9,7 @@ export type AgentSession = {
   emailVerified: boolean;
   agentType?: string | null;
   agencyId?: string | null;
+  photo?: string | null;
 };
 
 interface AgentSessionState {

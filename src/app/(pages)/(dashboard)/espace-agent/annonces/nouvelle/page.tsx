@@ -425,8 +425,6 @@ export default function NouvelleAnnoncePage() {
     if (!files) return;
 
     const MAX_SIZE = 10 * 1024 * 1024;
-    const MIN_W = 800, MIN_H = 600;
-    const MIN_RATIO = 4 / 3, MAX_RATIO = 16 / 9;
     const ACCEPTED = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
     const rejected: string[] = [];
@@ -442,25 +440,6 @@ export default function NouvelleAnnoncePage() {
       if (f.size > MAX_SIZE) {
         rejected.push(`"${f.name}" — ${t.errImageSize} (${(f.size / 1024 / 1024).toFixed(1)} Mo)`);
         continue;
-      }
-      // Dimensions + ratio via Image
-      const dims = await new Promise<{ w: number; h: number }>((resolve) => {
-        const img = new window.Image();
-        const url = URL.createObjectURL(f);
-        img.onload = () => { URL.revokeObjectURL(url); resolve({ w: img.naturalWidth, h: img.naturalHeight }); };
-        img.onerror = () => { URL.revokeObjectURL(url); resolve({ w: 0, h: 0 }); };
-        img.src = url;
-      });
-      if (dims.w > 0 && dims.h > 0) {
-        if (dims.w < MIN_W || dims.h < MIN_H) {
-          rejected.push(`"${f.name}" — ${t.errImageDimensions} (${dims.w}×${dims.h} px)`);
-          continue;
-        }
-        const ratio = dims.w / dims.h;
-        if (ratio < MIN_RATIO - 0.05 || ratio > MAX_RATIO + 0.05) {
-          rejected.push(`"${f.name}" — ${t.errImageAspectRatio} (${dims.w}×${dims.h})`);
-          continue;
-        }
       }
       valid.push(f);
     }

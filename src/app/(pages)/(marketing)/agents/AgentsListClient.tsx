@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { KINSHASA_COMMUNES } from "@/constants/kinshasa";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const LIMIT = 12;
@@ -37,6 +37,16 @@ export default function AgentsListClient() {
   const [tab, setTab] = useState<"agents" | "agencies">("agents");
   const [sortBy, setSortBy] = useState<"pertinence" | "title">("pertinence");
   const [sortOpen, setSortOpen] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  // Close mobile filter on resize to desktop
+  useEffect(() => {
+    function onResize() {
+      if (window.innerWidth >= 1024) setMobileFilterOpen(false);
+    }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   const router = useRouter();
   const searchParams = useSearchParams();
   const titleFilter = searchParams.get("title");
@@ -256,6 +266,23 @@ export default function AgentsListClient() {
                 )}
               </div>
 
+              <div className="flex items-center gap-2 ml-auto">
+              {/* Mobile filter button — hidden on desktop */}
+              <button
+                onClick={() => setMobileFilterOpen(true)}
+                className="lg:hidden inline-flex items-center gap-1.5 rounded-full border border-border px-3 h-8 text-sm text-foreground/80 bg-white dark:bg-card hover:border-primary/50 transition-colors"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                {t.agentsPage.filterBtn ?? "Filtres"}
+                {(tab === "agents" ? hasAgentFilters : hasAgencyFilters) && (
+                  <span className="flex items-center justify-center w-4 h-4 rounded-full bg-primary text-white text-[9px] font-bold">
+                    {tab === "agents"
+                      ? [agentQuery, agentLanguage, agentCommune, agentPropertyType, agentMinRating, agentTypeFilter].filter(Boolean).length
+                      : [agencyName, agencyLanguage, agencyCommune, agencyPropertyType, agencyRentalFocus, agencyMinAgents].filter((v) => v != null && v !== "").length}
+                  </span>
+                )}
+              </button>
+
               {/* Sort dropdown (agents tab only) */}
               {tab === "agents" && (
                 <div className="relative">
@@ -284,8 +311,93 @@ export default function AgentsListClient() {
                   )}
                 </div>
               )}
+              </div>
             </div>
           </div>
+
+          {/* Mobile filter drawer */}
+          {mobileFilterOpen && (
+            <div className="fixed inset-0 z-[200] lg:hidden">
+              {/* Backdrop */}
+              <div
+                className="absolute inset-0 bg-black/50"
+                onClick={() => setMobileFilterOpen(false)}
+              />
+              {/* Sheet */}
+              <div className="absolute bottom-0 left-0 right-0 bg-background rounded-t-2xl shadow-2xl flex flex-col max-h-[90dvh]">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+                  <div className="flex items-center gap-2">
+                    <SlidersHorizontal className="w-4 h-4 text-primary" />
+                    <h2 className="text-sm font-bold text-primary">{t.agentsPage.filterBtn ?? "Filtres"}</h2>
+                    {(tab === "agents" ? hasAgentFilters : hasAgencyFilters) && (
+                      <button
+                        onClick={() => { tab === "agents" ? resetAgentFilters() : resetAgencyFilters(); }}
+                        className="flex items-center gap-1 text-[11px] font-semibold text-white bg-primary rounded-full px-2 py-0.5 hover:bg-primary/80 transition-colors"
+                      >
+                        {t.agentsPage.filterClearBtn}
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setMobileFilterOpen(false)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Fermer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="overflow-y-auto flex-1 px-5 py-5">
+                  {tab === "agents" ? (
+                    <AgentFilterPanel
+                      query={agentQuery}
+                      onQueryChange={setQuery}
+                      language={agentLanguage}
+                      onLanguageChange={setLanguage}
+                      languageOptions={languageOptions}
+                      commune={agentCommune}
+                      onCommuneChange={setCommune}
+                      propertyType={agentPropertyType}
+                      onPropertyTypeChange={setPropertyType}
+                      minRating={agentMinRating}
+                      onMinRatingChange={setMinRating}
+                      agentType={agentTypeFilter}
+                      onAgentTypeChange={setAgentTypeFilter}
+                      hasFilters={hasAgentFilters}
+                      onReset={resetAgentFilters}
+                      t={t}
+                    />
+                  ) : (
+                    <AgencyFilterPanel
+                      name={agencyName}
+                      onNameChange={setAgencyName}
+                      language={agencyLanguage}
+                      onLanguageChange={setAgencyLanguage}
+                      languageOptions={agencyLanguageOptions}
+                      commune={agencyCommune}
+                      onCommuneChange={setAgencyCommune}
+                      propertyType={agencyPropertyType}
+                      onPropertyTypeChange={setAgencyPropertyType}
+                      rentalFocus={agencyRentalFocus}
+                      onRentalFocusChange={setAgencyRentalFocus}
+                      minAgents={agencyMinAgents}
+                      onMinAgentsChange={setAgencyMinAgents}
+                      hasFilters={hasAgencyFilters}
+                      onReset={resetAgencyFilters}
+                      t={t}
+                    />
+                  )}
+                </div>
+                <div className="px-5 py-4 border-t border-border shrink-0">
+                  <button
+                    onClick={() => setMobileFilterOpen(false)}
+                    className="w-full h-10 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
+                  >
+                    {t.agentsPage.filterApplyBtn ?? "Voir les résultats"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Flex row: sidebar + cards */}
           <div className="flex items-start gap-6">
