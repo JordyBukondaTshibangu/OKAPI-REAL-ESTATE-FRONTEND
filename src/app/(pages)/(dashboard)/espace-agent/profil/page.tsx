@@ -14,6 +14,9 @@ import {
   Briefcase,
   MapPin,
   FileText,
+  ShieldCheck,
+  Clock,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
@@ -137,6 +140,10 @@ export default function EditProfilePage() {
   const [initials, setInitials] = useState("??");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  // Identity verification state
+  const [verificationTier, setVerificationTier] = useState<"NON_VERIFIE" | "VERIFIE" | null>(null);
+  const [profileComplete, setProfileComplete] = useState<boolean>(false);
+  const [idRejectionReason, setIdRejectionReason] = useState<string | null>(null);
 
   const AGENT_TYPES = [
     { value: "COMMISSIONNAIRE", label: t.typeIndependent },
@@ -174,11 +181,20 @@ export default function EditProfilePage() {
         const p = raw_p as Partial<FormState> & {
           photo?: string;
           photoUrl?: string;
+          verificationTier?: "NON_VERIFIE" | "VERIFIE";
+          profileComplete?: boolean;
+          idDocumentRejectionReason?: string | null;
         };
         const raw = p.photo || p.photoUrl || "";
-        setAvatarSrc(
-          raw.startsWith("https://") && raw.length > 30 ? raw : null,
-        );
+        const cdnUrl = raw.startsWith("https://") && raw.length > 30 ? raw : null;
+        setAvatarSrc(cdnUrl);
+        setVerificationTier(p.verificationTier ?? "NON_VERIFIE");
+        setProfileComplete(Boolean(p.profileComplete));
+        setIdRejectionReason(p.idDocumentRejectionReason ?? null);
+        // Sync photo to session store so the nav avatar reflects it immediately
+        if (sessionAgent && cdnUrl && sessionAgent.photo !== cdnUrl) {
+          setAgent({ ...sessionAgent, photo: cdnUrl });
+        }
         const ini = (p.name ?? "")
           .split(" ")
           .map((w: string) => w[0])
@@ -260,8 +276,20 @@ export default function EditProfilePage() {
         { key },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      // 4. Show preview immediately (CDN URL loads on next profile fetch)
-      setAvatarSrc(URL.createObjectURL(file));
+      // 4. Show preview immediately and persist URL in session store
+      const objectUrl = URL.createObjectURL(file);
+      setAvatarSrc(objectUrl);
+      // Fetch the updated profile to get the real CDN URL, then sync to store
+      getMyAgentProfile(token!).then((updated: unknown) => {
+        const up = updated as { photo?: string; photoUrl?: string };
+        const cdnUrl = up.photo || up.photoUrl || null;
+        if (sessionAgent && cdnUrl) {
+          setAgent({ ...sessionAgent, photo: cdnUrl });
+        }
+      }).catch(() => {
+        // Fallback: store object URL so the avatar still shows across the session
+        if (sessionAgent) setAgent({ ...sessionAgent, photo: objectUrl });
+      });
     } catch (err: unknown) {
       const msg = (
         err as { response?: { data?: { message?: string | string[] } } }
@@ -354,6 +382,43 @@ export default function EditProfilePage() {
           <span className="text-muted-foreground/40">/</span>
           <span className="text-sm font-medium">{t.editProfileTitle}</span>
         </div>
+
+        {/* Identity verification banners */}
+        {verificationTier === "VERIFIE" && (
+          <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl px-4 py-3 mb-5">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <p className="text-sm text-emerald-800 dark:text-emerald-300 font-medium">
+              {t.bannerVerified}
+            </p>
+          </div>
+        )}
+        {verificationTier === "NON_VERIFIE" && idRejectionReason && (
+          <div className="flex items-start gap-3 bg-destructive/10 border border-destructive/30 rounded-xl px-4 py-3 mb-5">
+            <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-destructive">{t.bannerRejectedTitle}</p>
+              <p className="text-sm text-destructive/80 mt-0.5">{idRejectionReason}</p>
+              <Link href="/espace-agent/identite" className="text-xs text-destructive font-semibold underline mt-1 inline-block">
+                {t.bannerRejectedCta}
+              </Link>
+            </div>
+          </div>
+        )}
+        {verificationTier === "NON_VERIFIE" && !idRejectionReason && profileComplete && (
+          <div className="flex items-center gap-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3 mb-5">
+            <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+            <p className="text-sm text-amber-800 dark:text-amber-300">{t.bannerPending}</p>
+          </div>
+        )}
+        {verificationTier === "NON_VERIFIE" && !idRejectionReason && !profileComplete && (
+          <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-xl px-4 py-3 mb-5">
+            <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
+            <p className="text-sm text-muted-foreground flex-1">{t.bannerNotSubmitted}</p>
+            <Link href="/espace-agent/identite" className="text-xs text-primary font-semibold whitespace-nowrap hover:underline shrink-0">
+              {t.bannerNotSubmittedCta}
+            </Link>
+          </div>
+        )}
 
         {/* 2-column layout: sidebar + sections */}
         <div className="flex flex-col lg:grid lg:grid-cols-[240px_1fr] gap-5 lg:items-start">

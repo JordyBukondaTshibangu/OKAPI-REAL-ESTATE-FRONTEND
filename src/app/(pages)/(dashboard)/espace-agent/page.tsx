@@ -65,6 +65,8 @@ type AgentProfile = {
   agentType?: string;
   verificationTier: "NON_VERIFIE" | "VERIFIE";
   emailVerified: boolean;
+  profileComplete?: boolean;
+  idDocumentRejectionReason?: string | null;
   bio?: string;
   communes?: string[];
   propertyTypes?: string[];
@@ -560,7 +562,13 @@ function UpgradePromptCard({ profile, t }: { profile: AgentProfile; t: T }) {
 
 // Replaces the old multi-banner NotificationStrip with a single checklist card.
 function TodoCard({ profile, t }: { profile: AgentProfile; t: T }) {
-  const isPending = profile.verificationTier === "NON_VERIFIE";
+  const isVerified = profile.verificationTier === "VERIFIE";
+  // Identity doc not yet submitted
+  const needsIdentitySubmission = !isVerified && !profile.profileComplete;
+  // Docs submitted, waiting for admin review
+  const isPendingReview = !isVerified && Boolean(profile.profileComplete);
+  const wasRejected = Boolean(profile.idDocumentRejectionReason);
+
   const profileIncomplete =
     !profile.bio && (!profile.communes || profile.communes.length === 0);
   const hasListings = (profile.properties?.length ?? 0) > 0;
@@ -603,7 +611,7 @@ function TodoCard({ profile, t }: { profile: AgentProfile; t: T }) {
   }
 
   // Nothing to show at all
-  if (items.length === 0 && !isPending) return null;
+  if (items.length === 0 && !needsIdentitySubmission && !isPendingReview && !wasRejected) return null;
 
   return (
     <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
@@ -635,8 +643,47 @@ function TodoCard({ profile, t }: { profile: AgentProfile; t: T }) {
           </div>
         ))}
 
-        {/* Pending status row — always shown while account is pending */}
-        {isPending && (
+        {/* Rejected — show reason + link to resubmit */}
+        {wasRejected && (
+          <div className="px-4 py-3 bg-destructive/5 space-y-1">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+              <span className="text-sm text-destructive font-medium flex-1">
+                {t.todoIdentityRejectedLabel}
+              </span>
+              <Link
+                href="/espace-agent/identite"
+                className="text-xs text-destructive font-semibold hover:underline whitespace-nowrap"
+              >
+                {t.todoIdentityRejectedCta}
+              </Link>
+            </div>
+            {profile.idDocumentRejectionReason && (
+              <p className="text-xs text-destructive/70 pl-6 line-clamp-2">
+                {profile.idDocumentRejectionReason}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Needs submission — link to identity page */}
+        {needsIdentitySubmission && !wasRejected && (
+          <div className="flex items-center gap-3 px-4 py-3">
+            <div className="w-4 h-4 rounded border border-muted-foreground/30 flex-shrink-0" />
+            <span className="flex-1 text-sm text-foreground min-w-0">
+              {t.todoIdentityLabel}
+            </span>
+            <Link
+              href="/espace-agent/identite"
+              className="text-xs text-primary font-semibold hover:underline whitespace-nowrap ml-2"
+            >
+              {t.todoIdentityCta}
+            </Link>
+          </div>
+        )}
+
+        {/* Docs submitted, awaiting admin review */}
+        {isPendingReview && !wasRejected && (
           <div className="flex items-center gap-3 px-4 py-3">
             <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
             <span className="text-sm text-muted-foreground">

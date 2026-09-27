@@ -865,6 +865,35 @@ export type Messages = {
     todoCompleteProfile: string;
     todoCreateListing: string; todoCreateListingCta: string;
     todoPendingStatus: string;
+    // Identity verification
+    todoIdentityLabel: string; todoIdentityCta: string;
+    todoIdentityRejectedLabel: string; todoIdentityRejectedCta: string;
+    // Identity banners (profil page)
+    bannerVerified: string;
+    bannerRejectedTitle: string; bannerRejectedCta: string;
+    bannerPending: string;
+    bannerNotSubmitted: string; bannerNotSubmittedCta: string;
+    // Identity page (identite/page.tsx)
+    identiteTitle: string; identiteSubtitle: string;
+    identiteWhyTitle: string; identiteWhyBody: string;
+    identiteApprovedTitle: string; identiteApprovedBody: string;
+    identitePendingTitle: string; identitePendingBody: string;
+    identiteRejectedTitle: string; identiteRejectedBody: string; identiteRejectedHint: string;
+    identiteSectionPersonal: string; identiteSectionDocs: string;
+    identiteDob: string; identiteDobHint: string;
+    identiteIdNumber: string; identiteIdNumberHint: string;
+    identiteCommune: string; identiteCommuneHint: string;
+    identiteIdDoc: string; identiteIdDocHint: string;
+    identiteSelfie: string; identiteSelfieHint: string;
+    identiteClickToUpload: string; identiteUploadHint: string;
+    identiteUploaded: string;
+    identiteSubmitBtn: string; identiteSubmittingBtn: string;
+    identiteSuccessTitle: string; identiteSuccessBody: string;
+    identiteBackToDashboard: string;
+    identiteErrDob: string; identiteErrIdNumber: string;
+    identiteErrIdDoc: string; identiteErrCommune: string; identiteErrUploading: string;
+    identiteErrFileTooLarge: string; identiteErrUploadFailed: string;
+    identiteErrGeneric: string;
     // PendingPrompt
     pendingPromptTitle: string; pendingPromptBody: string; pendingPromptCta: string;
     pendingProNote: string; pendingProCta: string;
