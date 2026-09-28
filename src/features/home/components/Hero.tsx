@@ -40,7 +40,7 @@ const ALL_COMMUNES = [
   "Kalamu",
   "Lemba",
   "Matete",
-  "Ndjili",
+  "Tshangu",
   "Makala",
   "Mont-Ngafula",
   "Ngaba",
@@ -245,6 +245,7 @@ export default function Hero({
           <div
             style={anim(300)}
             ref={searchContainerRef}
+            data-tour-id="hero-search"
             className="relative max-w-[920px]"
           >
             {/* Card shell — corners adapt when dropdown is open */}
@@ -298,7 +299,7 @@ export default function Hero({
               </form>
 
               {/* Filter pills */}
-              <div className="flex items-center gap-2 px-5 pb-4 flex-wrap border-t border-border/30 pt-3">
+              <div data-tour-id="hero-filters" className="flex items-center gap-2 px-5 pb-4 flex-wrap border-t border-border/30 pt-3">
                 {FILTER_PILLS.map(({ label, param }) => (
                   <Button
                     key={param}

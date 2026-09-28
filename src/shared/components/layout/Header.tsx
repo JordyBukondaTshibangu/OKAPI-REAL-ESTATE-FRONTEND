@@ -288,6 +288,7 @@ function ProfileMenu() {
       <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen((v) => !v)}
+          data-tour-id="header-user"
           style={{
             boxShadow:
               "0 0 0 2px hsl(var(--navy)), 0 0 0 4px hsl(var(--secondary))",

@@ -4,13 +4,14 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Camera, CheckCircle, Eye, EyeOff, Trash2, X } from "lucide-react";
+import { Camera, CheckCircle, Eye, EyeOff, PlayCircle, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import UserSidebarLayout from "@/features/user/components/UserSidebarLayout";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useTourStore } from "@/store/useTourStore";
 import { useT } from "@/i18n/useT";
 import type { Messages } from "@/i18n/types";
 import {
@@ -54,6 +55,7 @@ function avatarUrl(profileImage: string | null | undefined): string | null {
 
 export default function ProfilePage() {
   const { user, token, setUser, logout } = useAuthStore();
+  const { resetTour, startTour } = useTourStore();
   const router = useRouter();
   const t = useT();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -409,6 +411,24 @@ export default function ProfilePage() {
               </Button>
             </div>
           </form>
+        </div>
+
+        {/* Tour replay */}
+        <div className="bg-card rounded-2xl shadow-sm p-4 sm:p-8">
+          <h2 className="text-base font-semibold mb-1">{t.tour.replayLabel}</h2>
+          <p className="text-sm text-muted-foreground mb-4">{t.tour.replayDesc}</p>
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => {
+              resetTour();
+              router.push("/");
+              setTimeout(startTour, 1200);
+            }}
+          >
+            <PlayCircle className="w-4 h-4" />
+            {t.tour.replayLabel}
+          </Button>
         </div>
 
         {/* Danger zone */}

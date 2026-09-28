@@ -1576,6 +1576,19 @@ const en: Messages = {
     errGeneric: "An error occurred. Please try again.",
     welcomeBack: "Welcome back, {{name}}!",
   },
+  tour: {
+    step1Title: "🔍 Search for properties",
+    step1Desc: "Type a neighbourhood, property type or keyword. You can also specify whether you want to buy or rent.",
+    step2Title: "🎛️ Refine your search",
+    step2Desc: "Filter by property type, price range, number of bedrooms or rental duration.",
+    step3Title: "👤 Your personal space",
+    step3Desc: "Find your favourites, alerts and reviews in your personal menu. Click your avatar to access them.",
+    skip: "Skip",
+    next: "Next →",
+    finish: "Done ✓",
+    replayLabel: "Getting started guide",
+    replayDesc: "Replay the guide for new users",
+  },
 };
 
 export default en;
