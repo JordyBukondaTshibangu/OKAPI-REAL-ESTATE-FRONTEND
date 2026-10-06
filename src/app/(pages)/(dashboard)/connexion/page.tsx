@@ -20,6 +20,9 @@ import { useT } from "@/i18n/useT";
 
 // ─── Google Icon ────────────────────────────────────────────────────────────
 
+// Google sign-in is temporarily disabled. Flip to true to re-enable.
+const GOOGLE_AUTH_ENABLED = false;
+
 function GoogleIcon() {
   return (
     <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
@@ -129,27 +132,31 @@ function UserLoginForm() {
         {isSubmitting ? t.signingIn : t.signInBtn}
       </Button>
 
-      <div className="relative my-1">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs text-muted-foreground">
-          <span className="bg-card px-3">{t.orContinueWith}</span>
-        </div>
-      </div>
+      {GOOGLE_AUTH_ENABLED && (
+        <>
+          <div className="relative my-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs text-muted-foreground">
+              <span className="bg-card px-3">{t.orContinueWith}</span>
+            </div>
+          </div>
 
-      <Button
-        variant="outline"
-        className="w-full"
-        type="button"
-        onClick={() => {
-          const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
-          window.location.href = `${backendUrl}/auth/google`;
-        }}
-      >
-        <GoogleIcon />
-        {t.continueWithGoogle}
-      </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            type="button"
+            onClick={() => {
+              const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+              window.location.href = `${backendUrl}/auth/google`;
+            }}
+          >
+            <GoogleIcon />
+            {t.continueWithGoogle}
+          </Button>
+        </>
+      )}
 
       <p className="text-center text-sm text-muted-foreground pt-1">
         {t.noAccountYet}{" "}
@@ -264,27 +271,31 @@ function AgentLoginForm() {
         {isSubmitting ? t.signingIn : t.signInBtn}
       </Button>
 
-      <div className="relative my-1">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs text-muted-foreground">
-          <span className="bg-card px-3">{t.orContinueWith}</span>
-        </div>
-      </div>
+      {GOOGLE_AUTH_ENABLED && (
+        <>
+          <div className="relative my-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs text-muted-foreground">
+              <span className="bg-card px-3">{t.orContinueWith}</span>
+            </div>
+          </div>
 
-      <Button
-        variant="outline"
-        className="w-full"
-        type="button"
-        onClick={() => {
-          const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
-          window.location.href = `${backendUrl}/auth/agent/google`;
-        }}
-      >
-        <GoogleIcon />
-        {t.continueWithGoogle}
-      </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            type="button"
+            onClick={() => {
+              const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+              window.location.href = `${backendUrl}/auth/agent/google`;
+            }}
+          >
+            <GoogleIcon />
+            {t.continueWithGoogle}
+          </Button>
+        </>
+      )}
 
       <p className="text-center text-sm text-muted-foreground pt-1">
         {t.notAnAgentYet}{" "}

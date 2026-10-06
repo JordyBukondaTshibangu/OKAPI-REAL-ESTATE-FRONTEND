@@ -1176,6 +1176,20 @@ export type Messages = {
     pwdLowercase: string;
     pwdSpecial: string;
   };
+  tour: {
+    step1Title: string;
+    step1Desc: string;
+    step2Title: string;
+    step2Desc: string;
+    step3Title: string;
+    step3Desc: string;
+    skip: string;
+    next: string;
+    finish: string;
+    /** Label for the "Replay tour" button in the user profile page */
+    replayLabel: string;
+    replayDesc: string;
+  };
   connexion: {
     tabClient: string;
     tabAgent: string;

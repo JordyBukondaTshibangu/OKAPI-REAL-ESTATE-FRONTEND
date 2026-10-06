@@ -1577,6 +1577,19 @@ const ln: Messages = {
     errGeneric: "Suka esalemi. Suka lisusu.",
     welcomeBack: "Boyei, {{name}}!",
   },
+  tour: {
+    step1Title: "🔍 Sala koluka bandako",
+    step1Desc: "Koma quartier, ndenge ya ndako to liloba. Okokaki koloba soki olingi kosomba to kokira.",
+    step2Title: "🎛️ Pona malamu",
+    step2Desc: "Bongisa koluka na ndenge ya ndako, prix, biloko mpe ntango ya kozala.",
+    step3Title: "👤 Esika na yo",
+    step3Desc: "Zwa bandako olingaki, ba alertes mpe ba avis na menu na yo. Kofukama avatar na yo kotia.",
+    skip: "Sika",
+    next: "Suka →",
+    finish: "Silisa ✓",
+    replayLabel: "Toli ya ebandeli",
+    replayDesc: "Tala lisusu toli ya bato ya sika",
+  },
 };
 
 export default ln;

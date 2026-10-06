@@ -6,6 +6,8 @@ import QueryProvider from "@/store/QueryProvider";
 import AuthProvider from "@/store/AuthProvider";
 import ThemeProvider from "@/shared/components/layout/ThemeProvider";
 import ChatWidget from "@/shared/components/ui/ChatWidget";
+import TourOverlay from "@/shared/components/ui/TourOverlay";
+import TourTrigger from "@/shared/components/ui/TourTrigger";
 import { ToastProvider } from "@/shared/context/ToastContext";
 import "./globals.css";
 
@@ -96,6 +98,8 @@ export default function RootLayout({
                 <main className="flex-1">{children}</main>
                 <Footer />
                 <ChatWidget />
+                <TourTrigger />
+                <TourOverlay />
               </ToastProvider>
             </ThemeProvider>
           </AuthProvider>
