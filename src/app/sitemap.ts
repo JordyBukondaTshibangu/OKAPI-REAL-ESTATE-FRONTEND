@@ -61,6 +61,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${BASE}/conditions-generales`, changeFrequency: "yearly", priority: 0.2 },
   { url: `${BASE}/confidentialite`, changeFrequency: "yearly", priority: 0.2 },
   { url: `${BASE}/cookies`, changeFrequency: "yearly", priority: 0.2 },
+  { url: `${BASE}/supprimer-mon-compte`, changeFrequency: "yearly", priority: 0.2 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

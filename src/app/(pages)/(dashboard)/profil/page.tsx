@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Camera, CheckCircle, Eye, EyeOff, PlayCircle, Trash2, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -437,7 +438,10 @@ export default function ProfilePage() {
             {t.dashboard.dangerZoneHeading}
           </h2>
           <p className="text-sm text-muted-foreground mb-5">
-            {t.dashboard.dangerZoneBody}
+            {t.dashboard.dangerZoneBody}{" "}
+            <Link href="/supprimer-mon-compte" className="text-primary hover:underline">
+              {t.dashboard.deleteAccountLearnMore}
+            </Link>
           </p>
 
           {!showDeleteConfirm ? (
