@@ -106,6 +106,7 @@ export type Messages = {
     privacy: string;
     cookies: string;
     legalMentions: string;
+    deleteAccount: string;
     joinTeam: string;
     agentSpace: string;
     becomeAgent: string;
@@ -648,6 +649,7 @@ export type Messages = {
     changePasswordBtn: string;
     dangerZoneHeading: string;
     dangerZoneBody: string;
+    deleteAccountLearnMore: string;
     deleteAccountBtn: string;
     deleteAccountConfirm: string;
     cancel: string;
@@ -1393,5 +1395,20 @@ export type Messages = {
     reviewNone: string;
     reviewConfirmBtn: string;
     reviewEditBtn: string;
+  };
+  deleteAccountPage: {
+    badge: string; heading: string; subtitle: string;
+    whatTitle: string; whatItems: string[];
+    keptTitle: string; keptBody: string;
+    delayTitle: string; delayBody: string;
+    actionTitle: string;
+    signedInAs: string;
+    loginPrompt: string; loginBtn: string;
+    acknowledge: string;
+    deleteBtn: string; confirmText: string; confirmBtn: string; cancel: string; deleting: string;
+    errDelete: string;
+    successTitle: string; successBody: string; backHome: string;
+    noAccessTitle: string; noAccessBody: string; emailSubject: string;
+    agentNote: string;
   };
 };

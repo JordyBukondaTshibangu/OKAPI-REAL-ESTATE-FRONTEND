@@ -110,6 +110,7 @@ export default function Footer() {
     { label: t.footer.privacy, href: "/confidentialite" },
     { label: t.footer.cookies, href: "/cookies" },
     { label: t.footer.legalMentions, href: "/conditions-generales" },
+    { label: t.footer.deleteAccount, href: "/supprimer-mon-compte" },
   ];
   const partnerLinks = [
     { label: t.footer.joinTeam, href: "/carrieres" },

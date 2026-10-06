@@ -45,6 +45,7 @@ function UserLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setAuth } = useAuthStore();
   const { logout: clearAgentSession } = useAgentSessionStore();
   const { showToast } = useToast();
@@ -69,7 +70,9 @@ function UserLoginForm() {
       clearAgentSession();
       setAuth(access_token, user);
       showToast(t.welcomeBack.replace("{{name}}", user.firstName), "success");
-      router.push("/");
+      // Only follow same-site paths to avoid open redirects.
+      const redirect = searchParams.get("redirect");
+      router.push(redirect && /^\/(?![\/\\])/.test(redirect) ? redirect : "/");
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       const msg = status === 401 ? t.errInvalidCredentials : t.errGeneric;
