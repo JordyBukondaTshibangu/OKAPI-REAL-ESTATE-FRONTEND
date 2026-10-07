@@ -1,5 +1,8 @@
 import type { NextRequest } from "next/server";
 
+// Edge runtime: no body-size limit (streams directly), unlike serverless (4.5 MB cap).
+export const runtime = "edge";
+
 /**
  * Server-side proxy for R2 PUT uploads.
  *

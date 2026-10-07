@@ -698,7 +698,7 @@ export default function PropertyDetailClient({
             {/* Headline */}
             <header>
               <div className="flex items-start justify-between gap-4 flex-wrap">
-                <h1 className="text-base md:text-lg text-foreground/85 flex-1 min-w-0">
+                <h1 className="text-xl md:text-2xl font-bold text-foreground leading-snug flex-1 min-w-0">
                   {detail.title}
                 </h1>
                 <p className="text-2xl md:text-3xl font-bold text-foreground tracking-tight shrink-0">
