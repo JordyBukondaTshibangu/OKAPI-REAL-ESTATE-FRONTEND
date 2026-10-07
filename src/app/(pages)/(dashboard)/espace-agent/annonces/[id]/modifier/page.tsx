@@ -49,6 +49,13 @@ const AMENITIES = [
   "Internet","Piscine","Garage","Sécurité 24h/24",
 ];
 
+const COMMODITY_OPTIONS = [
+  "Supermarchés", "Pharmacies", "Hôpitaux / Cliniques", "Restaurants",
+  "Écoles internationales", "Marché local", "Transport en commun",
+  "Banques / ATM", "Centres commerciaux", "Mosquées / Églises",
+  "Terrains de sport", "Parcs / Espaces verts",
+];
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 type FormState = {
@@ -60,7 +67,7 @@ type FormState = {
   description: string;
   suburb: string;
   neighborhood: string;
-  landmark: string;
+  landmark: string[]; // selected commodity checkboxes
   bedrooms: string;
   bathrooms: string;
   areaSqm: string;
@@ -242,7 +249,7 @@ export default function ModifierAnnoncePage() {
     description: "",
     suburb: "",
     neighborhood: "",
-    landmark: "",
+    landmark: [],
     bedrooms: "",
     bathrooms: "",
     areaSqm: "",
@@ -278,7 +285,10 @@ export default function ModifierAnnoncePage() {
           description: p.description ?? "",
           suburb: p.suburb ?? "",
           neighborhood: p.neighborhood ?? "",
-          landmark: p.landmark ?? "",
+          // Pre-select checkboxes from the stored comma-separated string
+          landmark: p.landmark
+            ? p.landmark.split(",").map((s: string) => s.trim()).filter((s: string) => COMMODITY_OPTIONS.includes(s))
+            : [],
           bedrooms: p.bedrooms != null ? String(p.bedrooms) : "",
           bathrooms: p.bathrooms != null ? String(p.bathrooms) : "",
           areaSqm: p.areaSqm != null ? String(p.areaSqm) : "",
@@ -459,7 +469,7 @@ export default function ModifierAnnoncePage() {
         areaSqm:        form.areaSqm ? Number(form.areaSqm) : 0,
         suburb:         form.suburb,
         neighborhood:   form.neighborhood.trim() || undefined,
-        landmark:       form.landmark.trim() || undefined,
+        landmark:       form.landmark.length > 0 ? form.landmark.join(", ") : undefined,
         city:           "Kinshasa",
         isFurnished:    form.isFurnished,
         isExclusive:    form.isExclusive,
@@ -583,9 +593,40 @@ export default function ModifierAnnoncePage() {
                     <TextInput value="Kinshasa" onChange={() => {}} disabled />
                   </Field>
                 </div>
-                <Field label={t.labelLandmark} hint={t.landmarkHint}>
-                  <TextInput value={form.landmark} onChange={(v) => set("landmark", v)} placeholder={t.landmarkPlaceholder} />
-                </Field>
+                <div>
+                  <p className="text-sm font-medium text-foreground mb-2">{t.labelLandmark}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {COMMODITY_OPTIONS.map((option) => {
+                      const checked = form.landmark.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => set("landmark", checked
+                            ? form.landmark.filter((x) => x !== option)
+                            : [...form.landmark, option]
+                          )}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-left transition-colors ${
+                            checked
+                              ? "border-primary bg-primary/10 text-primary font-medium"
+                              : "border-border bg-background text-foreground/70 hover:border-primary/50"
+                          }`}
+                        >
+                          <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                            checked ? "bg-primary border-primary" : "border-foreground/30"
+                          }`}>
+                            {checked && (
+                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 12 12">
+                                <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            )}
+                          </span>
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </section>
 
