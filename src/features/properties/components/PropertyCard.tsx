@@ -79,7 +79,7 @@ function CardCarousel({
       <div
         className="flex h-full transition-transform duration-300 ease-in-out"
         style={{
-          transform: `translateX(-${index * 100}%)`,
+          transform: `translateX(-${(index / total) * 100}%)`,
           width: `${total * 100}%`,
         }}
       >
