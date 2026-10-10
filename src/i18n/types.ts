@@ -888,12 +888,12 @@ export type Messages = {
     identiteIdDoc: string; identiteIdDocHint: string;
     identiteSelfie: string; identiteSelfieHint: string;
     identiteClickToUpload: string; identiteUploadHint: string;
-    identiteUploaded: string;
+    identiteUploaded: string; identiteDraftSaved: string; identiteDraftRestored: string; identiteClearDraft: string; identitePhotoRestored: string;
     identiteSubmitBtn: string; identiteSubmittingBtn: string;
     identiteSuccessTitle: string; identiteSuccessBody: string;
     identiteBackToDashboard: string;
     identiteErrDob: string; identiteErrIdNumber: string;
-    identiteErrIdDoc: string; identiteErrCommune: string; identiteErrUploading: string;
+    identiteErrIdDoc: string; identiteErrCommune: string; identiteErrUploading: string; identiteErrSelfie: string;
     identiteErrFileTooLarge: string; identiteErrUploadFailed: string;
     identiteErrGeneric: string;
     // PendingPrompt
@@ -1047,7 +1047,7 @@ export type Messages = {
     labelShortTermNotes: string; shortTermNotesHint: string; shortTermNotesPlaceholder: string;
     // Photos
     sectionPhotosLabel: string; photosInstruction: string; photosDropzone: string;
-    coverLabel: string; errMinPhotos: string; uploadingPhotos: string;
+    coverLabel: string; photoReorderHint: string; errMinPhotos: string; uploadingPhotos: string;
     // Amenities
     sectionAmenities: string;
     amenWater: string; amenElec: string; amenGenerator: string; amenAC: string;

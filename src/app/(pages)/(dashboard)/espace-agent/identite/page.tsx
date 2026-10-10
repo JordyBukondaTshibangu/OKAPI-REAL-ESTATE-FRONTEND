@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
@@ -14,6 +14,7 @@ import {
   Clock,
   Loader2,
   X,
+  Save,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useAgentSessionStore } from "@/store/useAgentSessionStore";
@@ -25,14 +26,25 @@ import Link from "next/link";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type UploadedFile = {
-  file: File;
+  file?: File;
   preview: string;
   key?: string;
   uploading: boolean;
   error?: string;
+  restored?: boolean;
 };
 
 type Status = "idle" | "submitted" | "approved" | "rejected";
+
+type Draft = {
+  dob: string;
+  idNumber: string;
+  commune: string;
+  idDocKey?: string;
+  selfieKey?: string;
+};
+
+const DRAFT_KEY = "okapi_identite_draft";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -56,6 +68,31 @@ async function presignAndUpload(file: File, token: string): Promise<string> {
   });
   if (!res.ok) throw new Error("Upload failed");
   return key;
+}
+
+function loadDraft(): Draft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    return raw ? (JSON.parse(raw) as Draft) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft(draft: Draft) {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  } catch {
+    // ignore quota errors
+  }
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -96,6 +133,7 @@ function PhotoUploadBox({
   clickLabel,
   uploadHint,
   uploadedLabel,
+  restoredLabel,
 }: {
   label: string;
   hint?: string;
@@ -106,15 +144,24 @@ function PhotoUploadBox({
   clickLabel: string;
   uploadHint: string;
   uploadedLabel: string;
+  restoredLabel: string;
 }) {
   const ref = useRef<HTMLInputElement>(null);
   return (
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-foreground">{label}</label>
       {uploaded ? (
-        <div className="relative rounded-xl overflow-hidden border border-border aspect-video bg-muted">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={uploaded.preview} alt={label} className="w-full h-full object-contain" />
+        <div className="relative rounded-xl overflow-hidden border border-border bg-muted">
+          {uploaded.preview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={uploaded.preview} alt={label} className="w-full aspect-video object-contain" />
+          ) : (
+            // Restored key — no local preview available
+            <div className="w-full aspect-video flex flex-col items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-950/20">
+              <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+              <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">{restoredLabel}</span>
+            </div>
+          )}
           {uploaded.uploading && (
             <div className="absolute inset-0 bg-background/70 flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -134,7 +181,7 @@ function PhotoUploadBox({
               <X className="w-4 h-4 text-foreground" />
             </button>
           )}
-          {uploaded.key && !uploaded.uploading && (
+          {uploaded.key && !uploaded.uploading && uploaded.preview && (
             <div className="absolute bottom-2 left-2 bg-emerald-500 text-white text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" /> {uploadedLabel}
             </div>
@@ -189,6 +236,54 @@ export default function IdentitePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
+
+  // Restore draft once status is loaded and form is idle
+  useEffect(() => {
+    if (loadingStatus) return;
+    if (status !== "idle" && status !== "rejected") return;
+    const draft = loadDraft();
+    if (!draft) return;
+    if (draft.dob) setDob(draft.dob);
+    if (draft.idNumber) setIdNumber(draft.idNumber);
+    if (draft.commune) setCommune(draft.commune);
+    if (draft.idDocKey) setIdDoc({ preview: "", key: draft.idDocKey, uploading: false, restored: true });
+    if (draft.selfieKey) setSelfie({ preview: "", key: draft.selfieKey, uploading: false, restored: true });
+    setDraftRestored(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingStatus]);
+
+  // Auto-save draft on field changes
+  const persistDraft = useCallback(() => {
+    if (submitSuccess) return;
+    const draft: Draft = {
+      dob,
+      idNumber,
+      commune,
+      idDocKey: idDoc?.key,
+      selfieKey: selfie?.key,
+    };
+    // Only save if there's at least one filled field
+    if (!dob && !idNumber && !commune && !idDoc?.key && !selfie?.key) return;
+    saveDraft(draft);
+    setDraftSavedAt(new Date());
+  }, [dob, idNumber, commune, idDoc?.key, selfie?.key, submitSuccess]);
+
+  useEffect(() => {
+    persistDraft();
+  }, [persistDraft]);
+
+  function handleClearDraft() {
+    clearDraft();
+    setDob("");
+    setIdNumber("");
+    setCommune("");
+    setIdDoc(null);
+    setSelfie(null);
+    setDraftRestored(false);
+    setDraftSavedAt(null);
+  }
 
   useEffect(() => {
     if (!hydrated) return;
@@ -225,6 +320,7 @@ export default function IdentitePage() {
     if (!dob) return setSubmitError(t.identiteErrDob);
     if (!idNumber.trim()) return setSubmitError(t.identiteErrIdNumber);
     if (!idDoc?.key) return setSubmitError(t.identiteErrIdDoc);
+    if (!selfie?.key) return setSubmitError(t.identiteErrSelfie);
     if (!commune) return setSubmitError(t.identiteErrCommune);
     if (idDoc.uploading || selfie?.uploading) return setSubmitError(t.identiteErrUploading);
     setSubmitting(true);
@@ -233,9 +329,11 @@ export default function IdentitePage() {
         dateOfBirth: new Date(dob).toISOString(),
         nationalIdNumber: idNumber.trim(),
         idDocumentUrl: idDoc.key!,
-        selfieUrl: selfie?.key,
+        selfieUrl: selfie.key!,
         residenceCommune: commune,
       });
+      clearDraft();
+      setDraftSavedAt(null);
       setSubmitSuccess(true);
       setStatus("submitted");
     } catch (err: unknown) {
@@ -291,11 +389,35 @@ export default function IdentitePage() {
         <Link href="/espace-agent" className="p-2 rounded-lg hover:bg-muted transition">
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </Link>
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl font-bold">{t.identiteTitle}</h1>
           <p className="text-sm text-muted-foreground">{t.identiteSubtitle}</p>
         </div>
+        {/* Draft saved indicator */}
+        {draftSavedAt && !submitSuccess && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Save className="w-3.5 h-3.5" />
+            <span>{t.identiteDraftSaved}</span>
+          </div>
+        )}
       </div>
+
+      {/* Draft restored banner */}
+      {draftRestored && !submitSuccess && (
+        <div className="flex items-start justify-between gap-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+          <div className="flex gap-2">
+            <Save className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+            <p className="text-sm text-blue-800 dark:text-blue-300">{t.identiteDraftRestored}</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleClearDraft}
+            className="text-xs text-blue-600 dark:text-blue-400 underline whitespace-nowrap shrink-0 hover:text-blue-800 transition"
+          >
+            {t.identiteClearDraft}
+          </button>
+        </div>
+      )}
 
       {/* Rejection banner */}
       {status === "rejected" && rejectionReason && (
@@ -391,6 +513,7 @@ export default function IdentitePage() {
             clickLabel={t.identiteClickToUpload}
             uploadHint={t.identiteUploadHint}
             uploadedLabel={t.identiteUploaded}
+            restoredLabel={t.identitePhotoRestored}
           />
 
           <PhotoUploadBox
@@ -403,6 +526,7 @@ export default function IdentitePage() {
             clickLabel={t.identiteClickToUpload}
             uploadHint={t.identiteUploadHint}
             uploadedLabel={t.identiteUploaded}
+            restoredLabel={t.identitePhotoRestored}
           />
         </div>
 

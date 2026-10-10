@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { KINSHASA_COMMUNES } from "@/constants/kinshasa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,6 +11,7 @@ import {
   ArrowRight,
   CheckCircle2,
   ChevronLeft,
+  GripVertical,
   Loader2,
   Save,
   SendHorizontal,
@@ -381,6 +382,8 @@ export default function NouvelleAnnoncePage() {
 
   const [photos, setPhotos] = useState<StagedPhoto[]>([]);
   const [photoStandardsOpen, setPhotoStandardsOpen] = useState(true);
+  const [dragSrc, setDragSrc] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<FormState>({
@@ -474,10 +477,32 @@ export default function NouvelleAnnoncePage() {
     if (to < 0 || to >= photos.length) return;
     setPhotos((prev) => {
       const next = [...prev];
-      [next[from], next[to]] = [next[to], next[from]];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
       return next;
     });
   }
+
+  const handleDragStart = useCallback((i: number) => {
+    setDragSrc(i);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent, i: number) => {
+    e.preventDefault();
+    setDragOver(i);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, i: number) => {
+    e.preventDefault();
+    if (dragSrc !== null && dragSrc !== i) movePhoto(dragSrc, i);
+    setDragSrc(null);
+    setDragOver(null);
+  }, [dragSrc]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleDragEnd = useCallback(() => {
+    setDragSrc(null);
+    setDragOver(null);
+  }, []);
 
   async function uploadPhotos(): Promise<string[]> {
     if (photos.length === 0) return [];
@@ -1110,53 +1135,65 @@ export default function NouvelleAnnoncePage() {
               />
 
               {photos.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-3">
-                  {photos.map((p, i) => (
-                    <div
-                      key={i}
-                      className="relative group aspect-video rounded-xl overflow-hidden bg-muted"
-                    >
-                      <Image
-                        src={p.preview}
-                        alt={`Photo ${i + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                      {i === 0 && (
-                        <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          {t.coverLabel}
-                        </span>
-                      )}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-1.5">
-                        {i > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => movePhoto(i, i - 1)}
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5"
-                          >
-                            ←
-                          </button>
+                <>
+                  <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
+                    <GripVertical className="w-3 h-3" />
+                    {t.photoReorderHint}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {photos.map((p, i) => (
+                      <div
+                        key={p.preview}
+                        draggable
+                        onDragStart={() => handleDragStart(i)}
+                        onDragOver={(e) => handleDragOver(e, i)}
+                        onDrop={(e) => handleDrop(e, i)}
+                        onDragEnd={handleDragEnd}
+                        className={[
+                          "relative group aspect-video rounded-xl overflow-hidden bg-muted cursor-grab active:cursor-grabbing transition-all select-none",
+                          dragSrc === i ? "opacity-40 scale-95" : "",
+                          dragOver === i && dragSrc !== i ? "ring-2 ring-primary ring-offset-1" : "",
+                        ].join(" ")}
+                      >
+                        <Image
+                          src={p.preview}
+                          alt={`Photo ${i + 1}`}
+                          fill
+                          className="object-cover pointer-events-none"
+                          draggable={false}
+                        />
+                        {/* Cover badge */}
+                        {i === 0 && (
+                          <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded z-10">
+                            {t.coverLabel}
+                          </span>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => removePhoto(i)}
-                          className="bg-destructive/80 hover:bg-destructive text-white rounded p-1"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                        {i < photos.length - 1 && (
+                        {/* Drag handle hint */}
+                        <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition z-10">
+                          <div className="bg-black/50 rounded p-0.5">
+                            <GripVertical className="w-3 h-3 text-white" />
+                          </div>
+                        </div>
+                        {/* Delete button */}
+                        <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition z-10">
                           <button
                             type="button"
-                            onClick={() => movePhoto(i, i + 1)}
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs rounded px-1.5 py-0.5"
+                            onClick={() => removePhoto(i)}
+                            className="bg-destructive/90 hover:bg-destructive text-white rounded p-1 shadow"
                           >
-                            →
+                            <Trash2 className="w-3 h-3" />
                           </button>
+                        </div>
+                        {/* Position number */}
+                        {i > 0 && (
+                          <span className="absolute bottom-1 left-1 bg-black/50 text-white text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition z-10">
+                            {i + 1}
+                          </span>
                         )}
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
 
               {missingPhotos > 0 && (
