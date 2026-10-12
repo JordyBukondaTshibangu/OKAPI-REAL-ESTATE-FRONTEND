@@ -340,6 +340,7 @@ export type Messages = {
       breadHome: string; breadFindAgent: string;
       ratingsLabel: string;
       alreadyReviewedMsg: string;
+      reviewPendingMsg: string;
       subRatingsTitle: string;
       ratingReactiviteLabel: string; ratingHonneteteLabel: string; ratingProfessionnalismeLabel: string;
       propertyMatchLabel: string; propertyMatchYes: string; propertyMatchNo: string; propertyMatchNotVisited: string;

@@ -432,6 +432,7 @@ const fr: Messages = {
       breadHome: "Accueil", breadFindAgent: "Trouver un agent",
       ratingsLabel: "avis",
       alreadyReviewedMsg: "Vous avez déjà laissé un avis pour cet agent.",
+      reviewPendingMsg: "Votre avis est en cours de modération. Il sera visible prochainement.",
       subRatingsTitle: "Évaluation détaillée (optionnel)",
       ratingReactiviteLabel: "Réactivité", ratingHonneteteLabel: "Honnêteté", ratingProfessionnalismeLabel: "Professionnalisme",
       propertyMatchLabel: "Le bien correspondait-il à l'annonce ?", propertyMatchYes: "Oui", propertyMatchNo: "Non", propertyMatchNotVisited: "Je n'ai pas visité le bien",

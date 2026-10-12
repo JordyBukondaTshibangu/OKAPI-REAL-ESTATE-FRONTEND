@@ -288,6 +288,7 @@ export type Review = {
   ratingProfessionnalisme?: number | null;
   comment?: string;
   createdAt: string;
+  isVisible?: boolean;
 };
 
 export async function getMyReviews(token: string): Promise<Review[]> {
@@ -328,9 +329,10 @@ export async function getPropertyReviews(propertyId: string): Promise<Review[]> 
   return res.data;
 }
 
-export async function getAgentReviews(agentId: string): Promise<Review[]> {
+export async function getAgentReviews(agentId: string, token?: string | null): Promise<Review[]> {
   const res = await axios.get<Review[]>(
-    `${BASE}/api/user/reviews/agent/${agentId}`
+    `${BASE}/api/user/reviews/agent/${agentId}`,
+    { headers: token ? authHeader(token) : {} }
   );
   return res.data;
 }

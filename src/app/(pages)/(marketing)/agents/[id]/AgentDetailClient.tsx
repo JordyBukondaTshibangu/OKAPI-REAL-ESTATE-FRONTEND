@@ -127,6 +127,7 @@ export default function AgentDetailClient({
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewJustSubmitted, setReviewJustSubmitted] = useState(false);
   const { token, isAuthenticated, user } = useAuthStore();
   const { isAuthenticated: isAgentAuth } = useAgentSessionStore();
   const router = useRouter();
@@ -139,11 +140,11 @@ export default function AgentDetailClient({
   const forRentCount = agentProperties.filter((p) => p.listingType === "rent").length;
 
   useEffect(() => {
-    getAgentReviews(id)
+    getAgentReviews(id, token)
       .then(setReviews)
       .catch(() => {})
       .finally(() => setReviewsLoading(false));
-  }, [id]);
+  }, [id, token]);
 
   async function handleSubmitReview() {
     if (!isAuthenticated || !token) {
@@ -166,6 +167,7 @@ export default function AgentDetailClient({
       });
       setReviews((prev) => [review, ...prev]);
       setReviewSuccess(true);
+      setReviewJustSubmitted(true);
       setReviewRating(0);
       setReviewReactivite(0);
       setReviewProfessionnalisme(0);
@@ -179,7 +181,11 @@ export default function AgentDetailClient({
     }
   }
 
-  const alreadyReviewed = isAuthenticated && !!user && reviews.some((r) => r.user?.id === user.id);
+  // A review pending moderation (isVisible:false) won't come back in the refetched list,
+  // so also gate on reviewJustSubmitted to prevent duplicate submissions.
+  const alreadyReviewed =
+    reviewJustSubmitted ||
+    (isAuthenticated && !!user && reviews.some((r) => r.user?.id === user.id));
 
   const filteredProps = agentProperties.filter((p) =>
     propertiesTab === "sale"
@@ -508,10 +514,21 @@ export default function AgentDetailClient({
           {/* Submit review — hidden for agents and users who already reviewed */}
           {!isAgentAuth && (
             alreadyReviewed ? (
-              <div className="mb-6 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-5 flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
-                <p className="text-sm text-green-800 dark:text-green-300 font-medium">
-                  {da.alreadyReviewedMsg}
+              <div className={`mb-6 rounded-xl p-5 flex items-center gap-3 border ${
+                reviewJustSubmitted
+                  ? "bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-700"
+                  : "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800"
+              }`}>
+                {reviewJustSubmitted
+                  ? <span className="text-lg shrink-0">⏳</span>
+                  : <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+                }
+                <p className={`text-sm font-medium ${
+                  reviewJustSubmitted
+                    ? "text-yellow-800 dark:text-yellow-300"
+                    : "text-green-800 dark:text-green-300"
+                }`}>
+                  {reviewJustSubmitted ? da.reviewPendingMsg : da.alreadyReviewedMsg}
                 </p>
               </div>
             ) : (
@@ -647,33 +664,45 @@ export default function AgentDetailClient({
             </div>
           ) : (
             <div className="space-y-4">
-              {reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="border-t border-border pt-4 first:border-t-0 first:pt-0"
-                >
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">{da.verifiedUser}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <StarRatingDark value={review.rating} />
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(review.createdAt).toLocaleDateString("fr-FR", {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })}
-                        </span>
+              {reviews.map((review) => {
+                const isPending = review.isVisible === false;
+                return (
+                  <div
+                    key={review.id}
+                    className={`border-t pt-4 first:border-t-0 first:pt-0 ${
+                      isPending
+                        ? "border-yellow-300 bg-yellow-50 dark:bg-yellow-950/20 rounded-xl px-4 pb-4"
+                        : "border-border"
+                    }`}
+                  >
+                    {isPending && (
+                      <p className="text-xs text-yellow-700 dark:text-yellow-400 font-medium mb-2">
+                        ⏳ {da.reviewPendingMsg}
+                      </p>
+                    )}
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{da.verifiedUser}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <StarRatingDark value={review.rating} />
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(review.createdAt).toLocaleDateString("fr-FR", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    {review.comment && (
+                      <p className="text-sm text-foreground/80 leading-relaxed">
+                        {review.comment}
+                      </p>
+                    )}
                   </div>
-                  {review.comment && (
-                    <p className="text-sm text-foreground/80 leading-relaxed">
-                      {review.comment}
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

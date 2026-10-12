@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -80,6 +80,7 @@ export default function ProfilePage() {
     register: regProfile,
     handleSubmit: handleProfile,
     formState: { errors: profileErrors, isSubmitting: profileSubmitting },
+    reset: resetProfile,
   } = useForm<ProfileData>({
     resolver: zodResolver(makeProfileSchema(t)),
     defaultValues: {
@@ -89,6 +90,18 @@ export default function ProfilePage() {
       phoneNumber: user?.phoneNumber ?? "",
     },
   });
+
+  // Populate fields once the user is available (Zustand rehydrates after mount)
+  useEffect(() => {
+    if (user) {
+      resetProfile({
+        firstName: user.firstName ?? "",
+        lastName: user.lastName ?? "",
+        email: user.email ?? "",
+        phoneNumber: user.phoneNumber ?? "",
+      });
+    }
+  }, [user, resetProfile]);
 
   const {
     register: regPwd,

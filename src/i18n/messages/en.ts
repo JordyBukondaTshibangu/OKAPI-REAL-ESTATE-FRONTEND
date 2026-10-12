@@ -406,6 +406,7 @@ const en: Messages = {
       breadHome: "Home", breadFindAgent: "Find an agent",
       ratingsLabel: "reviews",
       alreadyReviewedMsg: "You have already left a review for this agent.",
+      reviewPendingMsg: "Your review is pending moderation. It will be visible shortly.",
       subRatingsTitle: "Detailed rating (optional)",
       ratingReactiviteLabel: "Responsiveness", ratingHonneteteLabel: "Honesty", ratingProfessionnalismeLabel: "Professionalism",
       propertyMatchLabel: "Did the property match the listing?", propertyMatchYes: "Yes", propertyMatchNo: "No", propertyMatchNotVisited: "I didn't visit the property",

@@ -407,6 +407,7 @@ const ln: Messages = {
       breadHome: "Ndako", breadFindAgent: "Luka agent",
       ratingsLabel: "makanisi",
       alreadyReviewedMsg: "Osimbi koloba makanisi mpo na agent oyo.",
+      reviewPendingMsg: "Makanisi na yo ezali na vérification. Ekozala na litatoli mike mike.",
       subRatingsTitle: "Litatoli ya mozindo (ata soki te)",
       ratingReactiviteLabel: "Kolongwa nokinoki", ratingHonneteteLabel: "Bosembo", ratingProfessionnalismeLabel: "Bosali malamu",
       propertyMatchLabel: "Ndako ekokani na litatoli?", propertyMatchYes: "Iyo", propertyMatchNo: "Te", propertyMatchNotVisited: "Nakomi kotala ndako te",
