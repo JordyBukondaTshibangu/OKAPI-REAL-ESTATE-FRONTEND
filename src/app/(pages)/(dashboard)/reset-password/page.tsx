@@ -45,7 +45,24 @@ function ResetPasswordForm() {
     }
     setApiError(null);
     try {
-      await resetPassword(token, data.password);
+      // Try user reset first; if the token is not found (400), try agent reset.
+      // Both user and agent forgot-password emails use the same link format,
+      // so we cannot know in advance which table holds the token.
+      try {
+        await resetPassword(token, data.password);
+      } catch (userErr: any) {
+        if (userErr?.response?.status === 400) {
+          // Token not found in User table — try Agent table
+          const res = await fetch("/api/auth/agent/reset-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token, password: data.password }),
+          });
+          if (!res.ok) throw new Error("agent_reset_failed");
+        } else {
+          throw userErr;
+        }
+      }
       setDone(true);
     } catch {
       setApiError(
