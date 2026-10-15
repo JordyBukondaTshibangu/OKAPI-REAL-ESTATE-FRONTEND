@@ -1397,6 +1397,22 @@ export type Messages = {
     reviewConfirmBtn: string;
     reviewEditBtn: string;
   };
+  supportPage: {
+    badge: string; heading: string; subtitle: string;
+    faqHeading: string;
+    q1: string; a1: string;
+    q2: string; a2: string;
+    q3: string; a3: string;
+    q4: string; a4: string;
+    q5: string; a5: string;
+    q6: string; a6: string;
+    contactHeading: string; contactSubtitle: string;
+    channelEmailLabel: string; channelEmailDesc: string; channelEmailBtn: string;
+    channelWhatsAppLabel: string; channelWhatsAppDesc: string; channelWhatsAppBtn: string;
+    channelContactLabel: string; channelContactDesc: string; channelContactBtn: string;
+    linksHeading: string;
+    linkTerms: string; linkPrivacy: string; linkCookies: string; linkContact: string;
+  };
   deleteAccountPage: {
     badge: string; heading: string; subtitle: string;
     whatTitle: string; whatItems: string[];
